@@ -1,0 +1,38 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+app/android/.gradle/
+app/android/local.properties
+app/ios/Pods/
+app/ios/Flutter/Generated.xcconfig
+
+# Rust
+target/
+**/*.rs.bk
+
+# WASM output
+pkg/
+app/web/pkg/
+
+# OS / editores
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Dados genômicos reais nunca vão para o repositório
+*.vcf
+*.vcf.gz
+*.bcf
+*.bam
+*.cram
+!test_fixtures/**
+
+# Artigos com copyright de editora: ficam só localmente (ver docs/referencias/artigos/README.md)
+docs/referencias/artigos/*.pdf
