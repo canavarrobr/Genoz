@@ -17,7 +17,7 @@ Os dados genômicos são processados no próprio dispositivo; nada é enviado a 
 |---|---|
 | 1 — Núcleo Rust: leitura de VCF | concluído |
 | 2 — Comparação, filtros e QC | concluído |
-| 3 — App Flutter + ponte + persistência | próximo |
+| 3 — App Flutter + ponte + persistência | em andamento |
 
 ## Preparar o computador (Windows)
 
@@ -50,11 +50,25 @@ A pasta `resultado` recebe `rows.bgz` + `rows.idx` (tabela paginável), `summary
 
 `inspect` mostra: validade, SHA-256, compressão, build (GRCh37/38), estilo dos cromossomos, contagens por tipo e cromossomo, genótipos por amostra e cada problema com o número da linha.
 
+## Rodar o app (Módulo 3)
+
+Com o emulador Android aberto (ou um celular com depuração USB), no PowerShell:
+
+```powershell
+cd app
+flutter run
+```
+
+Na primeira vez a compilação demora alguns minutos, porque o núcleo Rust é compilado para Android.
+No app: **Novo projeto → Gerar exemplo sintético** (ou **Importar VCF**) → toque no arquivo para ver o relatório.
+
 ## Estrutura
 
 ```
 rust/genoz_core   núcleo científico (compartilhado por Web, Android e iOS)
 rust/genoz_cli    ferramenta de linha de comando para desenvolvimento
+app/              app Flutter (Android, iOS, Web)
+app/rust          ponte Flutter ↔ núcleo (flutter_rust_bridge), sem lógica científica
 test_fixtures/    VCFs de teste (fictícios)
 tools/            scripts de ambiente
 docs/             especificação, módulos, ADRs, referências

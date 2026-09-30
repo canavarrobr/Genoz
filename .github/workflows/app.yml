@@ -1,0 +1,40 @@
+name: App Flutter
+
+on:
+  push:
+    paths: ["app/**", "rust/**", ".github/workflows/app.yml"]
+  pull_request:
+    paths: ["app/**", "rust/**", ".github/workflows/app.yml"]
+
+jobs:
+  analisar-e-testar:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Código gerado está atualizado (Drift, freezed, traduções)
+        run: |
+          dart run build_runner build --delete-conflicting-outputs
+          flutter gen-l10n
+          git diff --exit-code -- lib
+      - run: flutter analyze
+      - run: flutter test
+
+  ponte-rust:
+    name: ponte Rust compila
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app/rust
+      - run: cargo build
+        working-directory: app/rust

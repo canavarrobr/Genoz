@@ -213,3 +213,34 @@ Aceite: site público compara dois VCFs com a rede desligada; resultados idênti
 **Testes:** cada categoria com fixtures A/B feitos à mão; gVCF; BED; ordenação incompatível (modo memória = modo streaming); build incompatível; filtros; estatísticas (Ti/Tv etc.) em casos calculados à mão; paginação; determinismo dos hashes; identidade A×A (tudo Shared).
 
 **Status:** concluído em 29/09/2026 (69 testes; resultado byte a byte idêntico entre execuções; ~600 mil × 600 mil variantes em ~10 s no PC, memória constante).
+
+---
+
+## Contrato do Módulo 3 (antes de implementar)
+
+**Entradas:** ações do usuário no app (criar/abrir/renomear/apagar projeto; importar VCF pelo seletor de arquivos; gerar dataset sintético de exemplo).
+
+**Saídas:**
+- projetos e arquivos importados persistidos localmente (sobrevivem a fechar o app e a atualizações);
+- cada arquivo importado com: nome, SHA-256, tamanho, compressão, versão VCF, build, amostras, veredito e relatório de validação completo;
+- tela de resumo por arquivo (veredito, build, amostras com contagens, tipos, problemas por linha).
+
+**Arquitetura:**
+- `app/` Flutter (Riverpod, go_router, gen-l10n pt-BR/en, Material 3 claro/escuro);
+- `app/rust/` crate `genoz_bridge` (flutter_rust_bridge v2) que só adapta o `genoz_core` — nenhuma lógica científica nova;
+- `app/lib/persistence/` Drift (SQLite) atrás de repositórios; migrações automáticas por versão de esquema;
+- arquivos genômicos copiados para a pasta privada do app (`projetos/<id>/arquivos/`), nunca para o banco;
+- interface `GenozCore` em Dart com implementação Rust e implementação falsa para testes.
+
+**Invariantes:**
+- nenhuma chamada de rede; nenhum genótipo em logs;
+- importação com progresso e cancelamento; a interface não congela;
+- apagar projeto remove banco + arquivos + resultados;
+- o banco guarda metadados; o genoma continua arquivo.
+
+**Erros:** arquivo que não é VCF (mensagem do núcleo em português); cancelamento pelo usuário; falta de espaço; arquivo ilegível.
+
+**Testes:** repositórios (Drift em memória) com migração; importação com núcleo falso; widgets principais; teste de integração no emulador: criar projeto → importar 2 VCFs → ver resumo → reiniciar → dados continuam.
+
+**Status:** concluído em 29/09/2026. Verificado no emulador Android (API 35): criar projeto → gerar exemplo sintético (Rust) → importar VCF pelo seletor do sistema → relatório → fechar à força e reabrir (dados mantidos) → apagar projeto (arquivos removidos). SHA-256 no Android idêntico ao do PC. 11 testes Dart + 80 Rust.
+Limitações conhecidas (tratadas nos próximos módulos): mensagens vindas do núcleo (ex.: evidências do build) ficam sempre em português; no Android, arquivos `content://` são copiados pelo Dart antes da validação (Módulo 6 pode otimizar); o controlador de importação é único para o app todo.

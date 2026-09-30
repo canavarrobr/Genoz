@@ -1,0 +1,118 @@
+{
+  "core_version": "0.1.0",
+  "digest": {
+    "sha256": "4f5a21b1c07ff3bcb01fbf8a7644c5216b1ce03b4cdc55ffc9983aa0a304366a",
+    "bytes": 428
+  },
+  "compression": "none",
+  "file_format": "VCFv4.3",
+  "build": {
+    "build": "GRCh37",
+    "confidence": "high",
+    "evidence": [
+      "contig 1 com comprimento 249250621 = GRCh37"
+    ]
+  },
+  "chrom_style": "mixed",
+  "contigs_in_header": 1,
+  "info_fields": 0,
+  "format_fields": 1,
+  "samples": [
+    {
+      "name": "S1",
+      "hom_ref": 0,
+      "het": 3,
+      "hom_alt": 1,
+      "missing": 0
+    }
+  ],
+  "records_read": 9,
+  "records_ok": 4,
+  "records_rejected": 5,
+  "multiallelic": 0,
+  "biallelic_after_split": 4,
+  "by_kind": {
+    "snv": 4
+  },
+  "by_chrom": [
+    {
+      "chrom": "1",
+      "raw": "1",
+      "records": 3
+    },
+    {
+      "chrom": "7",
+      "raw": "chr7",
+      "records": 1
+    }
+  ],
+  "filter_pass": 4,
+  "filter_failed": 0,
+  "filter_missing": 0,
+  "sorted": false,
+  "errors": 5,
+  "warnings": 3,
+  "issue_counts": {
+    "sample_count_mismatch": 1,
+    "invalid_pos": 1,
+    "invalid_ref": 1,
+    "invalid_alt": 1,
+    "invalid_qual": 1,
+    "genotype_allele_out_of_range": 1,
+    "contig_not_in_header": 1,
+    "unsorted_positions": 1
+  },
+  "issues": [
+    {
+      "line": 6,
+      "severity": "error",
+      "code": "invalid_pos",
+      "message": "posição inválida: 'abc'"
+    },
+    {
+      "line": 7,
+      "severity": "error",
+      "code": "invalid_ref",
+      "message": "REF inválido: 'Z' (use apenas A, C, G, T, N)"
+    },
+    {
+      "line": 8,
+      "severity": "error",
+      "code": "invalid_alt",
+      "message": "ALT inválido: 'G!'"
+    },
+    {
+      "line": 9,
+      "severity": "error",
+      "code": "genotype_allele_out_of_range",
+      "message": "genótipo da amostra S1 usa alelo inexistente (há 1 ALT)"
+    },
+    {
+      "line": 10,
+      "severity": "error",
+      "code": "sample_count_mismatch",
+      "message": "esperadas 10 colunas (1 amostras), encontradas 9"
+    },
+    {
+      "line": 11,
+      "severity": "warning",
+      "code": "invalid_qual",
+      "message": "QUAL inválido: 'alto'; tratado como ausente"
+    },
+    {
+      "line": 12,
+      "severity": "warning",
+      "code": "unsorted_positions",
+      "message": "posições fora de ordem em '1'; o arquivo não poderá ser indexado"
+    },
+    {
+      "line": 13,
+      "severity": "warning",
+      "code": "contig_not_in_header",
+      "message": "cromossomo 'chr7' não está declarado no cabeçalho"
+    }
+  ],
+  "issues_truncated": false,
+  "fatal": null,
+  "verdict": "partially_valid"
+}

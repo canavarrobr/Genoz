@@ -1,0 +1,83 @@
+{
+  "core_version": "0.1.0",
+  "digest": {
+    "sha256": "7fb7ff611d31cd67ffb56c86df4ffb766386cb6ce3388072c182896223837122",
+    "bytes": 1887
+  },
+  "compression": "none",
+  "file_format": "VCFv4.3",
+  "build": {
+    "build": "GRCh38",
+    "confidence": "high",
+    "evidence": [
+      "contig chr1 com comprimento 248956422 = GRCh38",
+      "contig chr2 com comprimento 242193529 = GRCh38",
+      "contig chrX com comprimento 156040895 = GRCh38"
+    ]
+  },
+  "chrom_style": "ucsc",
+  "contigs_in_header": 4,
+  "info_fields": 4,
+  "format_fields": 5,
+  "samples": [
+    {
+      "name": "AMOSTRA_A",
+      "hom_ref": 0,
+      "het": 6,
+      "hom_alt": 3,
+      "missing": 0
+    },
+    {
+      "name": "AMOSTRA_B",
+      "hom_ref": 3,
+      "het": 2,
+      "hom_alt": 3,
+      "missing": 1
+    }
+  ],
+  "records_read": 9,
+  "records_ok": 9,
+  "records_rejected": 0,
+  "multiallelic": 1,
+  "biallelic_after_split": 10,
+  "by_kind": {
+    "snv": 6,
+    "mnv": 1,
+    "insertion": 1,
+    "deletion": 1,
+    "structural": 1
+  },
+  "by_chrom": [
+    {
+      "chrom": "1",
+      "raw": "chr1",
+      "records": 5
+    },
+    {
+      "chrom": "2",
+      "raw": "chr2",
+      "records": 2
+    },
+    {
+      "chrom": "X",
+      "raw": "chrX",
+      "records": 1
+    },
+    {
+      "chrom": "MT",
+      "raw": "chrM",
+      "records": 1
+    }
+  ],
+  "filter_pass": 7,
+  "filter_failed": 1,
+  "filter_missing": 1,
+  "sorted": true,
+  "errors": 0,
+  "warnings": 0,
+  "issue_counts": {},
+  "issues": [],
+  "issues_truncated": false,
+  "fatal": null,
+  "verdict": "valid"
+}

@@ -1,0 +1,78 @@
+{
+  "core_version": "0.1.0",
+  "digest": {
+    "sha256": "7759ce0e525e5f2ca9e59e34af1fd5643f57cf871a4c7e4813ccd5b2efa89bd5",
+    "bytes": 15000
+  },
+  "compression": "bgzf",
+  "file_format": "VCFv4.3",
+  "build": {
+    "build": "GRCh38",
+    "confidence": "high",
+    "evidence": [
+      "contig chr20 com comprimento 64444167 = GRCh38",
+      "contig chr21 com comprimento 46709983 = GRCh38",
+      "contig chr22 com comprimento 50818468 = GRCh38"
+    ]
+  },
+  "chrom_style": "ucsc",
+  "contigs_in_header": 3,
+  "info_fields": 2,
+  "format_fields": 4,
+  "samples": [
+    {
+      "name": "SINT_1",
+      "hom_ref": 158,
+      "het": 148,
+      "hom_alt": 129,
+      "missing": 14
+    },
+    {
+      "name": "SINT_2",
+      "hom_ref": 148,
+      "het": 165,
+      "hom_alt": 129,
+      "missing": 7
+    },
+    {
+      "name": "SINT_3",
+      "hom_ref": 154,
+      "het": 169,
+      "hom_alt": 120,
+      "missing": 6
+    }
+  ],
+  "records_read": 449,
+  "records_ok": 449,
+  "records_rejected": 0,
+  "multiallelic": 9,
+  "biallelic_after_split": 458,
+  "by_kind": {
+    "snv": 399,
+    "insertion": 27,
+    "deletion": 32
+  },
+  "by_chrom": [
+    {
+      "chrom": "20",
+      "raw": "chr20",
+      "records": 295
+    },
+    {
+      "chrom": "21",
+      "raw": "chr21",
+      "records": 154
+    }
+  ],
+  "filter_pass": 439,
+  "filter_failed": 10,
+  "filter_missing": 0,
+  "sorted": true,
+  "errors": 0,
+  "warnings": 0,
+  "issue_counts": {},
+  "issues": [],
+  "issues_truncated": false,
+  "fatal": "o arquivo terminou antes do esperado (download incompleto ou arquivo truncado)",
+  "verdict": "invalid"
+}
