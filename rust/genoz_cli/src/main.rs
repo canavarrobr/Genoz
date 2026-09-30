@@ -6,6 +6,11 @@
 //!   genoz-cli hash amostra.vcf.gz
 //!   genoz-cli synth --out sintetico.vcf.gz --seed 42 --samples 3
 //!   genoz-cli split entrada.vcf.gz --out normalizado.vcf.gz
+//!   genoz-cli compare a.vcf.gz b.vcf.gz --out resultado/
+//!   genoz-cli view resultado/ --category only_a --page 2
+//!   genoz-cli stats amostra.vcf.gz
+
+mod analysis;
 
 use std::fs::File;
 use std::io::{BufWriter, Write};
@@ -68,6 +73,12 @@ enum Command {
         #[arg(long)]
         out: PathBuf,
     },
+    /// Compara duas amostras (A × B) e grava o resultado paginável + manifesto.
+    Compare(analysis::CompareArgs),
+    /// Estatísticas de QC de uma amostra (Ti/Tv, het/hom, profundidade...).
+    Stats(analysis::StatsArgs),
+    /// Mostra as linhas de um resultado de comparação, com filtros e páginas.
+    View(analysis::ViewArgs),
 }
 
 #[derive(Clone, Copy, ValueEnum)]
@@ -145,6 +156,9 @@ fn run(cli: Cli) -> Result<ExitCode, GenozError> {
             println!("{written} registros gravados em {}; {rejected} linhas inválidas descartadas", out.display());
             Ok(ExitCode::SUCCESS)
         }
+        Command::Compare(args) => analysis::compare_cmd(args).map(|()| ExitCode::SUCCESS),
+        Command::Stats(args) => analysis::stats_cmd(args).map(|()| ExitCode::SUCCESS),
+        Command::View(args) => analysis::view_cmd(args).map(|()| ExitCode::SUCCESS),
     }
 }
 

@@ -13,8 +13,8 @@ Um APK e um site de prévia aparecem já nos Módulos 5 e 6, para você testar c
 
 | # | Módulo | Resultado que você vê | Plataforma |
 |---|---|---|---|
-| 1 | Núcleo Rust: leitura de VCF | Ferramenta de linha de comando que valida um VCF, calcula SHA-256 e mostra um resumo | PC |
-| 2 | Núcleo Rust: comparação, filtros e QC | Mesma ferramenta compara A×B, filtra e gera estatísticas | PC |
+| 1 ✅ | Núcleo Rust: leitura de VCF | Ferramenta de linha de comando que valida um VCF, calcula SHA-256 e mostra um resumo | PC |
+| 2 ✅ | Núcleo Rust: comparação, filtros e QC | Mesma ferramenta compara A×B, filtra e gera estatísticas | PC |
 | 3 | App Flutter + ponte + persistência | App abre, cria projetos e importa VCF usando o núcleo Rust | Android (emulador) |
 | 4 | Telas de análise | Comparação, tabela, filtros, QC, exportação e manifesto no app | Android (emulador) |
 | 5 | Web local-first | **Site de prévia** (GitHub Pages) comparando VCF no navegador sem upload | Web |
@@ -169,3 +169,43 @@ Aceite: site público compara dois VCFs com a rede desligada; resultados idênti
 **Erros:** arquivo inexistente/ilegível; gzip corrompido/truncado; cabeçalho ausente ou sem `#CHROM`; linha com colunas insuficientes; POS não numérico; REF/ALT inválidos; GT inconsistente com o número de alelos; nº de amostras divergente. Erros fatais param; problemas por linha viram entradas no relatório (com limite configurável).
 
 **Testes:** unitários de parser, GT, tipo de variante, harmonização, build, split multialélico, hash; integração com fixtures; arquivos malformados; gzip truncado; determinismo do gerador sintético; propriedade (proptest) "parse→serializa→parse" estável.
+
+**Status:** concluído em 29/09/2026 (43 testes; CI verde em Linux, Windows, macOS e wasm32).
+
+---
+
+## Contrato do Módulo 2 (antes de implementar)
+
+**Entradas:**
+- dois VCFs (A e B), cada um com: seletor de amostra (primeira, índice ou nome), BED opcional de regiões chamáveis;
+- `CallFilter` (portão de qualidade): somente PASS, QUAL/DP/GQ mínimos, condições sobre campos INFO/FORMAT;
+- amostra "verdade" opcional (A ou B) para métricas de benchmark.
+
+**Saídas:**
+- linhas de comparação `ComparisonRow` (chave `CHROM:POS:REF:ALT` normalizada + categoria + visão de cada lado);
+- `CompareSummary`: contagens por categoria, por tipo e por cromossomo; concordância de genótipos, Jaccard; precisão/sensibilidade/F1 (se houver verdade), separados para SNV e indel;
+- `SampleStats` de cada amostra (QC): Ti/Tv, het/hom, histogramas de QUAL/DP/GQ, comprimento de indels, densidade por 1 Mb, heterozigosidade do X fora das PAR;
+- pacote de resultado: `rows.bgz` (BGZF) + `rows.idx` (índice a cada 1024 linhas, paginação rápida) + `summary.json` + `stats_a.json` + `stats_b.json` + `manifest.json`.
+
+**Categorias:**
+
+| Categoria | Regra |
+|---|---|
+| Shared | as duas amostras carregam o alelo, com o mesmo genótipo |
+| GenotypeDifference | as duas carregam o alelo, com genótipos diferentes (ex.: 0/1 × 1/1) |
+| OnlyA / OnlyB | só um lado carrega; o outro tem 0/0 explícito, bloco de referência gVCF, está dentro do BED chamável, ou simplesmente não tem o registro (evidência "ausente" registrada) |
+| MissingUncertain | um lado carrega e o outro tem genótipo ausente (`./.`) ou não passou no portão de qualidade; ou só há chamadas de baixa qualidade |
+| NotAssessed | um lado carrega e a posição está fora do BED chamável do outro |
+
+**Invariantes:**
+- builds diferentes (GRCh37 × GRCh38 com confiança) → comparação recusada com explicação;
+- `chr1` e `1` são o mesmo cromossomo; multialélicos são divididos e aparados antes da comparação;
+- modo streaming quando os dois arquivos estão ordenados de forma compatível (memória constante); caso contrário, modo em memória, informado no resumo;
+- mesmas entradas + parâmetros → mesmos bytes em `rows.bgz`, `rows.idx` e `summary.json` (o horário fica só no manifesto);
+- ID da análise derivado do conteúdo (hash das entradas + parâmetros), para reprodutibilidade.
+
+**Erros:** build incompatível; amostra inexistente (lista as disponíveis); BED malformado (linha e motivo); falhas de leitura.
+
+**Testes:** cada categoria com fixtures A/B feitos à mão; gVCF; BED; ordenação incompatível (modo memória = modo streaming); build incompatível; filtros; estatísticas (Ti/Tv etc.) em casos calculados à mão; paginação; determinismo dos hashes; identidade A×A (tudo Shared).
+
+**Status:** concluído em 29/09/2026 (69 testes; resultado byte a byte idêntico entre execuções; ~600 mil × 600 mil variantes em ~10 s no PC, memória constante).

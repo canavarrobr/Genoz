@@ -2,7 +2,7 @@
 
 use std::fmt::Write as _;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::chrom::canonical_chrom;
 use crate::header::VcfHeader;
@@ -108,7 +108,7 @@ pub enum Filter {
     Failed(Vec<String>),
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum VariantKind {
     Snv,

@@ -16,7 +16,8 @@ Os dados genômicos são processados no próprio dispositivo; nada é enviado a 
 | Módulo | Situação |
 |---|---|
 | 1 — Núcleo Rust: leitura de VCF | concluído |
-| 2 — Comparação, filtros e QC | próximo |
+| 2 — Comparação, filtros e QC | concluído |
+| 3 — App Flutter + ponte + persistência | próximo |
 
 ## Preparar o computador (Windows)
 
@@ -36,6 +37,16 @@ cargo run --release -p genoz_cli -- synth --out demo.vcf.gz --samples 3
 cargo run --release -p genoz_cli -- inspect demo.vcf.gz
 cargo run --release -p genoz_cli -- inspect ..\test_fixtures\vcf\invalid_records.vcf
 ```
+
+Comparação A × B (Módulo 2):
+
+```powershell
+cargo run --release -p genoz_cli -- compare ..\test_fixtures\compare\pessoa_a.vcf ..\test_fixtures\compare\pessoa_b.vcf --out resultado --bed-b ..\test_fixtures\compare\pessoa_b_chamavel.bed
+cargo run --release -p genoz_cli -- view resultado --category only_a,only_b
+cargo run --release -p genoz_cli -- stats ..\test_fixtures\vcf\valid_small_grch38_chr.vcf
+```
+
+A pasta `resultado` recebe `rows.bgz` + `rows.idx` (tabela paginável), `summary.json`, `stats_a.json`, `stats_b.json` e `manifest.json` (reprodutibilidade).
 
 `inspect` mostra: validade, SHA-256, compressão, build (GRCh37/38), estilo dos cromossomos, contagens por tipo e cromossomo, genótipos por amostra e cada problema com o número da linha.
 

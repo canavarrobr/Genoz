@@ -8,3 +8,4 @@ As decisões tomadas durante o desenvolvimento ficam registradas aqui, uma por a
 | [ADR-007](ADR-007-toolchain-rust-windows.md) | Toolchain Rust GNU + MinGW em `C:\mingw64` no Windows | 1 |
 | [ADR-008](ADR-008-nucleo-sobre-read.md) | Núcleo trabalha sobre `Read`, não sobre caminhos | 1 |
 | [ADR-009](ADR-009-divisao-multialelicos.md) | Convenção de divisão de multialélicos | 1 |
+| [ADR-010](ADR-010-ausencia-nao-e-referencia.md) | Ausência de registro não é genótipo de referência | 2 |

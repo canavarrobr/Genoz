@@ -10,15 +10,22 @@
 //! mesmo código rode no navegador (WASM), no celular e no PC.
 
 pub mod build;
+pub mod call;
 pub mod chrom;
+pub mod compare;
 pub mod digest;
 pub mod error;
+pub mod filter;
 pub mod header;
 pub mod inspect;
 pub mod io;
+pub mod manifest;
 pub mod normalize;
 pub mod reader;
 pub mod record;
+pub mod regions;
+pub mod results;
+pub mod stats;
 pub mod synth;
 pub mod writer;
 

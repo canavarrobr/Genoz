@@ -5,7 +5,7 @@
 //! então a leitura usa `MultiGzDecoder`; a distinção importa porque só BGZF
 //! pode ser indexado (tabix/CSI).
 
-use std::io::{self, BufRead, BufReader, Read, Write};
+use std::io::{self, BufRead, BufReader, Read, Seek, SeekFrom, Write};
 
 use flate2::read::MultiGzDecoder;
 use flate2::write::DeflateEncoder;
@@ -73,11 +73,18 @@ pub const BGZF_EOF: [u8; 28] = [
 pub struct BgzfWriter<W: Write> {
     inner: W,
     buf: Vec<u8>,
+    /// Bytes compactados já gravados (início do próximo bloco).
+    compressed_pos: u64,
 }
 
 impl<W: Write> BgzfWriter<W> {
     pub fn new(inner: W) -> Self {
-        Self { inner, buf: Vec::with_capacity(BGZF_BLOCK_DATA) }
+        Self { inner, buf: Vec::with_capacity(BGZF_BLOCK_DATA), compressed_pos: 0 }
+    }
+
+    /// Offset virtual BGZF da próxima escrita: `(offset do bloco << 16) | offset no bloco`.
+    pub fn virtual_offset(&self) -> u64 {
+        (self.compressed_pos << 16) | self.buf.len() as u64
     }
 
     fn write_block(&mut self, data: &[u8]) -> io::Result<()> {
@@ -92,6 +99,7 @@ impl<W: Write> BgzfWriter<W> {
         self.inner.write_all(&cdata)?;
         self.inner.write_all(&crc32fast::hash(data).to_le_bytes())?;
         self.inner.write_all(&(data.len() as u32).to_le_bytes())?;
+        self.compressed_pos += u64::from(bsize) + 1;
         Ok(())
     }
 
@@ -124,6 +132,80 @@ impl<W: Write> Write for BgzfWriter<W> {
     }
 }
 
+/// Leitor BGZF com acesso aleatório por offset virtual.
+pub struct BgzfReader<R: Read + Seek> {
+    inner: R,
+    block: Vec<u8>,
+    pos: usize,
+    cdata: Vec<u8>,
+}
+
+impl<R: Read + Seek> BgzfReader<R> {
+    pub fn new(inner: R) -> Self {
+        Self { inner, block: Vec::new(), pos: 0, cdata: Vec::new() }
+    }
+
+    /// Lê o próximo bloco. `false` no fim do arquivo.
+    fn read_block(&mut self) -> io::Result<bool> {
+        loop {
+            let mut header = [0u8; 18];
+            match self.inner.read_exact(&mut header) {
+                Ok(()) => {}
+                Err(e) if e.kind() == io::ErrorKind::UnexpectedEof => return Ok(false),
+                Err(e) => return Err(e),
+            }
+            if detect_compression(&header) != Compression::Bgzf {
+                return Err(io::Error::new(io::ErrorKind::InvalidData, "bloco BGZF inválido"));
+            }
+            let bsize = u16::from_le_bytes([header[16], header[17]]) as usize;
+            let rest = (bsize + 1)
+                .checked_sub(18)
+                .filter(|r| *r >= 8)
+                .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "tamanho de bloco BGZF inválido"))?;
+            self.cdata.resize(rest, 0);
+            self.inner.read_exact(&mut self.cdata)?;
+            let isize = u32::from_le_bytes(self.cdata[rest - 4..].try_into().expect("4 bytes")) as usize;
+            self.block.clear();
+            self.block.reserve(isize);
+            flate2::read::DeflateDecoder::new(&self.cdata[..rest - 8]).read_to_end(&mut self.block)?;
+            if self.block.len() != isize {
+                return Err(io::Error::new(io::ErrorKind::InvalidData, "bloco BGZF corrompido"));
+            }
+            self.pos = 0;
+            if !self.block.is_empty() {
+                return Ok(true);
+            }
+        }
+    }
+
+    /// Posiciona a leitura num offset virtual obtido de [`BgzfWriter::virtual_offset`].
+    pub fn seek_virtual(&mut self, voffset: u64) -> io::Result<()> {
+        self.inner.seek(SeekFrom::Start(voffset >> 16))?;
+        self.block.clear();
+        self.pos = 0;
+        let within = (voffset & 0xffff) as usize;
+        if self.read_block()? {
+            if within > self.block.len() {
+                return Err(io::Error::new(io::ErrorKind::InvalidData, "offset virtual fora do bloco"));
+            }
+            self.pos = within;
+        }
+        Ok(())
+    }
+}
+
+impl<R: Read + Seek> Read for BgzfReader<R> {
+    fn read(&mut self, out: &mut [u8]) -> io::Result<usize> {
+        if self.pos >= self.block.len() && !self.read_block()? {
+            return Ok(0);
+        }
+        let n = out.len().min(self.block.len() - self.pos);
+        out[..n].copy_from_slice(&self.block[self.pos..self.pos + n]);
+        self.pos += n;
+        Ok(n)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -145,6 +227,32 @@ mod tests {
         let mut out = Vec::new();
         r.read_to_end(&mut out).unwrap();
         assert_eq!(out, data);
+    }
+
+    #[test]
+    fn virtual_offsets_allow_random_access() {
+        let mut w = BgzfWriter::new(Vec::new());
+        let mut marks = Vec::new();
+        for i in 0..50_000u32 {
+            if i % 997 == 0 {
+                marks.push((i, w.virtual_offset()));
+            }
+            writeln!(w, "linha {i}").unwrap();
+        }
+        let packed = w.finish().unwrap();
+        let mut r = BgzfReader::new(std::io::Cursor::new(packed));
+        for (i, voff) in marks.iter().rev() {
+            r.seek_virtual(*voff).unwrap();
+            let mut line = String::new();
+            BufReader::new(&mut r).read_line(&mut line).unwrap();
+            assert_eq!(
+                line,
+                format!(
+                    "linha {i}
+"
+                )
+            );
+        }
     }
 
     #[test]

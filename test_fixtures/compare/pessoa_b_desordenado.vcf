@@ -1,0 +1,16 @@
+##fileformat=VCFv4.3
+##source=genoz fixture de comparação (dados fictícios)
+##contig=<ID=1,length=248956422>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genótipo">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Profundidade">
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Qualidade do genótipo">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	PESSOA_B
+1	5000	.	A	C	50	PASS	.	GT:DP:GQ	0/0:20:60
+1	1000	.	A	G	50	PASS	.	GT:DP:GQ	0/1:20:60
+1	11000	.	C	G	50	PASS	.	GT:DP:GQ	0|1:20:60
+1	2000	.	C	T	50	PASS	.	GT:DP:GQ	1/1:20:60
+1	4000	syn4	T	C	50	PASS	.	GT:DP:GQ	0/1:20:60
+1	6000	.	G	T	50	PASS	.	GT:DP:GQ	./.:20:60
+1	7000	.	A	G	50	PASS	.	GT:DP:GQ	0/1:20:60
+1	8001	.	A	G	50	PASS	.	GT:DP:GQ	0/1:20:60
+1	10000	.	T	TA	50	PASS	.	GT:DP:GQ	0/1:20:60

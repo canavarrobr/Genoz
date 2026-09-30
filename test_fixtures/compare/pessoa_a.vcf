@@ -1,0 +1,17 @@
+##fileformat=VCFv4.3
+##source=genoz fixture de comparação (dados fictícios)
+##contig=<ID=chr1,length=248956422>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genótipo">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Profundidade">
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Qualidade do genótipo">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	PESSOA_A
+chr1	1000	syn1	A	G	50	PASS	.	GT:DP:GQ	0/1:20:60
+chr1	2000	.	C	T	50	PASS	.	GT:DP:GQ	0/1:20:60
+chr1	3000	.	G	A	50	PASS	.	GT:DP:GQ	1/1:20:60
+chr1	5000	.	A	C	50	PASS	.	GT:DP:GQ	0/1:20:60
+chr1	6000	.	G	T	50	PASS	.	GT:DP:GQ	0/1:20:60
+chr1	7000	.	A	G,T	50	PASS	.	GT:DP:GQ	1/2:20:60
+chr1	8000	.	CAT	CGT	50	PASS	.	GT:DP:GQ	0/1:20:60
+chr1	9000	.	A	G	50	PASS	.	GT:DP:GQ	0/1:20:5
+chr1	10000	.	T	TA	50	PASS	.	GT:DP:GQ	0/1:20:60
+chr1	11000	.	C	G	50	PASS	.	GT:DP:GQ	1/0:20:60
