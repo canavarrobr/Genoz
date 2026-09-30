@@ -43,6 +43,11 @@ else { Falta "MinGW (as.exe/dlltool.exe) fora do PATH" "rode .\tools\setup.ps1 (
 # Flutter
 $flutter = Versao flutter
 if ($flutter) { Ok "Flutter: $flutter" } else { Falta "Flutter não encontrado" "instale o Flutter e adicione flutter\bin ao PATH" }
+$flutterPath = (Get-Command flutter -ErrorAction SilentlyContinue).Source
+if ($flutterPath -and $flutterPath -match ' ') {
+    # Hooks de "native assets" (sqlite3, objective_c) falham com espaço no caminho do SDK.
+    Falta "o caminho do Flutter tem espaço: $flutterPath" "crie um atalho sem espaço: cmd /c mklink /J C:\flutter <pasta do Flutter> e use C:\flutter\bin no PATH"
+} elseif ($flutterPath) { Ok "caminho do Flutter sem espaço: $(Split-Path $flutterPath)" }
 
 # Java / Android
 $jdk = $null

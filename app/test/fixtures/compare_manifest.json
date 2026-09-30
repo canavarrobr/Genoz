@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "analysis_id": "c7e0bc9d-f41f-8309-b678-5e20bea871b2",
+  "analysis_type": "compare",
+  "app_version": null,
+  "core_version": "0.1.0",
+  "platform": "cli-windows-x86_64",
+  "created_at": "2026-09-30T18:06:38Z",
+  "inputs": [
+    {
+      "role": "a",
+      "name": "pessoa_a.vcf",
+      "sha256": "3198114255695529607571549ceb3a276242c01cb9dda698857b4ff36cb3a1ae",
+      "bytes": 835,
+      "build": "GRCh38 (hg38)",
+      "sample": "PESSOA_A"
+    },
+    {
+      "role": "b",
+      "name": "pessoa_b.vcf",
+      "sha256": "8c053b4464fcb04ac6f4b4f0593bb3c7e8aa7957bd153a09b3d49bd563df3699",
+      "bytes": 755,
+      "build": "GRCh38 (hg38)",
+      "sample": "PESSOA_B"
+    }
+  ],
+  "parameters": {
+    "options": {
+      "allow_build_mismatch": false,
+      "call_filter": {
+        "conditions": [],
+        "min_dp": null,
+        "min_gq": null,
+        "min_qual": null,
+        "pass_only": false
+      },
+      "force_in_memory": false,
+      "truth": null
+    },
+    "sample_a": {
+      "by": "first"
+    },
+    "sample_b": {
+      "by": "first"
+    }
+  },
+  "annotation_sources": [],
+  "outputs": [
+    {
+      "name": "rows.bgz",
+      "sha256": "638d9909268189cd83a70f6a0b10f17a6d54ac4a8866cdf9308dfabe0340ae3a",
+      "bytes": 368
+    },
+    {
+      "name": "rows.idx",
+      "sha256": "02fe1e4764caad8c654f26851cbae9ddf8d2f565b5490b490ee5cd46521efe2d",
+      "bytes": 32
+    },
+    {
+      "name": "summary.json",
+      "sha256": "9e2a95a041bbbbaf0ee1ed7ce8b25b212c974d2bbf632065ade1ed600c297629",
+      "bytes": 1697
+    },
+    {
+      "name": "stats_a.json",
+      "sha256": "87a413fb5594869892b15c0cb3c34d26df7a1e1f7da1ca6e5748c33686f20f9d",
+      "bytes": 2634
+    },
+    {
+      "name": "stats_b.json",
+      "sha256": "f433a4f7f2633ee42d2fae178b45b5ef58362ea0f7a4a99df33747988dc3bce9",
+      "bytes": 2637
+    }
+  ],
+  "status": "completed",
+  "disclaimer": "Uso educacional e de pesquisa. Não é diagnóstico."
+}

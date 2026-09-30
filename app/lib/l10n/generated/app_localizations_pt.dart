@@ -343,4 +343,359 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get fileMenuReport => 'Ver relatório';
+
+  @override
+  String get compareTitle => 'Comparar A × B';
+
+  @override
+  String get compareNeedsFiles =>
+      'Importe ao menos um arquivo VCF para comparar.';
+
+  @override
+  String get sideA => 'Amostra A';
+
+  @override
+  String get sideB => 'Amostra B';
+
+  @override
+  String get chooseFile => 'Arquivo';
+
+  @override
+  String get chooseSample => 'Amostra';
+
+  @override
+  String get firstSample => '(primeira do arquivo)';
+
+  @override
+  String get qualityGate => 'Portão de qualidade';
+
+  @override
+  String get qualityGateHint =>
+      'Chamadas reprovadas viram “incertas”, nunca “ausentes”.';
+
+  @override
+  String get passOnly => 'Somente FILTER = PASS';
+
+  @override
+  String get minQual => 'QUAL mínimo';
+
+  @override
+  String get minDp => 'DP mínimo';
+
+  @override
+  String get minGq => 'GQ mínimo';
+
+  @override
+  String get truthLabel => 'Tratar como verdade (benchmark)';
+
+  @override
+  String get truthNone => 'nenhuma';
+
+  @override
+  String get runCompare => 'Comparar';
+
+  @override
+  String get comparing => 'Comparando…';
+
+  @override
+  String get compareFailedTitle => 'Não foi possível comparar';
+
+  @override
+  String get compareCancelled => 'Comparação cancelada.';
+
+  @override
+  String get sameSampleWarning =>
+      'A e B são a mesma amostra do mesmo arquivo: o resultado será tudo “compartilhada”.';
+
+  @override
+  String get analysesTitle => 'Análises';
+
+  @override
+  String analysisVs(String a, String b) {
+    return '$a × $b';
+  }
+
+  @override
+  String get deleteAnalysisTitle => 'Apagar análise?';
+
+  @override
+  String get deleteAnalysisBody =>
+      'Os resultados desta comparação serão apagados. Os arquivos VCF continuam no projeto.';
+
+  @override
+  String get analysisNotFound => 'Análise não encontrada.';
+
+  @override
+  String get catShared => 'Compartilhada';
+
+  @override
+  String get catGenotypeDifference => 'Genótipo diferente';
+
+  @override
+  String get catOnlyA => 'Somente em A';
+
+  @override
+  String get catOnlyB => 'Somente em B';
+
+  @override
+  String get catMissingUncertain => 'Ausente/incerta';
+
+  @override
+  String get catNotAssessed => 'Não avaliada';
+
+  @override
+  String get stCarrier => 'carrega o alelo';
+
+  @override
+  String get stLowQuality => 'carrega, baixa qualidade';
+
+  @override
+  String get stExplicitRef => '0/0 explícito';
+
+  @override
+  String get stMissing => 'genótipo ausente';
+
+  @override
+  String get stAbsentRefBlock => 'referência (bloco gVCF)';
+
+  @override
+  String get stAbsentCallable => 'sem registro (região avaliada)';
+
+  @override
+  String get stAbsentUnknown => 'sem registro';
+
+  @override
+  String get stNotAssessed => 'fora da região avaliada';
+
+  @override
+  String get tabSummary => 'Resumo';
+
+  @override
+  String get tabTable => 'Tabela';
+
+  @override
+  String get tabQc => 'QC';
+
+  @override
+  String get concordance => 'Concordância de genótipos';
+
+  @override
+  String get jaccard => 'Jaccard (sítios)';
+
+  @override
+  String benchmarkTitle(String side) {
+    return 'Benchmark (verdade: $side)';
+  }
+
+  @override
+  String get precision => 'Precisão';
+
+  @override
+  String get recall => 'Sensibilidade';
+
+  @override
+  String get f1 => 'F1';
+
+  @override
+  String get classAll => 'Todas';
+
+  @override
+  String get warningsTitle => 'Avisos';
+
+  @override
+  String get modeInMemory =>
+      'Comparação feita em memória (arquivos fora de ordem).';
+
+  @override
+  String get absenceHint =>
+      'Sem BED de regiões avaliadas ou gVCF, “somente em A/B” inclui posições sem registro no outro arquivo — que podem simplesmente não ter sido sequenciadas.';
+
+  @override
+  String rowsCount(int count) {
+    return '$count linhas';
+  }
+
+  @override
+  String get filters => 'Filtros';
+
+  @override
+  String get clearFilters => 'Limpar';
+
+  @override
+  String get searchHint => 'chr1:1000, chr7:1M-2M ou rs123';
+
+  @override
+  String get noRows => 'Nenhuma linha com esses filtros.';
+
+  @override
+  String get saveFilter => 'Salvar filtro';
+
+  @override
+  String get filterName => 'Nome do filtro';
+
+  @override
+  String get savedFilters => 'Filtros salvos';
+
+  @override
+  String get categoriesLabel => 'Categorias';
+
+  @override
+  String get kindsLabel => 'Tipos de variante';
+
+  @override
+  String get regionLabel => 'Região';
+
+  @override
+  String get regionInvalid => 'Região inválida (ex.: chr1:1000-2000)';
+
+  @override
+  String get idLabel => 'ID contém';
+
+  @override
+  String get apply => 'Aplicar';
+
+  @override
+  String get stateLabel => 'Estado';
+
+  @override
+  String get gtLabel => 'Genótipo';
+
+  @override
+  String get qualLabel => 'QUAL';
+
+  @override
+  String get dpLabel => 'DP';
+
+  @override
+  String get gqLabel => 'GQ';
+
+  @override
+  String get filterLabel => 'FILTER';
+
+  @override
+  String get idsLabel => 'IDs';
+
+  @override
+  String get noteLabel => 'Nota';
+
+  @override
+  String get tagsLabel => 'Etiquetas (separadas por vírgula)';
+
+  @override
+  String get favorite => 'Favorita';
+
+  @override
+  String get noteSaved => 'Nota salva.';
+
+  @override
+  String get tiTvHint => 'Referência: ~2,0–2,1 em genoma; ~3,0 em exoma.';
+
+  @override
+  String get hetHom => 'het / hom-alt';
+
+  @override
+  String get missingRate => 'Ausentes';
+
+  @override
+  String get carriers => 'Variantes carregadas';
+
+  @override
+  String get lowQualityCount => 'Baixa qualidade';
+
+  @override
+  String get dpDistribution => 'Profundidade (DP)';
+
+  @override
+  String get gqDistribution => 'Qualidade do genótipo (GQ)';
+
+  @override
+  String get qualDistribution => 'QUAL';
+
+  @override
+  String get xHet => 'Heterozigosidade no X (fora das PAR)';
+
+  @override
+  String get xHetHint =>
+      'Indicador educacional de consistência; não determina sexo.';
+
+  @override
+  String get export => 'Exportar';
+
+  @override
+  String get exportFormat => 'Formato';
+
+  @override
+  String exportFiltered(int count) {
+    return 'Exporta as $count linhas do filtro atual, com o manifesto de reprodutibilidade.';
+  }
+
+  @override
+  String exportDone(int count) {
+    return '$count linhas exportadas.';
+  }
+
+  @override
+  String get exportSaveManifest => 'Salvar também o manifesto?';
+
+  @override
+  String get exportSaveManifestBody =>
+      'O manifesto registra entradas, parâmetros e hashes para refazer esta análise.';
+
+  @override
+  String get journalTitle => 'Diário do projeto';
+
+  @override
+  String get journalEmpty => 'Nada registrado ainda.';
+
+  @override
+  String get notesTitle => 'Notas e favoritas';
+
+  @override
+  String get notesEmpty =>
+      'Toque numa variante da tabela para anotar ou favoritar.';
+
+  @override
+  String logImport(String name) {
+    return 'Arquivo importado: $name';
+  }
+
+  @override
+  String logDeleteFile(String name) {
+    return 'Arquivo removido: $name';
+  }
+
+  @override
+  String logCompare(String a, String b, String id) {
+    return 'Comparação $a × $b ($id)';
+  }
+
+  @override
+  String logExport(String format, int count) {
+    return 'Exportação $format: $count linhas';
+  }
+
+  @override
+  String logFilter(String name) {
+    return 'Filtro salvo: $name';
+  }
+
+  @override
+  String logDeleteAnalysis(String name) {
+    return 'Análise apagada: $name';
+  }
+
+  @override
+  String get minQualShort => 'QUAL ≥';
+
+  @override
+  String get minDpShort => 'DP ≥';
+
+  @override
+  String get minGqShort => 'GQ ≥';
+
+  @override
+  String get exportVcf => 'VCF (A e B)';
+
+  @override
+  String get notNow => 'Agora não';
 }

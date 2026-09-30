@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/genoz_core.dart';
 import '../../core/inspect_report.dart';
+import '../../persistence/analysis_repository.dart';
 import '../../persistence/app_storage.dart';
 import '../../persistence/project_repository.dart';
 
@@ -154,6 +155,8 @@ class ImportController extends Notifier<ImportState> {
               report: report,
               reportJson: reportJson,
             );
+            // O diário guarda só o nome; a tela traduz pelo tipo (`import`).
+            await ref.read(analysisRepositoryProvider).log(projectId, 'import', displayName);
             state = ImportSucceeded(fileId: id, fileName: displayName);
           }
           done.complete();

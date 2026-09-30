@@ -3,6 +3,7 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/analysis.dart';
 import 'api/genoz.dart';
 
 import 'dart:async';
@@ -69,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => 95607289;
+  int get rustContentHash => -1364293227;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -83,7 +84,27 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 abstract class RustLibApi extends BaseApi {
   void crateApiGenozCancelJob({required String jobId});
 
+  Stream<CompareEvent> crateApiAnalysisCompareFiles({
+    required CompareSide a,
+    required CompareSide b,
+    required String optionsJson,
+    required String outDir,
+    required String createdAt,
+    required String jobId,
+  });
+
   String crateApiGenozCoreVersion();
+
+  Future<BigInt> crateApiAnalysisExportRows({
+    required String outDir,
+    required String filterJson,
+    required String format,
+    required String sampleA,
+    required String sampleB,
+    required String destPath,
+  });
+
+  void crateApiAnalysisForgetResult({required String outDir});
 
   Stream<ImportEvent> crateApiGenozImportVcf({
     required String sourcePath,
@@ -92,6 +113,15 @@ abstract class RustLibApi extends BaseApi {
   });
 
   Future<void> crateApiGenozInitApp();
+
+  String? crateApiAnalysisParseRegion({required String text});
+
+  Future<ResultPage> crateApiAnalysisResultPage({
+    required String outDir,
+    required String filterJson,
+    required int start,
+    required int count,
+  });
 
   Future<void> crateApiGenozWriteSyntheticExample({
     required String destPath,
@@ -134,12 +164,68 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "cancel_job", argNames: ["jobId"]);
 
   @override
+  Stream<CompareEvent> crateApiAnalysisCompareFiles({
+    required CompareSide a,
+    required CompareSide b,
+    required String optionsJson,
+    required String outDir,
+    required String createdAt,
+    required String jobId,
+  }) {
+    final sink = RustStreamSink<CompareEvent>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_box_autoadd_compare_side(a, serializer);
+            sse_encode_box_autoadd_compare_side(b, serializer);
+            sse_encode_String(optionsJson, serializer);
+            sse_encode_String(outDir, serializer);
+            sse_encode_String(createdAt, serializer);
+            sse_encode_String(jobId, serializer);
+            sse_encode_StreamSink_compare_event_Sse(sink, serializer);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 2,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: null,
+          ),
+          constMeta: kCrateApiAnalysisCompareFilesConstMeta,
+          argValues: [a, b, optionsJson, outDir, createdAt, jobId, sink],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiAnalysisCompareFilesConstMeta =>
+      const TaskConstMeta(
+        debugName: "compare_files",
+        argNames: [
+          "a",
+          "b",
+          "optionsJson",
+          "outDir",
+          "createdAt",
+          "jobId",
+          "sink",
+        ],
+      );
+
+  @override
   String crateApiGenozCoreVersion() {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -154,6 +240,78 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiGenozCoreVersionConstMeta =>
       const TaskConstMeta(debugName: "core_version", argNames: []);
+
+  @override
+  Future<BigInt> crateApiAnalysisExportRows({
+    required String outDir,
+    required String filterJson,
+    required String format,
+    required String sampleA,
+    required String sampleB,
+    required String destPath,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(outDir, serializer);
+          sse_encode_String(filterJson, serializer);
+          sse_encode_String(format, serializer);
+          sse_encode_String(sampleA, serializer);
+          sse_encode_String(sampleB, serializer);
+          sse_encode_String(destPath, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 4,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_u_64,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiAnalysisExportRowsConstMeta,
+        argValues: [outDir, filterJson, format, sampleA, sampleB, destPath],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAnalysisExportRowsConstMeta => const TaskConstMeta(
+    debugName: "export_rows",
+    argNames: [
+      "outDir",
+      "filterJson",
+      "format",
+      "sampleA",
+      "sampleB",
+      "destPath",
+    ],
+  );
+
+  @override
+  void crateApiAnalysisForgetResult({required String outDir}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(outDir, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiAnalysisForgetResultConstMeta,
+        argValues: [outDir],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAnalysisForgetResultConstMeta =>
+      const TaskConstMeta(debugName: "forget_result", argNames: ["outDir"]);
 
   @override
   Stream<ImportEvent> crateApiGenozImportVcf({
@@ -174,7 +332,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 3,
+              funcId: 6,
               port: port_,
             );
           },
@@ -205,7 +363,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 4,
+            funcId: 7,
             port: port_,
           );
         },
@@ -222,6 +380,67 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiGenozInitAppConstMeta =>
       const TaskConstMeta(debugName: "init_app", argNames: []);
+
+  @override
+  String? crateApiAnalysisParseRegion({required String text}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(text, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiAnalysisParseRegionConstMeta,
+        argValues: [text],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAnalysisParseRegionConstMeta =>
+      const TaskConstMeta(debugName: "parse_region", argNames: ["text"]);
+
+  @override
+  Future<ResultPage> crateApiAnalysisResultPage({
+    required String outDir,
+    required String filterJson,
+    required int start,
+    required int count,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(outDir, serializer);
+          sse_encode_String(filterJson, serializer);
+          sse_encode_u_32(start, serializer);
+          sse_encode_u_32(count, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 9,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_result_page,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiAnalysisResultPageConstMeta,
+        argValues: [outDir, filterJson, start, count],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAnalysisResultPageConstMeta => const TaskConstMeta(
+    debugName: "result_page",
+    argNames: ["outDir", "filterJson", "start", "count"],
+  );
 
   @override
   Future<void> crateApiGenozWriteSyntheticExample({
@@ -243,7 +462,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 10,
             port: port_,
           );
         },
@@ -271,6 +490,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RustStreamSink<CompareEvent> dco_decode_StreamSink_compare_event_Sse(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
   RustStreamSink<ImportEvent> dco_decode_StreamSink_import_event_Sse(
     dynamic raw,
   ) {
@@ -288,6 +515,50 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   bool dco_decode_bool(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as bool;
+  }
+
+  @protected
+  CompareSide dco_decode_box_autoadd_compare_side(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_compare_side(raw);
+  }
+
+  @protected
+  CompareEvent dco_decode_compare_event(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return CompareEvent_Progress(
+          bytesDone: dco_decode_u_64(raw[1]),
+          bytesTotal: dco_decode_u_64(raw[2]),
+        );
+      case 1:
+        return CompareEvent_Done(
+          summaryJson: dco_decode_String(raw[1]),
+          manifestJson: dco_decode_String(raw[2]),
+        );
+      case 2:
+        return CompareEvent_Failed(message: dco_decode_String(raw[1]));
+      case 3:
+        return CompareEvent_Cancelled();
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
+  CompareSide dco_decode_compare_side(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return CompareSide(
+      path: dco_decode_String(arr[0]),
+      displayName: dco_decode_String(arr[1]),
+      sha256: dco_decode_String(arr[2]),
+      bytes: dco_decode_u_64(arr[3]),
+      sample: dco_decode_opt_String(arr[4]),
+    );
   }
 
   @protected
@@ -330,6 +601,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  String? dco_decode_opt_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
+  ResultPage dco_decode_result_page(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ResultPage(
+      total: dco_decode_u_32(arr[0]),
+      rowsJson: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
   int dco_decode_u_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
@@ -361,6 +650,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RustStreamSink<CompareEvent> sse_decode_StreamSink_compare_event_Sse(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
   RustStreamSink<ImportEvent> sse_decode_StreamSink_import_event_Sse(
     SseDeserializer deserializer,
   ) {
@@ -379,6 +676,61 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   bool sse_decode_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  CompareSide sse_decode_box_autoadd_compare_side(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_compare_side(deserializer));
+  }
+
+  @protected
+  CompareEvent sse_decode_compare_event(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_bytesDone = sse_decode_u_64(deserializer);
+        var var_bytesTotal = sse_decode_u_64(deserializer);
+        return CompareEvent_Progress(
+          bytesDone: var_bytesDone,
+          bytesTotal: var_bytesTotal,
+        );
+      case 1:
+        var var_summaryJson = sse_decode_String(deserializer);
+        var var_manifestJson = sse_decode_String(deserializer);
+        return CompareEvent_Done(
+          summaryJson: var_summaryJson,
+          manifestJson: var_manifestJson,
+        );
+      case 2:
+        var var_message = sse_decode_String(deserializer);
+        return CompareEvent_Failed(message: var_message);
+      case 3:
+        return CompareEvent_Cancelled();
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
+  CompareSide sse_decode_compare_side(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_path = sse_decode_String(deserializer);
+    var var_displayName = sse_decode_String(deserializer);
+    var var_sha256 = sse_decode_String(deserializer);
+    var var_bytes = sse_decode_u_64(deserializer);
+    var var_sample = sse_decode_opt_String(deserializer);
+    return CompareSide(
+      path: var_path,
+      displayName: var_displayName,
+      sha256: var_sha256,
+      bytes: var_bytes,
+      sample: var_sample,
+    );
   }
 
   @protected
@@ -430,6 +782,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ResultPage sse_decode_result_page(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_total = sse_decode_u_32(deserializer);
+    var var_rowsJson = sse_decode_String(deserializer);
+    return ResultPage(total: var_total, rowsJson: var_rowsJson);
+  }
+
+  @protected
   int sse_decode_u_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint32();
@@ -462,6 +833,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_StreamSink_compare_event_Sse(
+    RustStreamSink<CompareEvent> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+      self.setupAndSerialize(
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_compare_event,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+      ),
+      serializer,
+    );
+  }
+
+  @protected
   void sse_encode_StreamSink_import_event_Sse(
     RustStreamSink<ImportEvent> self,
     SseSerializer serializer,
@@ -488,6 +876,51 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_compare_side(
+    CompareSide self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_compare_side(self, serializer);
+  }
+
+  @protected
+  void sse_encode_compare_event(CompareEvent self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case CompareEvent_Progress(
+        bytesDone: final bytesDone,
+        bytesTotal: final bytesTotal,
+      ):
+        sse_encode_i_32(0, serializer);
+        sse_encode_u_64(bytesDone, serializer);
+        sse_encode_u_64(bytesTotal, serializer);
+      case CompareEvent_Done(
+        summaryJson: final summaryJson,
+        manifestJson: final manifestJson,
+      ):
+        sse_encode_i_32(1, serializer);
+        sse_encode_String(summaryJson, serializer);
+        sse_encode_String(manifestJson, serializer);
+      case CompareEvent_Failed(message: final message):
+        sse_encode_i_32(2, serializer);
+        sse_encode_String(message, serializer);
+      case CompareEvent_Cancelled():
+        sse_encode_i_32(3, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_compare_side(CompareSide self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.path, serializer);
+    sse_encode_String(self.displayName, serializer);
+    sse_encode_String(self.sha256, serializer);
+    sse_encode_u_64(self.bytes, serializer);
+    sse_encode_opt_String(self.sample, serializer);
   }
 
   @protected
@@ -534,6 +967,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint8List(self);
+  }
+
+  @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_result_page(ResultPage self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.total, serializer);
+    sse_encode_String(self.rowsJson, serializer);
   }
 
   @protected

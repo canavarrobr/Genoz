@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/genoz_core.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../persistence/app_storage.dart';
+import '../../persistence/analysis_repository.dart';
 import '../../persistence/database.dart';
 import '../../persistence/project_repository.dart';
 import '../../ui/labels.dart';
 import '../../ui/privacy_chip.dart';
+import '../analysis/analysis_screen.dart' show analysisTitle;
 import '../import/import_controller.dart';
 import 'project_dialogs.dart';
 
@@ -27,7 +31,14 @@ class ProjectScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(project?.name ?? ''),
-        actions: [if (project != null) ProjectMenu(project: project, popAfterDelete: true)],
+        actions: [
+          IconButton(
+            tooltip: l.journalTitle,
+            icon: const Icon(Icons.history),
+            onPressed: () => context.push('/projeto/$projectId/diario'),
+          ),
+          if (project != null) ProjectMenu(project: project, popAfterDelete: true),
+        ],
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(40),
           child: Align(alignment: Alignment.centerLeft, child: PrivacyChip()),
@@ -61,6 +72,16 @@ class ProjectScreen extends ConsumerWidget {
                 ),
               ),
             for (final f in list) _FileTile(file: f),
+            if (list.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: FilledButton.icon(
+                  onPressed: () => context.push('/projeto/$projectId/comparar'),
+                  icon: const Icon(Icons.compare_arrows),
+                  label: Text(l.compareTitle),
+                ),
+              ),
+            _AnalysesSection(projectId: projectId),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: OutlinedButton.icon(
@@ -192,11 +213,10 @@ class _FileTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
-    final c = Theme.of(context).colorScheme;
     final v = file.verdictValue;
     return Card(
       child: ListTile(
-        leading: Icon(verdictIcon(v), color: verdictColor(v, c)),
+        leading: Icon(verdictIcon(v), color: verdictColor(v, context)),
         title: Text(file.displayName, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text([
           l.verdict(v),
@@ -216,10 +236,54 @@ class _FileTile extends ConsumerWidget {
               title: l.deleteFileTitle,
               body: l.deleteFileBody(file.displayName),
             );
-            if (ok) await ref.read(projectRepositoryProvider).deleteFile(file);
+            if (!ok) return;
+            await ref.read(projectRepositoryProvider).deleteFile(file);
+            await ref.read(analysisRepositoryProvider).log(file.projectId, 'delete_file', l.logDeleteFile(file.displayName));
           },
         ),
       ),
+    );
+  }
+}
+
+class _AnalysesSection extends ConsumerWidget {
+  const _AnalysesSection({required this.projectId});
+  final String projectId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final analyses = ref.watch(analysesProvider(projectId)).value ?? const <Analysis>[];
+    if (analyses.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 4),
+          child: Text(l.analysesTitle, style: Theme.of(context).textTheme.titleMedium),
+        ),
+        for (final a in analyses)
+          Card(
+            child: ListTile(
+              leading: const CircleAvatar(child: Icon(Icons.analytics_outlined)),
+              title: Text(analysisTitle(l, a), overflow: TextOverflow.ellipsis),
+              subtitle: Text(l.rowsCount(a.summary.rows)),
+              onTap: () => context.push('/projeto/$projectId/analise/${a.id}'),
+              trailing: IconButton(
+                tooltip: l.delete,
+                icon: const Icon(Icons.delete_outline),
+                onPressed: () async {
+                  final ok = await confirmDelete(context, title: l.deleteAnalysisTitle, body: l.deleteAnalysisBody);
+                  if (!ok) return;
+                  final repo = ref.read(analysisRepositoryProvider);
+                  ref.read(genozCoreProvider).forgetResult(ref.read(appStorageProvider).absolute(a.resultDir));
+                  await repo.deleteAnalysis(a);
+                  await repo.log(projectId, 'delete_analysis', l.logDeleteAnalysis(analysisTitle(l, a)));
+                },
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

@@ -6,6 +6,7 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
+import 'api/analysis.dart';
 import 'api/genoz.dart';
 
 import 'dart:async';
@@ -27,6 +28,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AnyhowException dco_decode_AnyhowException(dynamic raw);
 
   @protected
+  RustStreamSink<CompareEvent> dco_decode_StreamSink_compare_event_Sse(
+    dynamic raw,
+  );
+
+  @protected
   RustStreamSink<ImportEvent> dco_decode_StreamSink_import_event_Sse(
     dynamic raw,
   );
@@ -36,6 +42,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   bool dco_decode_bool(dynamic raw);
+
+  @protected
+  CompareSide dco_decode_box_autoadd_compare_side(dynamic raw);
+
+  @protected
+  CompareEvent dco_decode_compare_event(dynamic raw);
+
+  @protected
+  CompareSide dco_decode_compare_side(dynamic raw);
 
   @protected
   int dco_decode_i_32(dynamic raw);
@@ -48,6 +63,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
+
+  @protected
+  String? dco_decode_opt_String(dynamic raw);
+
+  @protected
+  ResultPage dco_decode_result_page(dynamic raw);
 
   @protected
   int dco_decode_u_32(dynamic raw);
@@ -65,6 +86,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
   @protected
+  RustStreamSink<CompareEvent> sse_decode_StreamSink_compare_event_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   RustStreamSink<ImportEvent> sse_decode_StreamSink_import_event_Sse(
     SseDeserializer deserializer,
   );
@@ -74,6 +100,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   bool sse_decode_bool(SseDeserializer deserializer);
+
+  @protected
+  CompareSide sse_decode_box_autoadd_compare_side(SseDeserializer deserializer);
+
+  @protected
+  CompareEvent sse_decode_compare_event(SseDeserializer deserializer);
+
+  @protected
+  CompareSide sse_decode_compare_side(SseDeserializer deserializer);
 
   @protected
   int sse_decode_i_32(SseDeserializer deserializer);
@@ -86,6 +121,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
+
+  @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer);
+
+  @protected
+  ResultPage sse_decode_result_page(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_32(SseDeserializer deserializer);
@@ -106,6 +147,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_StreamSink_compare_event_Sse(
+    RustStreamSink<CompareEvent> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_StreamSink_import_event_Sse(
     RustStreamSink<ImportEvent> self,
     SseSerializer serializer,
@@ -116,6 +163,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_compare_side(
+    CompareSide self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_compare_event(CompareEvent self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_compare_side(CompareSide self, SseSerializer serializer);
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
@@ -131,6 +190,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     Uint8List self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_result_page(ResultPage self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_32(int self, SseSerializer serializer);

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../core/inspect_report.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'theme.dart';
 
 extension LabelsX on AppLocalizations {
   String verdict(Verdict v) => switch (v) {
@@ -56,12 +57,48 @@ IconData verdictIcon(Verdict v) => switch (v) {
       Verdict.invalid => Icons.error,
     };
 
-Color verdictColor(Verdict v, ColorScheme c) => switch (v) {
-      Verdict.valid => Colors.green.shade600,
-      Verdict.validWithWarnings => c.primary,
-      Verdict.partiallyValid => Colors.orange.shade700,
-      Verdict.invalid => c.error,
+Color verdictColor(Verdict v, BuildContext context) {
+  final p = context.palette;
+  return switch (v) {
+    Verdict.valid => p.success,
+    Verdict.validWithWarnings => p.info,
+    Verdict.partiallyValid => p.warning,
+    Verdict.invalid => p.error,
+  };
+}
+
+extension ComparisonLabelsX on AppLocalizations {
+  String category(String code) => switch (code) {
+        'shared' => catShared,
+        'genotype_difference' => catGenotypeDifference,
+        'only_a' => catOnlyA,
+        'only_b' => catOnlyB,
+        'missing_uncertain' => catMissingUncertain,
+        _ => catNotAssessed,
+      };
+
+  String sideState(String code) => switch (code) {
+        'carrier' => stCarrier,
+        'low_quality' => stLowQuality,
+        'explicit_ref' => stExplicitRef,
+        'missing' => stMissing,
+        'absent_ref_block' => stAbsentRefBlock,
+        'absent_callable' => stAbsentCallable,
+        'absent_unknown' => stAbsentUnknown,
+        _ => stNotAssessed,
+      };
+}
+
+IconData categoryIcon(String code) => switch (code) {
+      'shared' => Icons.join_inner,
+      'genotype_difference' => Icons.compare_arrows,
+      'only_a' => Icons.looks_one_outlined,
+      'only_b' => Icons.looks_two_outlined,
+      'missing_uncertain' => Icons.help_outline,
+      _ => Icons.block,
     };
+
+String percent(double? v) => v == null ? '—' : '${(v * 100).toStringAsFixed(1)}%';
 
 String formatBytes(int bytes) {
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];

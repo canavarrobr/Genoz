@@ -250,6 +250,181 @@ impl<R: Read + Seek> ResultReader<R> {
         }
         Ok((out, matched))
     }
+
+    /// Chama `f` para cada linha que passa no filtro, em ordem.
+    pub fn for_each(&mut self, filter: &RowFilter, mut f: impl FnMut(u32, &ComparisonRow) -> Result<()>) -> Result<()> {
+        if self.index.marks.is_empty() {
+            return Ok(());
+        }
+        self.bgzf.seek_virtual(self.index.marks[0])?;
+        let mut reader = BufReader::new(&mut self.bgzf);
+        let mut line = String::new();
+        let mut n = 0u32;
+        loop {
+            line.clear();
+            if reader.read_line(&mut line)? == 0 {
+                break;
+            }
+            let row = decode_row(&line).ok_or_else(corrupted)?;
+            if filter.matches(&row) {
+                f(n, &row)?;
+            }
+            n += 1;
+        }
+        Ok(())
+    }
+
+    /// Números (0-based) das linhas que passam no filtro. Com eles, a tabela
+    /// pagina o resultado filtrado sem varrer o arquivo a cada página.
+    pub fn matching_rows(&mut self, filter: &RowFilter) -> Result<Vec<u32>> {
+        let mut out = Vec::new();
+        self.for_each(filter, |n, _| {
+            out.push(n);
+            Ok(())
+        })?;
+        Ok(out)
+    }
+
+    /// Linhas pelos números informados (em ordem crescente).
+    pub fn rows_at(&mut self, rows: &[u32]) -> Result<Vec<ComparisonRow>> {
+        let mut out = Vec::with_capacity(rows.len());
+        let mut line = String::new();
+        let marks = &self.index.marks;
+        let total = self.index.rows;
+        let mut rd = BufReader::new(&mut self.bgzf);
+        // Número da próxima linha que o leitor devolveria (None = não posicionado).
+        let mut current: Option<u64> = None;
+        for &r in rows {
+            let r = u64::from(r);
+            if r >= total {
+                break;
+            }
+            // Reposiciona se voltou ou se pular linhas custaria mais que um bloco.
+            let reposition = current.is_none_or(|c| r < c || r / ROWS_PER_MARK > c / ROWS_PER_MARK);
+            if reposition {
+                let inner = rd.into_inner(); // descarta o buffer antigo
+                inner.seek_virtual(marks[(r / ROWS_PER_MARK) as usize])?;
+                rd = BufReader::new(inner);
+                current = Some(r / ROWS_PER_MARK * ROWS_PER_MARK);
+            }
+            let mut c = current.expect("posicionado");
+            while c < r {
+                line.clear();
+                rd.read_line(&mut line)?;
+                c += 1;
+            }
+            line.clear();
+            rd.read_line(&mut line)?;
+            out.push(decode_row(&line).ok_or_else(corrupted)?);
+            current = Some(c + 1);
+        }
+        Ok(out)
+    }
+}
+
+fn corrupted() -> GenozError {
+    GenozError::InvalidParam("linha de resultado corrompida".into())
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ExportFormat {
+    Csv,
+    Tsv,
+    Json,
+    /// VCF com duas colunas de amostra (A e B) e a categoria em INFO/GENOZ_CAT.
+    Vcf,
+}
+
+const EXPORT_COLUMNS: [&str; 19] = [
+    "chrom", "pos", "ref", "alt", "kind", "category", "ids", "a_state", "a_gt", "a_qual", "a_dp", "a_gq", "a_filter",
+    "b_state", "b_gt", "b_qual", "b_dp", "b_gq", "b_filter",
+];
+
+fn csv_field(v: &str) -> String {
+    if v.contains([',', '"', '\n']) {
+        format!("\"{}\"", v.replace('"', "\"\""))
+    } else {
+        v.to_string()
+    }
+}
+
+/// Exporta as linhas que passam no filtro. Retorna quantas linhas foram gravadas.
+/// A saída é determinística: mesmo resultado + mesmo filtro → mesmos bytes.
+pub fn export_rows<R: Read + Seek, W: Write>(
+    reader: &mut ResultReader<R>,
+    filter: &RowFilter,
+    format: ExportFormat,
+    sample_names: (&str, &str),
+    mut out: W,
+) -> Result<u64> {
+    let mut n = 0u64;
+    match format {
+        ExportFormat::Csv | ExportFormat::Tsv => {
+            let sep = if format == ExportFormat::Csv { "," } else { "\t" };
+            writeln!(out, "{}", EXPORT_COLUMNS.join(sep))?;
+            reader.for_each(filter, |_, row| {
+                let line = encode_row(row);
+                let fields: Vec<String> = line
+                    .split('\t')
+                    .map(|f| if format == ExportFormat::Csv { csv_field(f) } else { f.to_string() })
+                    .collect();
+                writeln!(out, "{}", fields.join(sep))?;
+                n += 1;
+                Ok(())
+            })?;
+        }
+        ExportFormat::Json => {
+            write!(out, "[")?;
+            reader.for_each(filter, |_, row| {
+                if n > 0 {
+                    write!(out, ",")?;
+                }
+                write!(out, "\n  {}", serde_json::to_string(row).expect("linha serializável"))?;
+                n += 1;
+                Ok(())
+            })?;
+            writeln!(out, "\n]")?;
+        }
+        ExportFormat::Vcf => {
+            writeln!(out, "##fileformat=VCFv4.3")?;
+            writeln!(out, "##source=Genoz {} (comparação A x B)", crate::CORE_VERSION)?;
+            writeln!(
+                out,
+                "##INFO=<ID=GENOZ_CAT,Number=1,Type=String,Description=\"Categoria da comparação (shared, genotype_difference, only_a, only_b, missing_uncertain, not_assessed)\">"
+            )?;
+            writeln!(out, "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genótipo\">")?;
+            writeln!(
+                out,
+                "##FORMAT=<ID=GZST,Number=1,Type=String,Description=\"Estado do lado na comparação Genoz\">"
+            )?;
+            writeln!(
+                out,
+                "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t{}\t{}",
+                sample_names.0, sample_names.1
+            )?;
+            reader.for_each(filter, |_, row| {
+                let side = |s: &SideView| format!("{}:{}", s.gt.as_deref().unwrap_or("."), s.state.code());
+                let ids = if row.ids.is_empty() { ".".to_string() } else { row.ids.join(";") };
+                writeln!(
+                    out,
+                    "{}\t{}\t{}\t{}\t{}\t.\t.\tGENOZ_CAT={}\tGT:GZST\t{}\t{}",
+                    row.chrom,
+                    row.pos,
+                    ids,
+                    row.reference,
+                    row.alt,
+                    row.category.code(),
+                    side(&row.a),
+                    side(&row.b)
+                )?;
+                n += 1;
+                Ok(())
+            })?;
+        }
+    }
+    out.flush()?;
+    Ok(n)
 }
 
 #[cfg(test)]
@@ -304,5 +479,57 @@ mod tests {
         let (rows, total) = r.scan(&f, 10, 5).unwrap();
         assert_eq!(total, 1667);
         assert_eq!(rows[0].pos, 1030);
+    }
+
+    fn store(n: u64) -> ResultReader<std::io::Cursor<Vec<u8>>> {
+        let mut w = ResultWriter::new(Vec::new()).unwrap();
+        for i in 0..n {
+            w.push(&row(i)).unwrap();
+        }
+        let (bytes, index) = w.finish().unwrap();
+        ResultReader::new(std::io::Cursor::new(bytes), index)
+    }
+
+    #[test]
+    fn matching_rows_and_random_access_agree_with_scan() {
+        let mut r = store(5000);
+        let f = RowFilter { categories: vec![Category::OnlyA], ..Default::default() };
+        let idx = r.matching_rows(&f).unwrap();
+        assert_eq!(idx.len(), 1667);
+        // Páginas espalhadas, inclusive voltando para trás e cruzando blocos.
+        for (skip, count) in [(0usize, 5usize), (1600, 67), (300, 400), (10, 3)] {
+            let want = r.scan(&f, skip as u64, count).unwrap().0;
+            let got = r.rows_at(&idx[skip..(skip + count).min(idx.len())]).unwrap();
+            assert_eq!(got, want, "skip={skip}");
+        }
+        // Linhas fora do intervalo são ignoradas.
+        assert!(r.rows_at(&[9_999_999]).unwrap().is_empty());
+    }
+
+    #[test]
+    fn exports() {
+        let mut r = store(4);
+        let all = RowFilter::default();
+        let mut csv = Vec::new();
+        assert_eq!(export_rows(&mut r, &all, ExportFormat::Csv, ("A", "B"), &mut csv).unwrap(), 4);
+        let csv = String::from_utf8(csv).unwrap();
+        assert!(csv.starts_with("chrom,pos,ref,alt,kind,category,ids,a_state"));
+        assert!(csv.contains("\n1,1000,A,G,snv,only_a,syn0,carrier,0/1,50.5,12,.,pass,absent_unknown"));
+
+        let mut json = Vec::new();
+        export_rows(&mut r, &all, ExportFormat::Json, ("A", "B"), &mut json).unwrap();
+        let parsed: Vec<ComparisonRow> = serde_json::from_slice(&json).unwrap();
+        assert_eq!(parsed.len(), 4);
+
+        let mut vcf = Vec::new();
+        let f = RowFilter { categories: vec![Category::Shared], ..Default::default() };
+        assert_eq!(export_rows(&mut r, &f, ExportFormat::Vcf, ("PESSOA_A", "PESSOA_B"), &mut vcf).unwrap(), 2);
+        let vcf = String::from_utf8(vcf).unwrap();
+        assert!(vcf.contains("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tPESSOA_A\tPESSOA_B\n"));
+        assert!(vcf.contains("1\t1001\t.\tA\tG\t.\t.\tGENOZ_CAT=shared\tGT:GZST\t0/1:carrier\t.:absent_unknown\n"));
+        // O VCF exportado é lido de volta pelo próprio Genoz sem erros.
+        let report = crate::inspect::inspect(vcf.as_bytes(), &Default::default()).unwrap();
+        assert_eq!(report.errors, 0, "{:#?}", report.issues);
+        assert_eq!(report.records_ok, 2);
     }
 }

@@ -35,6 +35,18 @@ class AppStorage {
     return p.join('projetos', projectId, 'arquivos', '$fileId$ext');
   }
 
+  /// Pasta relativa dos resultados de uma análise.
+  String analysisRelative(String projectId, String analysisId) =>
+      p.join('projetos', projectId, 'analises', analysisId);
+
+  /// Pasta relativa das exportações do projeto.
+  String exportsRelative(String projectId) => p.join('projetos', projectId, 'exportacoes');
+
+  Future<void> deleteDir(String relative) async {
+    final dir = Directory(absolute(relative));
+    if (await dir.exists()) await dir.delete(recursive: true);
+  }
+
   Future<void> deleteProjectFiles(String projectId) async {
     final dir = Directory(projectDir(projectId));
     if (await dir.exists()) await dir.delete(recursive: true);

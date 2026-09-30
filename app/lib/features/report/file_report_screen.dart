@@ -41,9 +41,9 @@ class _ReportBody extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       children: [
         Card(
-          color: verdictColor(r.verdict, c).withValues(alpha: 0.12),
+          color: verdictColor(r.verdict, context).withValues(alpha: 0.12),
           child: ListTile(
-            leading: Icon(verdictIcon(r.verdict), color: verdictColor(r.verdict, c), size: 32),
+            leading: Icon(verdictIcon(r.verdict), color: verdictColor(r.verdict, context), size: 32),
             title: Text(l.verdict(r.verdict), style: t.titleMedium),
             subtitle: Text(l.problemsCount(r.errors, r.warnings)),
           ),

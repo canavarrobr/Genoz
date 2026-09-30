@@ -3,9 +3,9 @@
 Base: [especificação técnica v4](../especificacao/Genoz_especificacao_tecnica_v4.md).
 Cada módulo termina com testes automáticos passando, commit no GitHub e uma demonstração que você mesmo consegue executar.
 
-**Meta final (Módulo 12):** um **APK Android** instalável e um **site** público (PWA, funciona offline), ambos com as mesmas funções e processando tudo localmente.
+**Meta final (Módulo 13):** um **APK Android** instalável e um **site** público (PWA, funciona offline), ambos com as mesmas funções e processando tudo localmente.
 
-Um APK e um site de prévia aparecem já nos Módulos 5 e 6, para você testar cedo em aparelhos reais.
+Um APK e um site de prévia aparecem já nos Módulos 6 e 7 (depois do módulo de estética), para você testar cedo em aparelhos reais.
 
 ---
 
@@ -15,16 +15,17 @@ Um APK e um site de prévia aparecem já nos Módulos 5 e 6, para você testar c
 |---|---|---|---|
 | 1 ✅ | Núcleo Rust: leitura de VCF | Ferramenta de linha de comando que valida um VCF, calcula SHA-256 e mostra um resumo | PC |
 | 2 ✅ | Núcleo Rust: comparação, filtros e QC | Mesma ferramenta compara A×B, filtra e gera estatísticas | PC |
-| 3 | App Flutter + ponte + persistência | App abre, cria projetos e importa VCF usando o núcleo Rust | Android (emulador) |
-| 4 | Telas de análise | Comparação, tabela, filtros, QC, exportação e manifesto no app | Android (emulador) |
-| 5 | Web local-first | **Site de prévia** (GitHub Pages) comparando VCF no navegador sem upload | Web |
-| 6 | Android completo | **APK de prévia** para instalar no celular; bloqueio do app; privacidade | Android |
-| 7 | Visualização + modo estudante | Ideograma, densidade, visualizador de região, trilhas guiadas, dados sintéticos | Web + Android |
-| 8 | Arquivos de consumidor + multiamostra | Importa 23andMe/AncestryDNA/MyHeritage; escolhe amostra em VCF multi-amostra | Web + Android |
-| 9 | Anotação local | Pacotes (genes, rsID, ClinVar, frequências) baixados uma vez; busca por gene | Web + Android |
-| 10 | Relatórios, reprodutibilidade e criptografia | Relatório HTML/PDF, "reexecutar manifesto", exportação `.genoz` cifrada | Web + Android |
-| 11 | Família e populações | Trio, parentesco KING, ROH, comparação de N amostras | Web + Android |
-| 12 | **Lançamento 1.0** | **APK release assinado + site 1.0 publicado**, manual, desempenho, acessibilidade | Web + Android |
+| 3 ✅ | App Flutter + ponte + persistência | App abre, cria projetos e importa VCF usando o núcleo Rust | Android (emulador) |
+| 4 ✅ | Telas de análise | Comparação, tabela, filtros, QC, exportação e manifesto no app | Android (emulador) |
+| 5 | **Estética e identidade visual** | Logo, ícone, abertura, paleta, tipografia e componentes do [guia de estilo](../estilo/GUIA_DE_ESTILO.md) aplicados em todo o app | Web + Android |
+| 6 | Web local-first | **Site de prévia** (GitHub Pages) comparando VCF no navegador sem upload | Web |
+| 7 | Android completo | **APK de prévia** para instalar no celular; bloqueio do app; privacidade | Android |
+| 8 | Visualização + modo estudante | Ideograma, densidade, visualizador de região, trilhas guiadas, dados sintéticos | Web + Android |
+| 9 | Arquivos de consumidor + multiamostra | Importa 23andMe/AncestryDNA/MyHeritage; escolhe amostra em VCF multi-amostra | Web + Android |
+| 10 | Anotação local | Pacotes (genes, rsID, ClinVar, frequências) baixados uma vez; busca por gene | Web + Android |
+| 11 | Relatórios, reprodutibilidade e criptografia | Relatório HTML/PDF, "reexecutar manifesto", exportação `.genoz` cifrada | Web + Android |
+| 12 | Família e populações | Trio, parentesco KING, ROH, comparação de N amostras | Web + Android |
+| 13 | **Lançamento 1.0** | **APK release assinado + site 1.0 publicado**, manual, desempenho, acessibilidade | Web + Android |
 
 Pós-1.0 (fora deste plano): referências brasileiras, liftover GRCh37↔GRCh38, pangenoma, iOS publicado na App Store, integrações opt-in.
 
@@ -81,7 +82,22 @@ Aceite: no emulador, criar projeto → importar dois VCFs → ver resumo; dados 
 - Busca por posição, faixa e rsID.
 - Notas, tags, favoritos e diário do projeto.
 
-## Módulo 5 — Web local-first (site de prévia)
+## Módulo 5 — Estética e identidade visual
+
+Base: [guia de estilo](../estilo/GUIA_DE_ESTILO.md) e recortes em `docs/estilo/recortes/`.
+
+- Tokens de cor, tipografia, espaçamento e raios num único arquivo de tema (claro e escuro).
+- Logo e símbolo redesenhados em vetor (SVG), fiéis à referência; ícone do app para Android (adaptativo), iOS e Web (favicon/PWA).
+- Tela de abertura (splash) em azul profundo com símbolo e "Análise genômica local e privada".
+- Menu lateral/navegação no estilo da referência (fundo azul profundo, item ativo em azul-petróleo).
+- Componentes: cards, chips de categoria, barras de frequência, cabeçalho com gradiente principal, estados vazios ilustrados.
+- Fontes embutidas no app (licença livre), sem download da internet.
+- Acessibilidade: contraste mínimo WCAG AA verificado por teste automático; cores de estado sempre com ícone e texto.
+- Tela "Sobre" com assinatura, slogan e pilares (Ciência · Privacidade · Desempenho · Multiplataforma).
+
+Aceite: todas as telas seguem o guia; teste de contraste passando; ícone e abertura aparecem no emulador e no navegador.
+
+## Módulo 6 — Web local-first (site de prévia)
 
 - Núcleo compilado para WASM rodando em Web Worker.
 - Arquivos em OPFS; SQLite via sqlite3.wasm.
@@ -92,7 +108,7 @@ Aceite: no emulador, criar projeto → importar dois VCFs → ver resumo; dados 
 
 Aceite: site público compara dois VCFs com a rede desligada; resultados idênticos (hash) aos do Android.
 
-## Módulo 6 — Android completo (APK de prévia)
+## Módulo 7 — Android completo (APK de prévia)
 
 - UX mobile (gestos, tamanhos de tela, modo escuro).
 - Seletor de arquivos e permissões mínimas.
@@ -101,20 +117,20 @@ Aceite: site público compara dois VCFs com a rede desligada; resultados idênti
 - APK gerado automaticamente pelo GitHub Actions (anexado ao release).
 - Configuração iOS pronta (compilação sem publicação).
 
-## Módulo 7 — Visualização e modo estudante
+## Módulo 8 — Visualização e modo estudante
 
 - Ideograma cromossômico, mapa de densidade, visualizador de região.
 - Diagrama de interseções.
 - Datasets didáticos embutidos, trilhas guiadas, glossário, exercícios com correção automática, pacote de aula do professor.
 
-## Módulo 8 — Arquivos de consumidor e multiamostra
+## Módulo 9 — Arquivos de consumidor e multiamostra
 
 - Importadores 23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA.
 - Comparação chip × sequenciamento restrita aos sítios avaliados.
 - VCF multi-amostra: seleção de amostra.
 - Normalização completa opcional (left-align) com FASTA de referência local.
 
-## Módulo 9 — Anotação local
+## Módulo 10 — Anotação local
 
 - Formato de pacote com manifesto, licença e SHA-256.
 - Download controlado (modo Online controlado), um a um, com confirmação.
@@ -122,21 +138,21 @@ Aceite: site público compara dois VCFs com a rede desligada; resultados idênti
 - Pacote personalizado (BED/TSV do usuário).
 - Busca por gene; colunas de anotação na tabela; textos "o que a fonte diz" sem classificação própria.
 
-## Módulo 10 — Relatórios, reprodutibilidade e criptografia
+## Módulo 11 — Relatórios, reprodutibilidade e criptografia
 
 - Relatório HTML autocontido e PDF.
 - "Reexecutar a partir do manifesto" com verificação de hash.
 - Criptografia opcional de projeto (Argon2id + XChaCha20-Poly1305).
 - Exportação/importação `.genoz` cifrada entre aparelhos, sem nuvem.
 
-## Módulo 11 — Família e populações
+## Módulo 12 — Família e populações
 
 - Trio: padrões compatíveis com herança materna/paterna e aparentemente de novo.
 - Parentesco KING-robust e IBS0.
 - Runs of homozygosity.
 - Comparação de N amostras (matriz de similaridade).
 
-## Módulo 12 — Lançamento 1.0
+## Módulo 13 — Lançamento 1.0
 
 - Revisão de desempenho (benchmarks Web e Android) e limites documentados.
 - Acessibilidade, traduções finais, onboarding.
@@ -244,3 +260,30 @@ Aceite: site público compara dois VCFs com a rede desligada; resultados idênti
 
 **Status:** concluído em 29/09/2026. Verificado no emulador Android (API 35): criar projeto → gerar exemplo sintético (Rust) → importar VCF pelo seletor do sistema → relatório → fechar à força e reabrir (dados mantidos) → apagar projeto (arquivos removidos). SHA-256 no Android idêntico ao do PC. 11 testes Dart + 80 Rust.
 Limitações conhecidas (tratadas nos próximos módulos): mensagens vindas do núcleo (ex.: evidências do build) ficam sempre em português; no Android, arquivos `content://` são copiados pelo Dart antes da validação (Módulo 6 pode otimizar); o controlador de importação é único para o app todo.
+
+---
+
+## Contrato do Módulo 4 (antes de implementar)
+
+**Entradas:** dois arquivos já importados (ou o mesmo arquivo multiamostra com amostras diferentes), amostra de cada lado, portão de qualidade (PASS, QUAL/DP/GQ mínimos), amostra "verdade" opcional; na tabela: filtros, busca e página.
+
+**Saídas:**
+- análise gravada: pasta `projetos/<id>/analises/<analise>/` com `rows.bgz`, `rows.idx`, `summary.json`, `stats_a.json`, `stats_b.json`, `manifest.json` + registro no banco;
+- tela de resultado com 3 abas: **Resumo** (categorias, concordância, Jaccard, benchmark, avisos), **Tabela** (rolagem de milhões de linhas, filtros, busca por posição/faixa/ID, detalhe da variante) e **QC** (Ti/Tv, het/hom, histogramas de A e B lado a lado);
+- exportação CSV, TSV, JSON e VCF (2 amostras) do resultado filtrado, sempre acompanhada do manifesto;
+- filtros salvos (reutilizáveis entre análises), notas/etiquetas/favoritos por variante e diário automático do projeto.
+
+**Arquitetura:**
+- ponte Rust: `compare_files` (progresso + cancelamento), `result_page`, `result_filtered_page` (índice de linhas filtradas em cache), `export_rows`, `parse_region`;
+- núcleo: `ResultReader::matching_rows` / `rows_at` e exportadores em `results.rs` (lógica científica continua no Rust);
+- banco: esquema v2 com migração automática (análises, filtros salvos, notas, diário);
+- cores já seguem o guia de estilo (tokens), refinadas no Módulo 5.
+
+**Invariantes:** nenhuma rede; a interface nunca carrega o resultado inteiro na memória do Dart (só a página visível); exportações reproduzíveis (mesmo filtro → mesmo arquivo); apagar projeto apaga análises e exportações.
+
+**Erros:** builds incompatíveis (mensagem do núcleo), amostra inexistente, região inválida na busca, falta de espaço, cancelamento.
+
+**Testes:** Rust (linhas filtradas, acesso por índice, exportadores com hash fixo); Dart (migração v1→v2, repositórios de análises/filtros/notas/diário, controlador de comparação com núcleo falso); emulador: comparar pessoa_a × pessoa_b e conferir as mesmas contagens da CLI (5/1/4/1/1).
+
+**Status:** concluído em 30/09/2026. Verificado no emulador Android: importar pessoa_a e pessoa_b → comparar → Resumo com 5/1/4/1/1 (igual à CLI), concordância 83,3%, Jaccard 54,5% → Tabela com filtro "Somente em A" (4 linhas) → detalhe da variante com nota e favorita → QC lado a lado → exportação CSV + manifesto para Downloads → diário completo. **O resultado no Android é byte a byte idêntico ao do PC** (rows.bgz, rows.idx, summary.json) e o ID da análise é o mesmo (parâmetros do manifesto agora montados num único lugar do núcleo). 19 testes Dart + 82 Rust.
+Pendências conhecidas: exportações muito grandes passam pela memória do Dart antes do "Salvar como" (streaming no Módulo 8); filtros por campos INFO/FORMAT existem no núcleo mas ainda não têm tela (Módulo 5/8).

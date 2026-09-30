@@ -223,5 +223,202 @@
   "confLow": "baixa",
   "confNone": "nenhuma",
   "importFile": "Arquivo",
-  "fileMenuReport": "Ver relatório"
+  "fileMenuReport": "Ver relatório",
+  "compareTitle": "Comparar A × B",
+  "compareNeedsFiles": "Importe ao menos um arquivo VCF para comparar.",
+  "sideA": "Amostra A",
+  "sideB": "Amostra B",
+  "chooseFile": "Arquivo",
+  "chooseSample": "Amostra",
+  "firstSample": "(primeira do arquivo)",
+  "qualityGate": "Portão de qualidade",
+  "qualityGateHint": "Chamadas reprovadas viram “incertas”, nunca “ausentes”.",
+  "passOnly": "Somente FILTER = PASS",
+  "minQual": "QUAL mínimo",
+  "minDp": "DP mínimo",
+  "minGq": "GQ mínimo",
+  "truthLabel": "Tratar como verdade (benchmark)",
+  "truthNone": "nenhuma",
+  "runCompare": "Comparar",
+  "comparing": "Comparando…",
+  "compareFailedTitle": "Não foi possível comparar",
+  "compareCancelled": "Comparação cancelada.",
+  "sameSampleWarning": "A e B são a mesma amostra do mesmo arquivo: o resultado será tudo “compartilhada”.",
+  "analysesTitle": "Análises",
+  "analysisVs": "{a} × {b}",
+  "@analysisVs": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      },
+      "b": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAnalysisTitle": "Apagar análise?",
+  "deleteAnalysisBody": "Os resultados desta comparação serão apagados. Os arquivos VCF continuam no projeto.",
+  "analysisNotFound": "Análise não encontrada.",
+  "catShared": "Compartilhada",
+  "catGenotypeDifference": "Genótipo diferente",
+  "catOnlyA": "Somente em A",
+  "catOnlyB": "Somente em B",
+  "catMissingUncertain": "Ausente/incerta",
+  "catNotAssessed": "Não avaliada",
+  "stCarrier": "carrega o alelo",
+  "stLowQuality": "carrega, baixa qualidade",
+  "stExplicitRef": "0/0 explícito",
+  "stMissing": "genótipo ausente",
+  "stAbsentRefBlock": "referência (bloco gVCF)",
+  "stAbsentCallable": "sem registro (região avaliada)",
+  "stAbsentUnknown": "sem registro",
+  "stNotAssessed": "fora da região avaliada",
+  "tabSummary": "Resumo",
+  "tabTable": "Tabela",
+  "tabQc": "QC",
+  "concordance": "Concordância de genótipos",
+  "jaccard": "Jaccard (sítios)",
+  "benchmarkTitle": "Benchmark (verdade: {side})",
+  "@benchmarkTitle": {
+    "placeholders": {
+      "side": {
+        "type": "String"
+      }
+    }
+  },
+  "precision": "Precisão",
+  "recall": "Sensibilidade",
+  "f1": "F1",
+  "classAll": "Todas",
+  "warningsTitle": "Avisos",
+  "modeInMemory": "Comparação feita em memória (arquivos fora de ordem).",
+  "absenceHint": "Sem BED de regiões avaliadas ou gVCF, “somente em A/B” inclui posições sem registro no outro arquivo — que podem simplesmente não ter sido sequenciadas.",
+  "rowsCount": "{count} linhas",
+  "@rowsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "filters": "Filtros",
+  "clearFilters": "Limpar",
+  "searchHint": "chr1:1000, chr7:1M-2M ou rs123",
+  "noRows": "Nenhuma linha com esses filtros.",
+  "saveFilter": "Salvar filtro",
+  "filterName": "Nome do filtro",
+  "savedFilters": "Filtros salvos",
+  "categoriesLabel": "Categorias",
+  "kindsLabel": "Tipos de variante",
+  "regionLabel": "Região",
+  "regionInvalid": "Região inválida (ex.: chr1:1000-2000)",
+  "idLabel": "ID contém",
+  "apply": "Aplicar",
+  "stateLabel": "Estado",
+  "gtLabel": "Genótipo",
+  "qualLabel": "QUAL",
+  "dpLabel": "DP",
+  "gqLabel": "GQ",
+  "filterLabel": "FILTER",
+  "idsLabel": "IDs",
+  "noteLabel": "Nota",
+  "tagsLabel": "Etiquetas (separadas por vírgula)",
+  "favorite": "Favorita",
+  "noteSaved": "Nota salva.",
+  "tiTvHint": "Referência: ~2,0–2,1 em genoma; ~3,0 em exoma.",
+  "hetHom": "het / hom-alt",
+  "missingRate": "Ausentes",
+  "carriers": "Variantes carregadas",
+  "lowQualityCount": "Baixa qualidade",
+  "dpDistribution": "Profundidade (DP)",
+  "gqDistribution": "Qualidade do genótipo (GQ)",
+  "qualDistribution": "QUAL",
+  "xHet": "Heterozigosidade no X (fora das PAR)",
+  "xHetHint": "Indicador educacional de consistência; não determina sexo.",
+  "export": "Exportar",
+  "exportFormat": "Formato",
+  "exportFiltered": "Exporta as {count} linhas do filtro atual, com o manifesto de reprodutibilidade.",
+  "@exportFiltered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exportDone": "{count} linhas exportadas.",
+  "@exportDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exportSaveManifest": "Salvar também o manifesto?",
+  "exportSaveManifestBody": "O manifesto registra entradas, parâmetros e hashes para refazer esta análise.",
+  "journalTitle": "Diário do projeto",
+  "journalEmpty": "Nada registrado ainda.",
+  "notesTitle": "Notas e favoritas",
+  "notesEmpty": "Toque numa variante da tabela para anotar ou favoritar.",
+  "logImport": "Arquivo importado: {name}",
+  "@logImport": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "logDeleteFile": "Arquivo removido: {name}",
+  "@logDeleteFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "logCompare": "Comparação {a} × {b} ({id})",
+  "@logCompare": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      },
+      "b": {
+        "type": "String"
+      },
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "logExport": "Exportação {format}: {count} linhas",
+  "@logExport": {
+    "placeholders": {
+      "format": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "logFilter": "Filtro salvo: {name}",
+  "@logFilter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "logDeleteAnalysis": "Análise apagada: {name}",
+  "@logDeleteAnalysis": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "minQualShort": "QUAL ≥",
+  "minDpShort": "DP ≥",
+  "minGqShort": "GQ ≥",
+  "exportVcf": "VCF (A e B)",
+  "notNow": "Agora não"
 }

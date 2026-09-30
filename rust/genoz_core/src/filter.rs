@@ -160,7 +160,8 @@ pub fn parse_region(text: &str) -> Option<Region> {
         (v >= 0.0).then(|| (v * mult).round() as u64)
     };
     let (start, end) = match range {
-        None => (1, u64::MAX),
+        // i64::MAX e não u64::MAX: o valor precisa caber em inteiros de JSON/Dart.
+        None => (1, i64::MAX as u64),
         Some(r) => match r.split_once('-') {
             Some((a, b)) => (parse(a)?, parse(b)?),
             None => {
@@ -278,7 +279,7 @@ mod tests {
             Some(Region { chrom: "7".into(), start: 117_559_000, end: 117_560_000 })
         );
         assert_eq!(parse_region("chrX:1.5M-2M"), Some(Region { chrom: "X".into(), start: 1_500_000, end: 2_000_000 }));
-        assert_eq!(parse_region("chrM").unwrap().end, u64::MAX);
+        assert_eq!(parse_region("chrM").unwrap().end, i64::MAX as u64);
         assert_eq!(parse_region("1:10-5"), None);
         assert_eq!(parse_region(":5"), None);
     }

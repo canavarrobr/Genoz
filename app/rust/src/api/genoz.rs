@@ -38,22 +38,33 @@ pub enum ImportPhase {
 }
 
 pub enum ImportEvent {
-    Progress { phase: ImportPhase, bytes_done: u64, bytes_total: u64 },
+    Progress {
+        phase: ImportPhase,
+        bytes_done: u64,
+        bytes_total: u64,
+    },
     /// Relatório de inspeção em JSON (o mesmo formato de `genoz-cli inspect --json`).
-    Done { report_json: String },
-    Failed { message: String },
+    Done {
+        report_json: String,
+    },
+    Failed {
+        message: String,
+    },
     Cancelled,
 }
 
-static JOBS: LazyLock<Mutex<HashMap<String, Arc<AtomicBool>>>> = LazyLock::new(|| Mutex::new(HashMap::new()));
+static JOBS: LazyLock<Mutex<HashMap<String, Arc<AtomicBool>>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
 
-fn register(job_id: &str) -> Arc<AtomicBool> {
+pub(crate) fn register(job_id: &str) -> Arc<AtomicBool> {
     let flag = Arc::new(AtomicBool::new(false));
-    JOBS.lock().expect("lock").insert(job_id.to_string(), flag.clone());
+    JOBS.lock()
+        .expect("lock")
+        .insert(job_id.to_string(), flag.clone());
     flag
 }
 
-fn unregister(job_id: &str) {
+pub(crate) fn unregister(job_id: &str) {
     JOBS.lock().expect("lock").remove(job_id);
 }
 
@@ -65,7 +76,7 @@ pub fn cancel_job(job_id: String) {
     }
 }
 
-const PROGRESS_STEP: u64 = 4 << 20;
+pub(crate) const PROGRESS_STEP: u64 = 4 << 20;
 
 /// Leitor que informa o progresso e interrompe a leitura quando cancelado.
 struct ProgressReader<'a, R> {
@@ -107,18 +118,24 @@ fn copy_and_hash(
     cancel: &AtomicBool,
     sink: &StreamSink<ImportEvent>,
 ) -> Result<Option<FileDigest>, String> {
-    let total = std::fs::metadata(source).map(|m| m.len()).map_err(|e| format!("não foi possível ler o arquivo: {e}"))?;
+    let total = std::fs::metadata(source)
+        .map(|m| m.len())
+        .map_err(|e| format!("não foi possível ler o arquivo: {e}"))?;
     // Origem == destino: o app já gravou o arquivo (ex.: `content://` no Android);
     // aqui só calculamos o hash.
     let in_place = source == dest;
     if let Some(parent) = dest.parent() {
-        std::fs::create_dir_all(parent).map_err(|e| format!("não foi possível criar a pasta do projeto: {e}"))?;
+        std::fs::create_dir_all(parent)
+            .map_err(|e| format!("não foi possível criar a pasta do projeto: {e}"))?;
     }
-    let mut input = File::open(source).map_err(|e| format!("não foi possível abrir o arquivo: {e}"))?;
+    let mut input =
+        File::open(source).map_err(|e| format!("não foi possível abrir o arquivo: {e}"))?;
     let mut output: Box<dyn Write> = if in_place {
         Box::new(std::io::sink())
     } else {
-        Box::new(BufWriter::new(File::create(dest).map_err(|e| format!("não foi possível gravar a cópia: {e}"))?))
+        Box::new(BufWriter::new(
+            File::create(dest).map_err(|e| format!("não foi possível gravar a cópia: {e}"))?,
+        ))
     };
     let mut hasher = Sha256::new();
     let mut buf = vec![0u8; 1 << 20];
@@ -127,24 +144,44 @@ fn copy_and_hash(
         if cancel.load(Ordering::SeqCst) {
             return Ok(None);
         }
-        let n = input.read(&mut buf).map_err(|e| format!("falha de leitura: {e}"))?;
+        let n = input
+            .read(&mut buf)
+            .map_err(|e| format!("falha de leitura: {e}"))?;
         if n == 0 {
             break;
         }
         hasher.update(&buf[..n]);
-        output.write_all(&buf[..n]).map_err(|e| format!("falha ao gravar (espaço em disco?): {e}"))?;
+        output
+            .write_all(&buf[..n])
+            .map_err(|e| format!("falha ao gravar (espaço em disco?): {e}"))?;
         done += n as u64;
         if done - last >= PROGRESS_STEP || done == total {
             last = done;
-            let _ = sink.add(ImportEvent::Progress { phase: ImportPhase::Copying, bytes_done: done, bytes_total: total });
+            let _ = sink.add(ImportEvent::Progress {
+                phase: ImportPhase::Copying,
+                bytes_done: done,
+                bytes_total: total,
+            });
         }
     }
-    output.flush().map_err(|e| format!("falha ao gravar (espaço em disco?): {e}"))?;
-    Ok(Some(FileDigest { sha256: format!("{:x}", hasher.finalize()), bytes: done }))
+    output
+        .flush()
+        .map_err(|e| format!("falha ao gravar (espaço em disco?): {e}"))?;
+    Ok(Some(FileDigest {
+        sha256: format!("{:x}", hasher.finalize()),
+        bytes: done,
+    }))
 }
 
-fn run_import(source: &Path, dest: &Path, cancel: &AtomicBool, sink: &StreamSink<ImportEvent>) -> Result<Outcome, String> {
-    let Some(digest) = copy_and_hash(source, dest, cancel, sink)? else { return Ok(Outcome::Cancelled) };
+fn run_import(
+    source: &Path,
+    dest: &Path,
+    cancel: &AtomicBool,
+    sink: &StreamSink<ImportEvent>,
+) -> Result<Outcome, String> {
+    let Some(digest) = copy_and_hash(source, dest, cancel, sink)? else {
+        return Ok(Outcome::Cancelled);
+    };
     let reader = ProgressReader {
         inner: File::open(dest).map_err(|e| format!("não foi possível reabrir a cópia: {e}"))?,
         done: 0,
@@ -153,18 +190,26 @@ fn run_import(source: &Path, dest: &Path, cancel: &AtomicBool, sink: &StreamSink
         cancel,
         sink,
     };
-    let mut report = inspect(reader, &InspectOptions { max_issues: 500 }).map_err(|e| e.user_message())?;
+    let mut report =
+        inspect(reader, &InspectOptions { max_issues: 500 }).map_err(|e| e.user_message())?;
     if cancel.load(Ordering::SeqCst) {
         return Ok(Outcome::Cancelled);
     }
     report.digest = Some(digest);
-    Ok(Outcome::Done(serde_json::to_string(&report).expect("relatório serializável")))
+    Ok(Outcome::Done(
+        serde_json::to_string(&report).expect("relatório serializável"),
+    ))
 }
 
 /// Copia um VCF para a pasta privada do app (`dest_path`), calcula o SHA-256
 /// e valida. Emite progresso; termina com `Done`, `Failed` ou `Cancelled`.
 /// Em falha ou cancelamento, a cópia parcial é apagada.
-pub fn import_vcf(source_path: String, dest_path: String, job_id: String, sink: StreamSink<ImportEvent>) {
+pub fn import_vcf(
+    source_path: String,
+    dest_path: String,
+    job_id: String,
+    sink: StreamSink<ImportEvent>,
+) {
     let cancel = register(&job_id);
     let (source, dest) = (Path::new(&source_path), Path::new(&dest_path));
     let event = match run_import(source, dest, &cancel, &sink) {
@@ -192,9 +237,15 @@ pub fn write_synthetic_example(
 ) -> Result<(), String> {
     let params = SynthParams {
         seed,
-        samples: (1..=samples.max(1)).map(|i| format!("EXEMPLO_{i}")).collect(),
+        samples: (1..=samples.max(1))
+            .map(|i| format!("EXEMPLO_{i}"))
+            .collect(),
         variants_per_chrom,
-        build: if grch37 { GenomeBuild::Grch37 } else { GenomeBuild::Grch38 },
+        build: if grch37 {
+            GenomeBuild::Grch37
+        } else {
+            GenomeBuild::Grch38
+        },
         ..Default::default()
     };
     if let Some(parent) = Path::new(&dest_path).parent() {

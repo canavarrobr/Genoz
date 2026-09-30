@@ -1,0 +1,90 @@
+{
+  "core_version": "0.1.0",
+  "mode": "streaming",
+  "a": {
+    "label": "A",
+    "sample": "PESSOA_A",
+    "build": {
+      "build": "GRCh38",
+      "confidence": "high",
+      "evidence": [
+        "contig chr1 com comprimento 248956422 = GRCh38"
+      ]
+    },
+    "records": 10,
+    "rejected_lines": 0,
+    "duplicate_keys": 0,
+    "callable_regions": false
+  },
+  "b": {
+    "label": "B",
+    "sample": "PESSOA_B",
+    "build": {
+      "build": "GRCh38",
+      "confidence": "high",
+      "evidence": [
+        "contig 1 com comprimento 248956422 = GRCh38"
+      ]
+    },
+    "records": 9,
+    "rejected_lines": 0,
+    "duplicate_keys": 0,
+    "callable_regions": false
+  },
+  "rows": 12,
+  "counts": {
+    "shared": 5,
+    "genotype_difference": 1,
+    "only_a": 4,
+    "only_b": 1,
+    "missing_uncertain": 1,
+    "not_assessed": 0
+  },
+  "by_kind": {
+    "shared": {
+      "snv": 4,
+      "insertion": 1
+    },
+    "genotype_difference": {
+      "snv": 1
+    },
+    "only_a": {
+      "snv": 4
+    },
+    "only_b": {
+      "snv": 1
+    },
+    "missing_uncertain": {
+      "snv": 1
+    }
+  },
+  "by_chrom": [
+    {
+      "chrom": "1",
+      "counts": {
+        "shared": 5,
+        "genotype_difference": 1,
+        "only_a": 4,
+        "only_b": 1,
+        "missing_uncertain": 1
+      }
+    }
+  ],
+  "sites_in_both": 6,
+  "genotype_concordance": 0.8333333333333334,
+  "jaccard": 0.5454545454545454,
+  "benchmark": null,
+  "options": {
+    "call_filter": {
+      "pass_only": false,
+      "min_qual": null,
+      "min_dp": null,
+      "min_gq": null,
+      "conditions": []
+    },
+    "truth": null,
+    "allow_build_mismatch": false,
+    "force_in_memory": false
+  },
+  "warnings": []
+}

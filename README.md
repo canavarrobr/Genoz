@@ -9,6 +9,7 @@ Os dados genômicos são processados no próprio dispositivo; nada é enviado a 
 - Especificação: [docs/especificacao/Genoz_especificacao_tecnica_v4.md](docs/especificacao/Genoz_especificacao_tecnica_v4.md)
 - Plano de módulos até a 1.0 (APK + site): [docs/modulos/PLANO_DE_MODULOS.md](docs/modulos/PLANO_DE_MODULOS.md)
 - Decisões de arquitetura: [docs/adr/](docs/adr/)
+- Guia de estilo (cores, logo, ícone): [docs/estilo/GUIA_DE_ESTILO.md](docs/estilo/GUIA_DE_ESTILO.md)
 - Referências oficiais (VCF, BGZF, tabix, crypt4gh etc.): [docs/referencias/](docs/referencias/)
 
 ## Status
@@ -17,7 +18,9 @@ Os dados genômicos são processados no próprio dispositivo; nada é enviado a 
 |---|---|
 | 1 — Núcleo Rust: leitura de VCF | concluído |
 | 2 — Comparação, filtros e QC | concluído |
-| 3 — App Flutter + ponte + persistência | em andamento |
+| 3 — App Flutter + ponte + persistência | concluído |
+| 4 — Telas de análise (comparação, tabela, filtros, QC, exportação) | concluído |
+| 5 — Estética e identidade visual | próximo |
 
 ## Preparar o computador (Windows)
 

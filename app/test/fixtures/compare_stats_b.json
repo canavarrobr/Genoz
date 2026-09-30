@@ -1,0 +1,194 @@
+{
+  "label": "B",
+  "calls_total": 9,
+  "carriers": 7,
+  "hom_ref": 1,
+  "het": 6,
+  "hom_alt": 1,
+  "missing": 1,
+  "low_quality": 0,
+  "ref_blocks": 0,
+  "by_kind": {
+    "snv": 6,
+    "insertion": 1
+  },
+  "transitions": 5,
+  "transversions": 1,
+  "ti_tv": 5.0,
+  "het_hom_ratio": 6.0,
+  "missing_rate": 0.1111111111111111,
+  "filter": {
+    "pass": 9
+  },
+  "qual_hist": [
+    {
+      "lo": 0.0,
+      "hi": 10.0,
+      "count": 0
+    },
+    {
+      "lo": 10.0,
+      "hi": 20.0,
+      "count": 0
+    },
+    {
+      "lo": 20.0,
+      "hi": 30.0,
+      "count": 0
+    },
+    {
+      "lo": 30.0,
+      "hi": 50.0,
+      "count": 0
+    },
+    {
+      "lo": 50.0,
+      "hi": 100.0,
+      "count": 7
+    },
+    {
+      "lo": 100.0,
+      "hi": 200.0,
+      "count": 0
+    },
+    {
+      "lo": 200.0,
+      "hi": 500.0,
+      "count": 0
+    },
+    {
+      "lo": 500.0,
+      "hi": 1000.0,
+      "count": 0
+    },
+    {
+      "lo": 1000.0,
+      "hi": null,
+      "count": 0
+    }
+  ],
+  "dp_hist": [
+    {
+      "lo": 0.0,
+      "hi": 5.0,
+      "count": 0
+    },
+    {
+      "lo": 5.0,
+      "hi": 10.0,
+      "count": 0
+    },
+    {
+      "lo": 10.0,
+      "hi": 15.0,
+      "count": 0
+    },
+    {
+      "lo": 15.0,
+      "hi": 20.0,
+      "count": 0
+    },
+    {
+      "lo": 20.0,
+      "hi": 30.0,
+      "count": 7
+    },
+    {
+      "lo": 30.0,
+      "hi": 40.0,
+      "count": 0
+    },
+    {
+      "lo": 40.0,
+      "hi": 60.0,
+      "count": 0
+    },
+    {
+      "lo": 60.0,
+      "hi": 100.0,
+      "count": 0
+    },
+    {
+      "lo": 100.0,
+      "hi": null,
+      "count": 0
+    }
+  ],
+  "gq_hist": [
+    {
+      "lo": 0.0,
+      "hi": 10.0,
+      "count": 0
+    },
+    {
+      "lo": 10.0,
+      "hi": 20.0,
+      "count": 0
+    },
+    {
+      "lo": 20.0,
+      "hi": 30.0,
+      "count": 0
+    },
+    {
+      "lo": 30.0,
+      "hi": 40.0,
+      "count": 0
+    },
+    {
+      "lo": 40.0,
+      "hi": 50.0,
+      "count": 0
+    },
+    {
+      "lo": 50.0,
+      "hi": 60.0,
+      "count": 0
+    },
+    {
+      "lo": 60.0,
+      "hi": 70.0,
+      "count": 7
+    },
+    {
+      "lo": 70.0,
+      "hi": 80.0,
+      "count": 0
+    },
+    {
+      "lo": 80.0,
+      "hi": 90.0,
+      "count": 0
+    },
+    {
+      "lo": 90.0,
+      "hi": 99.0,
+      "count": 0
+    },
+    {
+      "lo": 99.0,
+      "hi": null,
+      "count": 0
+    }
+  ],
+  "indel_lengths": {
+    "1": 1
+  },
+  "by_chrom": [
+    {
+      "chrom": "1",
+      "carriers": 7,
+      "het": 6,
+      "hom_alt": 1,
+      "density": [
+        7
+      ]
+    }
+  ],
+  "x_heterozygosity": {
+    "het": 0,
+    "hom_alt": 0,
+    "het_fraction": null,
+    "par_excluded": true
+  }
+}

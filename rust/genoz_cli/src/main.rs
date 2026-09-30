@@ -79,6 +79,8 @@ enum Command {
     Stats(analysis::StatsArgs),
     /// Mostra as linhas de um resultado de comparação, com filtros e páginas.
     View(analysis::ViewArgs),
+    /// Exporta as linhas de um resultado (csv, tsv, json ou vcf), com filtros.
+    Export(analysis::ExportArgs),
 }
 
 #[derive(Clone, Copy, ValueEnum)]
@@ -159,6 +161,7 @@ fn run(cli: Cli) -> Result<ExitCode, GenozError> {
         Command::Compare(args) => analysis::compare_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::Stats(args) => analysis::stats_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::View(args) => analysis::view_cmd(args).map(|()| ExitCode::SUCCESS),
+        Command::Export(args) => analysis::export_cmd(args).map(|()| ExitCode::SUCCESS),
     }
 }
 

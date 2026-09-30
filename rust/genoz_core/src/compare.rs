@@ -799,6 +799,17 @@ pub fn compare_to_store<W: std::io::Write>(
     Ok(StoredComparison { rows_out, index, outcome })
 }
 
+/// Parâmetros de uma comparação no manifesto. Única fonte para CLI e app:
+/// o ID da análise (derivado destes parâmetros) precisa ser o mesmo em
+/// qualquer plataforma.
+pub fn manifest_parameters(
+    opts: &CompareOptions,
+    sample_a: &SampleSelector,
+    sample_b: &SampleSelector,
+) -> serde_json::Value {
+    serde_json::json!({ "options": opts, "sample_a": sample_a, "sample_b": sample_b })
+}
+
 /// JSON formatado e determinístico (mesma entrada → mesmos bytes).
 pub fn to_json_bytes<T: Serialize>(value: &T) -> Vec<u8> {
     let mut v = serde_json::to_vec_pretty(value).expect("tipos serializáveis");

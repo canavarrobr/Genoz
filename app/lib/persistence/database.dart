@@ -55,7 +55,72 @@ class ProjectFiles extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Projects, ProjectFiles])
+// ---- Esquema v2 (Módulo 4) -------------------------------------------------
+
+/// Uma comparação A × B. Os resultados ficam em arquivos na pasta `resultDir`.
+@DataClassName('Analysis')
+class Analyses extends Table {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id, onDelete: KeyAction.cascade)();
+  TextColumn get fileAId => text()();
+  TextColumn get fileBId => text()();
+  TextColumn get sampleA => text().nullable()();
+  TextColumn get sampleB => text().nullable()();
+
+  /// `CompareOptions` do núcleo, em JSON.
+  TextColumn get optionsJson => text()();
+
+  /// Pasta RELATIVA com rows.bgz, rows.idx, summary.json, stats_*.json e manifest.json.
+  TextColumn get resultDir => text()();
+  TextColumn get summaryJson => text()();
+
+  /// ID derivado do conteúdo (manifesto): a mesma análise tem o mesmo ID em qualquer aparelho.
+  TextColumn get contentId => text()();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+/// Filtros de tabela salvos (`RowFilter` do núcleo, em JSON). Valem para o projeto todo.
+class SavedFilters extends Table {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id, onDelete: KeyAction.cascade)();
+  TextColumn get name => text().withLength(min: 1, max: 80)();
+  TextColumn get filterJson => text()();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+/// Nota, etiquetas e favorito de uma variante (chave `chrom:pos:ref:alt`).
+class VariantNotes extends Table {
+  TextColumn get projectId => text().references(Projects, #id, onDelete: KeyAction.cascade)();
+  TextColumn get variantKey => text()();
+  TextColumn get note => text().withDefault(const Constant(''))();
+
+  /// Lista JSON de etiquetas.
+  TextColumn get tagsJson => text().withDefault(const Constant('[]'))();
+  BoolColumn get favorite => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {projectId, variantKey};
+}
+
+/// Diário automático do projeto: o que foi feito e quando.
+class JournalEntries extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get projectId => text().references(Projects, #id, onDelete: KeyAction.cascade)();
+
+  /// `import`, `compare`, `export`, `filter`, `delete_file`, `delete_analysis`, `note`.
+  TextColumn get kind => text()();
+  TextColumn get message => text()();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
+@DriftDatabase(tables: [Projects, ProjectFiles, Analyses, SavedFilters, VariantNotes, JournalEntries])
 class GenozDatabase extends _$GenozDatabase {
   GenozDatabase(super.executor);
 
@@ -72,14 +137,14 @@ class GenozDatabase extends _$GenozDatabase {
   );
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) => m.createAll(),
     onUpgrade: (m, from, to) async {
       for (var v = from; v < to; v++) {
-        await _migrations[v]?.call(m);
+        await _upgradeFrom(m, v);
       }
     },
     beforeOpen: (details) async {
@@ -87,7 +152,15 @@ class GenozDatabase extends _$GenozDatabase {
     },
   );
 
-  /// Passos de migração: a chave é a versão de ORIGEM.
-  /// Ex.: `1: (m) => m.addColumn(projectFiles, projectFiles.novaColuna)`.
-  static final Map<int, Future<void> Function(Migrator m)> _migrations = {};
+  /// Um passo de migração, a partir da versão `from`.
+  /// Ex. futuro: `case 2: await m.addColumn(projectFiles, projectFiles.novaColuna);`
+  Future<void> _upgradeFrom(Migrator m, int from) async {
+    switch (from) {
+      case 1: // v1 → v2 (Módulo 4): análises, filtros salvos, notas e diário.
+        await m.createTable(analyses);
+        await m.createTable(savedFilters);
+        await m.createTable(variantNotes);
+        await m.createTable(journalEntries);
+    }
+  }
 }

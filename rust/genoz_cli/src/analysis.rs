@@ -12,7 +12,7 @@ use genoz_core::filter::{parse_region, CallFilter, RowFilter};
 use genoz_core::manifest::{InputRef, Manifest, OutputRef};
 use genoz_core::record::VariantKind;
 use genoz_core::regions::read_bed;
-use genoz_core::results::{ResultReader, RowIndex};
+use genoz_core::results::{export_rows, ExportFormat, ResultReader, RowIndex};
 use genoz_core::stats::{sample_stats, SampleStats};
 use genoz_core::GenozError;
 
@@ -92,17 +92,8 @@ pub struct ViewArgs {
     pub page: u64,
     #[arg(long, default_value_t = 25)]
     pub page_size: usize,
-    /// Categorias: shared, genotype_difference, only_a, only_b, missing_uncertain, not_assessed.
-    #[arg(long, value_delimiter = ',')]
-    pub category: Vec<String>,
-    /// Tipos: snv, mnv, insertion, deletion, complex, structural, other.
-    #[arg(long, value_delimiter = ',')]
-    pub kind: Vec<String>,
-    /// Região, ex.: chr1:1-50000 ou chr7:117.5M-117.6M.
-    #[arg(long)]
-    pub region: Option<String>,
-    #[arg(long)]
-    pub id: Option<String>,
+    #[command(flatten)]
+    pub filter: RowFilterArgs,
 }
 
 fn selector(name: &Option<String>) -> SampleSelector {
@@ -207,11 +198,8 @@ pub fn compare_cmd(args: CompareArgs) -> Result<(), GenozError> {
     inputs[0].sample = s.a.sample.clone();
     inputs[1].build = Some(s.b.build.build.label().into());
     inputs[1].sample = s.b.sample.clone();
-    let parameters = serde_json::json!({
-        "options": opts,
-        "sample_a": selector(&args.sample_a),
-        "sample_b": selector(&args.sample_b),
-    });
+    let parameters =
+        genoz_core::compare::manifest_parameters(&opts, &selector(&args.sample_a), &selector(&args.sample_b));
     let platform = format!("cli-{}-{}", std::env::consts::OS, std::env::consts::ARCH);
     let manifest = Manifest::new("compare", inputs, parameters, outputs, &platform, &now_utc());
     std::fs::write(args.out.join("manifest.json"), to_json_bytes(&manifest))?;
@@ -292,24 +280,75 @@ fn print_stats(file: &Path, s: &SampleStats) {
     }
 }
 
+#[derive(Args)]
+pub struct RowFilterArgs {
+    /// Categorias: shared, genotype_difference, only_a, only_b, missing_uncertain, not_assessed.
+    #[arg(long, value_delimiter = ',')]
+    pub category: Vec<String>,
+    /// Tipos: snv, mnv, insertion, deletion, complex, structural, other.
+    #[arg(long, value_delimiter = ',')]
+    pub kind: Vec<String>,
+    /// Região, ex.: chr1:1-50000 ou chr7:117.5M-117.6M.
+    #[arg(long)]
+    pub region: Option<String>,
+    #[arg(long)]
+    pub id: Option<String>,
+}
+
+impl RowFilterArgs {
+    fn filter(&self) -> Result<RowFilter, GenozError> {
+        let bad = |what: &str, v: &str| GenozError::InvalidParam(format!("{what} desconhecido: {v}"));
+        let mut filter = RowFilter::default();
+        for c in &self.category {
+            filter.categories.push(Category::from_code(c).ok_or_else(|| bad("categoria", c))?);
+        }
+        for k in &self.kind {
+            let kind: VariantKind =
+                serde_json::from_value(serde_json::Value::String(k.clone())).map_err(|_| bad("tipo", k))?;
+            filter.kinds.push(kind);
+        }
+        if let Some(r) = &self.region {
+            filter.region = Some(parse_region(r).ok_or_else(|| bad("formato de região", r))?);
+        }
+        filter.id_contains = self.id.clone();
+        Ok(filter)
+    }
+}
+
+fn open_result(dir: &Path) -> Result<ResultReader<BufReader<File>>, GenozError> {
+    let index = RowIndex::from_bytes(&std::fs::read(dir.join("rows.idx"))?)?;
+    Ok(ResultReader::new(BufReader::new(File::open(dir.join("rows.bgz"))?), index))
+}
+
+#[derive(Args)]
+pub struct ExportArgs {
+    /// Pasta de resultado criada por `compare`.
+    pub dir: PathBuf,
+    #[arg(long)]
+    pub out: PathBuf,
+    /// csv, tsv, json ou vcf.
+    #[arg(long, default_value = "csv")]
+    pub format: String,
+    #[command(flatten)]
+    pub filter: RowFilterArgs,
+}
+
+pub fn export_cmd(args: ExportArgs) -> Result<(), GenozError> {
+    let format: ExportFormat = serde_json::from_value(serde_json::Value::String(args.format.clone()))
+        .map_err(|_| GenozError::InvalidParam(format!("formato desconhecido: {}", args.format)))?;
+    let summary: serde_json::Value = serde_json::from_slice(&std::fs::read(args.dir.join("summary.json"))?)
+        .map_err(|e| GenozError::InvalidParam(format!("summary.json inválido: {e}")))?;
+    let name = |side: &str| summary[side]["sample"].as_str().unwrap_or(side).to_string();
+    let mut reader = open_result(&args.dir)?;
+    let out = std::io::BufWriter::new(File::create(&args.out)?);
+    let n = export_rows(&mut reader, &args.filter.filter()?, format, (&name("a"), &name("b")), out)?;
+    println!("{n} linhas exportadas para {}", args.out.display());
+    Ok(())
+}
+
 pub fn view_cmd(args: ViewArgs) -> Result<(), GenozError> {
-    let index = RowIndex::from_bytes(&std::fs::read(args.dir.join("rows.idx"))?)?;
-    let rows = BufReader::new(File::open(args.dir.join("rows.bgz"))?);
-    let mut reader = ResultReader::new(rows, index);
-    let bad = |what: &str, v: &str| GenozError::InvalidParam(format!("{what} desconhecido: {v}"));
-    let mut filter = RowFilter::default();
-    for c in &args.category {
-        filter.categories.push(Category::from_code(c).ok_or_else(|| bad("categoria", c))?);
-    }
-    for k in &args.kind {
-        let kind: VariantKind =
-            serde_json::from_value(serde_json::Value::String(k.clone())).map_err(|_| bad("tipo", k))?;
-        filter.kinds.push(kind);
-    }
-    if let Some(r) = &args.region {
-        filter.region = Some(parse_region(r).ok_or_else(|| bad("formato de região", r))?);
-    }
-    filter.id_contains = args.id.clone();
+    let mut reader = open_result(&args.dir)?;
+    let filter = args.filter.filter()?;
 
     let skip = (args.page.max(1) - 1) * args.page_size as u64;
     let (rows, total) = if filter == RowFilter::default() {

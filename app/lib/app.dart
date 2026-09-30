@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 
+import 'features/analysis/analysis_screen.dart';
+import 'features/compare/compare_setup_screen.dart';
+import 'features/projects/journal_screen.dart';
 import 'features/projects/project_screen.dart';
 import 'features/projects/projects_screen.dart';
 import 'features/report/file_report_screen.dart';
@@ -18,6 +21,18 @@ GoRouter buildRouter() => GoRouter(
             GoRoute(
               path: 'arquivo/:fileId',
               builder: (_, s) => FileReportScreen(fileId: s.pathParameters['fileId']!),
+            ),
+            GoRoute(
+              path: 'comparar',
+              builder: (_, s) => CompareSetupScreen(projectId: s.pathParameters['id']!),
+            ),
+            GoRoute(
+              path: 'analise/:analysisId',
+              builder: (_, s) => AnalysisScreen(analysisId: s.pathParameters['analysisId']!),
+            ),
+            GoRoute(
+              path: 'diario',
+              builder: (_, s) => JournalScreen(projectId: s.pathParameters['id']!),
             ),
           ],
         ),
