@@ -420,5 +420,34 @@
   "minDpShort": "DP ≥",
   "minGqShort": "GQ ≥",
   "exportVcf": "VCF (A e B)",
-  "notNow": "Agora não"
+  "notNow": "Agora não",
+  "brandSignature": "GENÔMICA SEM FRONTEIRAS",
+  "brandSlogan": "Sua genômica, no seu controle.",
+  "brandSplash": "Análise genômica local e privada",
+  "menuProjects": "Projetos",
+  "menuAbout": "Sobre o Genoz",
+  "menuPrivacy": "Privacidade",
+  "aboutTitle": "Sobre",
+  "aboutBody": "O Genoz compara e explora arquivos genômicos (VCF) inteiramente no seu dispositivo. É um projeto acadêmico para ensino e pesquisa.",
+  "pillarScience": "Ciência",
+  "pillarScienceBody": "Informação confiável, com as fontes e os métodos à vista.",
+  "pillarPrivacy": "Privacidade",
+  "pillarPrivacyBody": "Seus dados, no seu dispositivo.",
+  "pillarPerformance": "Desempenho",
+  "pillarPerformanceBody": "Análises rápidas e precisas, mesmo em arquivos grandes.",
+  "pillarMultiplatform": "Multiplataforma",
+  "pillarMultiplatformBody": "Web, Android e iOS com o mesmo núcleo.",
+  "aboutVersion": "Versão do app {app} · núcleo {core}",
+  "@aboutVersion": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "core": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutLicenses": "Licenças de código aberto",
+  "aboutSource": "Código-fonte: github.com/canavarrobr/Genoz"
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 
+import 'features/about/about_screen.dart';
 import 'features/analysis/analysis_screen.dart';
 import 'features/compare/compare_setup_screen.dart';
 import 'features/projects/journal_screen.dart';
@@ -14,6 +15,7 @@ import 'ui/theme.dart';
 GoRouter buildRouter() => GoRouter(
       routes: [
         GoRoute(path: '/', builder: (_, _) => const ProjectsScreen()),
+        GoRoute(path: '/sobre', builder: (_, _) => const AboutScreen()),
         GoRoute(
           path: '/projeto/:id',
           builder: (_, s) => ProjectScreen(projectId: s.pathParameters['id']!),

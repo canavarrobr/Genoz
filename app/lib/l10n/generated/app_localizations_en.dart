@@ -695,4 +695,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notNow => 'Not now';
+
+  @override
+  String get brandSignature => 'GENOMICS WITHOUT BORDERS';
+
+  @override
+  String get brandSlogan => 'Your genomics, under your control.';
+
+  @override
+  String get brandSplash => 'Local and private genomic analysis';
+
+  @override
+  String get menuProjects => 'Projects';
+
+  @override
+  String get menuAbout => 'About Genoz';
+
+  @override
+  String get menuPrivacy => 'Privacy';
+
+  @override
+  String get aboutTitle => 'About';
+
+  @override
+  String get aboutBody =>
+      'Genoz compares and explores genomic files (VCF) entirely on your device. It is an academic project for teaching and research.';
+
+  @override
+  String get pillarScience => 'Science';
+
+  @override
+  String get pillarScienceBody =>
+      'Reliable information, with sources and methods in plain sight.';
+
+  @override
+  String get pillarPrivacy => 'Privacy';
+
+  @override
+  String get pillarPrivacyBody => 'Your data, on your device.';
+
+  @override
+  String get pillarPerformance => 'Performance';
+
+  @override
+  String get pillarPerformanceBody =>
+      'Fast and precise analyses, even on large files.';
+
+  @override
+  String get pillarMultiplatform => 'Multiplatform';
+
+  @override
+  String get pillarMultiplatformBody =>
+      'Web, Android and iOS with the same core.';
+
+  @override
+  String aboutVersion(String app, String core) {
+    return 'App version $app · core $core';
+  }
+
+  @override
+  String get aboutLicenses => 'Open-source licenses';
+
+  @override
+  String get aboutSource => 'Source code: github.com/canavarrobr/Genoz';
 }

@@ -1,12 +1,13 @@
 {
-    "name": "genoz",
-    "short_name": "genoz",
+    "name": "Genoz — genômica local e privada",
+    "short_name": "Genoz",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "Genoz - plataforma genomica local-first",
-    "orientation": "portrait-primary",
+    "background_color": "#073B4C",
+    "theme_color": "#073B4C",
+    "description": "Análise genômica local e privada: seus arquivos nunca saem do seu dispositivo. Uso educacional e de pesquisa, não é diagnóstico.",
+    "lang": "pt-BR",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

@@ -698,4 +698,67 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get notNow => 'Agora não';
+
+  @override
+  String get brandSignature => 'GENÔMICA SEM FRONTEIRAS';
+
+  @override
+  String get brandSlogan => 'Sua genômica, no seu controle.';
+
+  @override
+  String get brandSplash => 'Análise genômica local e privada';
+
+  @override
+  String get menuProjects => 'Projetos';
+
+  @override
+  String get menuAbout => 'Sobre o Genoz';
+
+  @override
+  String get menuPrivacy => 'Privacidade';
+
+  @override
+  String get aboutTitle => 'Sobre';
+
+  @override
+  String get aboutBody =>
+      'O Genoz compara e explora arquivos genômicos (VCF) inteiramente no seu dispositivo. É um projeto acadêmico para ensino e pesquisa.';
+
+  @override
+  String get pillarScience => 'Ciência';
+
+  @override
+  String get pillarScienceBody =>
+      'Informação confiável, com as fontes e os métodos à vista.';
+
+  @override
+  String get pillarPrivacy => 'Privacidade';
+
+  @override
+  String get pillarPrivacyBody => 'Seus dados, no seu dispositivo.';
+
+  @override
+  String get pillarPerformance => 'Desempenho';
+
+  @override
+  String get pillarPerformanceBody =>
+      'Análises rápidas e precisas, mesmo em arquivos grandes.';
+
+  @override
+  String get pillarMultiplatform => 'Multiplataforma';
+
+  @override
+  String get pillarMultiplatformBody =>
+      'Web, Android e iOS com o mesmo núcleo.';
+
+  @override
+  String aboutVersion(String app, String core) {
+    return 'Versão do app $app · núcleo $core';
+  }
+
+  @override
+  String get aboutLicenses => 'Licenças de código aberto';
+
+  @override
+  String get aboutSource => 'Código-fonte: github.com/canavarrobr/Genoz';
 }

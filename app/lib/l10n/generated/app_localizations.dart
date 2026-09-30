@@ -1309,6 +1309,120 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Agora não'**
   String get notNow;
+
+  /// No description provided for @brandSignature.
+  ///
+  /// In pt, this message translates to:
+  /// **'GENÔMICA SEM FRONTEIRAS'**
+  String get brandSignature;
+
+  /// No description provided for @brandSlogan.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua genômica, no seu controle.'**
+  String get brandSlogan;
+
+  /// No description provided for @brandSplash.
+  ///
+  /// In pt, this message translates to:
+  /// **'Análise genômica local e privada'**
+  String get brandSplash;
+
+  /// No description provided for @menuProjects.
+  ///
+  /// In pt, this message translates to:
+  /// **'Projetos'**
+  String get menuProjects;
+
+  /// No description provided for @menuAbout.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sobre o Genoz'**
+  String get menuAbout;
+
+  /// No description provided for @menuPrivacy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Privacidade'**
+  String get menuPrivacy;
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sobre'**
+  String get aboutTitle;
+
+  /// No description provided for @aboutBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Genoz compara e explora arquivos genômicos (VCF) inteiramente no seu dispositivo. É um projeto acadêmico para ensino e pesquisa.'**
+  String get aboutBody;
+
+  /// No description provided for @pillarScience.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ciência'**
+  String get pillarScience;
+
+  /// No description provided for @pillarScienceBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informação confiável, com as fontes e os métodos à vista.'**
+  String get pillarScienceBody;
+
+  /// No description provided for @pillarPrivacy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Privacidade'**
+  String get pillarPrivacy;
+
+  /// No description provided for @pillarPrivacyBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seus dados, no seu dispositivo.'**
+  String get pillarPrivacyBody;
+
+  /// No description provided for @pillarPerformance.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desempenho'**
+  String get pillarPerformance;
+
+  /// No description provided for @pillarPerformanceBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Análises rápidas e precisas, mesmo em arquivos grandes.'**
+  String get pillarPerformanceBody;
+
+  /// No description provided for @pillarMultiplatform.
+  ///
+  /// In pt, this message translates to:
+  /// **'Multiplataforma'**
+  String get pillarMultiplatform;
+
+  /// No description provided for @pillarMultiplatformBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Web, Android e iOS com o mesmo núcleo.'**
+  String get pillarMultiplatformBody;
+
+  /// No description provided for @aboutVersion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Versão do app {app} · núcleo {core}'**
+  String aboutVersion(String app, String core);
+
+  /// No description provided for @aboutLicenses.
+  ///
+  /// In pt, this message translates to:
+  /// **'Licenças de código aberto'**
+  String get aboutLicenses;
+
+  /// No description provided for @aboutSource.
+  ///
+  /// In pt, this message translates to:
+  /// **'Código-fonte: github.com/canavarrobr/Genoz'**
+  String get aboutSource;
 }
 
 class _AppLocalizationsDelegate

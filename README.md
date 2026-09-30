@@ -20,7 +20,8 @@ Os dados genômicos são processados no próprio dispositivo; nada é enviado a 
 | 2 — Comparação, filtros e QC | concluído |
 | 3 — App Flutter + ponte + persistência | concluído |
 | 4 — Telas de análise (comparação, tabela, filtros, QC, exportação) | concluído |
-| 5 — Estética e identidade visual | próximo |
+| 5 — Estética e identidade visual | concluído |
+| 6 — Web local-first (site de prévia) | próximo |
 
 ## Preparar o computador (Windows)
 

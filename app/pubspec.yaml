@@ -2,7 +2,7 @@ name: genoz
 description: "Genoz - plataforma genômica local-first para ensino e pesquisa."
 publish_to: 'none'
 
-version: 0.3.0+1
+version: 0.5.0+5
 
 environment:
   sdk: ^3.13.2
@@ -26,6 +26,7 @@ dependencies:
     path: rust_builder
   flutter_rust_bridge: 2.13.0
   freezed_annotation: ^3.1.0
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -36,7 +37,63 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   freezed: ^4.0.2
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.8
 
 flutter:
   uses-material-design: true
   generate: true
+  assets:
+    - assets/marca/simbolo.svg
+    - assets/marca/simbolo_escuro.svg
+    - assets/fonts/OFL-Poppins.txt
+    - assets/fonts/OFL-Inter.txt
+  # Fontes embutidas (licença OFL). Nada é baixado da internet, nem na Web.
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+
+# Ícone do app (gerado por tools/marca/gerar_marca.py → dart run flutter_launcher_icons).
+flutter_launcher_icons:
+  image_path: assets/marca/icone_1024.png
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  adaptive_icon_background: "#073B4C"
+  adaptive_icon_foreground: assets/marca/icone_primeiro_plano_1024.png
+  adaptive_icon_monochrome: assets/marca/icone_primeiro_plano_1024.png
+  min_sdk_android: 24
+  web:
+    generate: true
+    image_path: assets/marca/icone_1024.png
+    background_color: "#073B4C"
+    theme_color: "#073B4C"
+
+# Tela de abertura (dart run flutter_native_splash:create).
+flutter_native_splash:
+  color: "#073B4C"
+  image: assets/marca/abertura_simbolo.png
+  android_12:
+    color: "#073B4C"
+    image: assets/marca/icone_primeiro_plano_1024.png
+    icon_background_color: "#073B4C"
+  web: true
+  fullscreen: false

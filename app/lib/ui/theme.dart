@@ -18,6 +18,15 @@ abstract final class GenozColors {
   static const info = Color(0xFF6366F1);
 
   static const gradient = LinearGradient(colors: [deep, cyan]);
+
+  /// Gradiente principal com texto branco por cima: o ciano fica só na borda
+  /// direita (branco sobre ciano não tem contraste suficiente; ver teste).
+  static const headerGradient = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [deep, petroleum, cyan],
+    stops: [0.0, 0.72, 1.0],
+  );
   static const gradientAlt = LinearGradient(colors: [Color(0xFF4C1D95), Color(0xFF38BDF8)]);
 }
 
@@ -118,15 +127,32 @@ ThemeData genozTheme(Brightness brightness) {
           info: Color(0xFFA5B4FC),
           muted: Color(0xFFA7B7C4),
         );
+  // Tipografia do guia: Inter no texto, Poppins (geométrica) em títulos e marca.
+  final base = ThemeData(colorScheme: scheme, useMaterial3: true, fontFamily: 'Inter').textTheme;
+  TextStyle? poppins(TextStyle? s, [FontWeight w = FontWeight.w600]) =>
+      s?.copyWith(fontFamily: 'Poppins', fontWeight: w, letterSpacing: 0);
+  final textTheme = base.copyWith(
+    displayLarge: poppins(base.displayLarge),
+    displayMedium: poppins(base.displayMedium),
+    displaySmall: poppins(base.displaySmall),
+    headlineLarge: poppins(base.headlineLarge),
+    headlineMedium: poppins(base.headlineMedium),
+    headlineSmall: poppins(base.headlineSmall),
+    titleLarge: poppins(base.titleLarge),
+    titleMedium: poppins(base.titleMedium, FontWeight.w500),
+  );
   return ThemeData(
     colorScheme: scheme,
     useMaterial3: true,
+    fontFamily: 'Inter',
+    textTheme: textTheme,
     scaffoldBackgroundColor: light ? GenozColors.background : GenozColors.deep,
     extensions: [palette],
     appBarTheme: AppBarTheme(
       backgroundColor: light ? GenozColors.background : GenozColors.deep,
       foregroundColor: light ? GenozColors.deep : Colors.white,
       titleTextStyle: TextStyle(
+        fontFamily: 'Poppins',
         fontSize: 22,
         fontWeight: FontWeight.w600,
         color: light ? GenozColors.deep : Colors.white,

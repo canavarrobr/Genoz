@@ -17,7 +17,7 @@ Um APK e um site de prévia aparecem já nos Módulos 6 e 7 (depois do módulo d
 | 2 ✅ | Núcleo Rust: comparação, filtros e QC | Mesma ferramenta compara A×B, filtra e gera estatísticas | PC |
 | 3 ✅ | App Flutter + ponte + persistência | App abre, cria projetos e importa VCF usando o núcleo Rust | Android (emulador) |
 | 4 ✅ | Telas de análise | Comparação, tabela, filtros, QC, exportação e manifesto no app | Android (emulador) |
-| 5 | **Estética e identidade visual** | Logo, ícone, abertura, paleta, tipografia e componentes do [guia de estilo](../estilo/GUIA_DE_ESTILO.md) aplicados em todo o app | Web + Android |
+| 5 ✅ | **Estética e identidade visual** | Logo, ícone, abertura, paleta, tipografia e componentes do [guia de estilo](../estilo/GUIA_DE_ESTILO.md) aplicados em todo o app | Web + Android |
 | 6 | Web local-first | **Site de prévia** (GitHub Pages) comparando VCF no navegador sem upload | Web |
 | 7 | Android completo | **APK de prévia** para instalar no celular; bloqueio do app; privacidade | Android |
 | 8 | Visualização + modo estudante | Ideograma, densidade, visualizador de região, trilhas guiadas, dados sintéticos | Web + Android |
@@ -287,3 +287,25 @@ Limitações conhecidas (tratadas nos próximos módulos): mensagens vindas do n
 
 **Status:** concluído em 30/09/2026. Verificado no emulador Android: importar pessoa_a e pessoa_b → comparar → Resumo com 5/1/4/1/1 (igual à CLI), concordância 83,3%, Jaccard 54,5% → Tabela com filtro "Somente em A" (4 linhas) → detalhe da variante com nota e favorita → QC lado a lado → exportação CSV + manifesto para Downloads → diário completo. **O resultado no Android é byte a byte idêntico ao do PC** (rows.bgz, rows.idx, summary.json) e o ID da análise é o mesmo (parâmetros do manifesto agora montados num único lugar do núcleo). 19 testes Dart + 82 Rust.
 Pendências conhecidas: exportações muito grandes passam pela memória do Dart antes do "Salvar como" (streaming no Módulo 8); filtros por campos INFO/FORMAT existem no núcleo mas ainda não têm tela (Módulo 5/8).
+
+---
+
+## Contrato do Módulo 5 — Estética (antes de implementar)
+
+**Entradas:** guia de estilo (`docs/estilo/`), tokens de cor já em `app/lib/ui/theme.dart`.
+
+**Saídas:**
+- **Marca em vetor:** símbolo (dupla hélice em "S") gerado por script reproduzível `tools/marca/gerar_marca.py` → `app/assets/marca/simbolo.svg` + PNGs derivados (ícone 1024, primeiro plano do ícone adaptativo, imagem da abertura, ícones web/PWA, favicon);
+- **Ícone do app** para Android (adaptativo + legado), iOS e Web, e **abertura (splash)** em azul profundo, gerados a partir desses PNGs;
+- **Tipografia embutida** (licença OFL): Poppins no logotipo e títulos, Inter no texto; nada é baixado da internet (inclusive na Web);
+- **Componentes:** cabeçalho com gradiente principal e slogan, menu lateral no estilo da referência (fundo azul profundo, item ativo em azul-petróleo), estados vazios com o símbolo, cards e chips com raios e sombras do guia;
+- **Tela "Sobre":** assinatura, slogan, pilares (Ciência · Privacidade · Desempenho · Multiplataforma), versão do app e do núcleo, licenças (fontes incluídas);
+- **Tema escuro** derivado do azul profundo.
+
+**Invariantes:** todas as cores vêm dos tokens; nenhum recurso visual externo; cores de estado sempre com ícone e texto.
+
+**Testes:** contraste WCAG (texto ≥ 4,5:1, elementos grandes/ícones ≥ 3:1) calculado automaticamente para os pares de cores do tema claro e escuro; teste de tela da "Sobre" e do menu; captura no emulador (ícone, abertura, telas principais em claro e escuro).
+
+**Decisão registrada:** ADR-011 (fontes e geração da marca).
+
+**Status:** concluído em 30/09/2026. Símbolo redesenhado em vetor por script (versões clara e escura), ícone adaptativo Android + iOS + Web, abertura em azul profundo, Poppins + Inter embutidas (sem download), cabeçalho com gradiente, menu lateral, estados vazios, tela "Sobre" com pilares e licenças, tema escuro. Contraste WCAG verificado por 39 testes automáticos (61 testes Dart no total). Capturas em `docs/estilo/capturas/`.

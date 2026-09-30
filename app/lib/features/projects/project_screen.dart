@@ -9,6 +9,7 @@ import '../../persistence/app_storage.dart';
 import '../../persistence/analysis_repository.dart';
 import '../../persistence/database.dart';
 import '../../persistence/project_repository.dart';
+import '../../ui/brand.dart';
 import '../../ui/labels.dart';
 import '../../ui/privacy_chip.dart';
 import '../analysis/analysis_screen.dart' show analysisTitle;
@@ -58,19 +59,7 @@ class ProjectScreen extends ConsumerWidget {
         data: (list) => ListView(
           padding: const EdgeInsets.only(top: 8, bottom: 120),
           children: [
-            if (list.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  children: [
-                    Icon(Icons.description_outlined, size: 56, color: Theme.of(context).colorScheme.primary),
-                    const SizedBox(height: 12),
-                    Text(l.filesEmptyTitle, style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 6),
-                    Text(l.filesEmptyBody, textAlign: TextAlign.center),
-                  ],
-                ),
-              ),
+            if (list.isEmpty) EmptyState(title: l.filesEmptyTitle, body: l.filesEmptyBody),
             for (final f in list) _FileTile(file: f),
             if (list.isNotEmpty)
               Padding(

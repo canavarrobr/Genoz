@@ -50,7 +50,7 @@ Fonte: `guia_de_estilo_original.png` (fornecido em 30/09/2026). Recortes de refe
 - **Cards:** superfície branca, cantos bem arredondados, sombra suave (`recortes/tela_resultados.png`).
 - **Barras de frequência:** trilho claro + preenchimento ciano/petróleo.
 - **Pilares da marca:** Ciência · Privacidade · Desempenho · Multiplataforma (`recortes/pilares_da_marca.png`).
-- **Tipografia (a definir no Módulo 5):** sans-serif geométrica no logotipo e sans-serif neutra na interface; as fontes serão embutidas no app (sem baixar da internet).
+- **Tipografia:** Poppins (geométrica) no logotipo e títulos; Inter no texto da interface; ambas embutidas no app (sem baixar da internet).
 
 ## Regras de uso no Genoz
 
@@ -58,3 +58,19 @@ Fonte: `guia_de_estilo_original.png` (fornecido em 30/09/2026). Recortes de refe
 2. **Cores de estado nunca são o único sinal:** sempre acompanhadas de ícone e texto (daltonismo).
 3. **Tema escuro:** fundo derivado de `deep`; `cyan` vira a cor de destaque principal.
 4. **Sem conotação clínica:** a referência `tela_resultados.png` mostra "Impacto Alto/Moderado/Baixo" em genes como BRCA1. No Genoz, rótulos desse tipo só aparecem **citando a fonte da anotação** (Módulo 10), nunca como classificação própria do app, conforme a especificação ("não é diagnóstico").
+
+## Implementação no app (Módulo 5)
+
+| Elemento | Onde |
+|---|---|
+| Símbolo em vetor (claro e escuro) | `app/assets/marca/simbolo.svg`, `simbolo_escuro.svg` — gerados por `tools/marca/gerar_marca.py` |
+| Ícone e abertura | gerados a partir de `app/assets/marca/*.png` (ver ADR-011) |
+| Tipografia | Poppins (títulos, logotipo) e Inter (texto), embutidas, licença OFL |
+| Tokens de cor | `app/lib/ui/theme.dart` (`GenozColors`, `GenozPalette`) |
+| Componentes | `app/lib/ui/brand.dart` (logo, cabeçalho com gradiente, menu lateral, estado vazio) |
+| Contraste | verificado por `app/test/contrast_test.dart` (claro e escuro) |
+
+Prévias: [`marca/previa_icone.png`](marca/previa_icone.png), [`marca/previa_simbolo_fundo_claro.png`](marca/previa_simbolo_fundo_claro.png).
+Capturas no Android: [`capturas/`](capturas/).
+
+![ícone, abertura e início](capturas/android_icone_abertura_inicio.png)
