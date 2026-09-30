@@ -172,6 +172,10 @@ Aceite: site público compara dois VCFs com a rede desligada; resultados idênti
 
 **Status:** concluído em 29/09/2026 (43 testes; CI verde em Linux, Windows, macOS e wasm32).
 
+**Revisão (29/09/2026, antes do Módulo 3):** duas lacunas encontradas e fechadas:
+1. *Conformidade com as especificações oficiais* — os exemplos das especificações VCF 4.1, 4.2, 4.3, 4.4 e 4.5 viraram fixtures (`test_fixtures/spec`, origem e ajustes documentados no README de lá). Os testes revelaram e corrigiram: breakend simples (`.CCCG`) classificado como indel; `FORMAT/LEN` (4.5) ignorado nos blocos `<*>`; `Number=P` (4.4) não reconhecido. Também revelaram erros nos próprios exemplos oficiais (alelos inexistentes no exemplo de PSL; END e LEN inconsistentes), que o Genoz agora aponta.
+2. *Validação dos campos contra o cabeçalho* — INFO/FORMAT/FILTER não declarados, tipo errado (ex.: `Integer` com `abc`), número de valores errado para `Number=1/A/R/G/P`, Flag com valor, END × LEN. Tudo como aviso, uma vez por campo.
+
 ---
 
 ## Contrato do Módulo 2 (antes de implementar)

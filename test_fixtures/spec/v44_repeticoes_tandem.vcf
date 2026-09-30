@@ -1,0 +1,13 @@
+##fileformat=VCFv4.4
+##INFO=<ID=SVLEN,Number=A,Type=Integer,Description="Length">
+##INFO=<ID=CN,Number=A,Type=Float,Description="Copy number">
+##INFO=<ID=RUS,Number=.,Type=String,Description="Repeat unit sequence">
+##INFO=<ID=RN,Number=A,Type=Integer,Description="Repeat number">
+##INFO=<ID=RB,Number=.,Type=Integer,Description="Repeat unit bases">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=PS,Number=1,Type=Integer,Description="Phase set">
+##FORMAT=<ID=CN,Number=1,Type=Float,Description="Copy number">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sample
+chr1	100	cnv_notation	T	<CNV:TR>,<CNV:TR>	.	.	SVLEN=30,30;CN=3,0.9666;RUS=CAG,CAG,CA,CAG;RN=1,3;RB=90,15,2,12	GT:PS:CN	1|2:100:3.9666
+chr1	117	precise_alt2	AG	A	.	.	.	GT:PS	0|1:100
+chr1	130	precise_alt1	G	GCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAG	.	.	.	GT:PS	1|0:100

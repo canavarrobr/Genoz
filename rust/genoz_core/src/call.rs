@@ -254,8 +254,14 @@ impl<'a> CallStream<'a> {
             if !is_ref {
                 return None;
             }
-            let end = match rec.info_value("END") {
-                Some(Some(e)) => e.parse().ok()?,
+            // VCF 4.5: FORMAT/LEN da amostra tem prioridade; gVCF antigo usa INFO/END.
+            let len = self.sample.and_then(|i| {
+                let fi = rec.format.iter().position(|k| k == "LEN")?;
+                rec.samples.get(i)?.values.get(fi)?.parse::<u64>().ok()
+            });
+            let end = match (len, rec.info_value("END")) {
+                (Some(l), _) if l > 0 => rec.pos + l - 1,
+                (_, Some(Some(e))) => e.parse().ok()?,
                 _ => rec.pos + rec.reference.len() as u64 - 1,
             };
             return Some(StreamItem::RefBlock { chrom: rec.chrom.clone(), start: rec.pos, end });

@@ -148,6 +148,7 @@ pub fn inspect<R: Read>(source: R, opts: &InspectOptions) -> Result<InspectRepor
     let mut warned_order: HashSet<String> = HashSet::new();
     let mut warned_contig: HashSet<String> = HashSet::new();
     let mut fatal = None;
+    let mut fields = crate::fields::FieldValidator::default();
 
     loop {
         let parsed = match reader.next_parsed() {
@@ -167,6 +168,9 @@ pub fn inspect<R: Read>(source: R, opts: &InspectOptions) -> Result<InspectRepor
             continue;
         };
         ok += 1;
+        for issue in fields.check(&rec, &header) {
+            col.push(issue);
+        }
 
         style.observe(&rec.raw_chrom);
         if !header.contigs.is_empty() && !header.has_contig(&rec.chrom) && warned_contig.insert(rec.chrom.clone()) {

@@ -125,7 +125,9 @@ pub enum VariantKind {
 
 impl VariantKind {
     pub fn classify(reference: &str, alt: &str) -> VariantKind {
-        if alt.starts_with('<') || alt.contains('[') || alt.contains(']') {
+        // Simbólico, breakend (`T[chr:5[`) ou breakend simples (`.CCG`, `G.`), VCFv4.5 §5.4.
+        let single_breakend = alt.len() > 1 && (alt.starts_with('.') || alt.ends_with('.'));
+        if alt.starts_with('<') || alt.contains('[') || alt.contains(']') || single_breakend {
             return VariantKind::Structural;
         }
         if alt == "*" || alt == "." || alt.is_empty() {
@@ -532,6 +534,8 @@ mod tests {
         assert_eq!(VariantKind::classify("A", "<DEL>"), VariantKind::Structural);
         assert_eq!(VariantKind::classify("A", "A[2:321682["), VariantKind::Structural);
         assert_eq!(VariantKind::classify("A", "*"), VariantKind::Other);
+        assert_eq!(VariantKind::classify("G", ".CCCCCCG"), VariantKind::Structural);
+        assert_eq!(VariantKind::classify("G", "G."), VariantKind::Structural);
     }
 
     #[test]

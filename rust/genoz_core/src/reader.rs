@@ -39,6 +39,12 @@ pub enum IssueCode {
     ChromNotContiguous,
     EmptyLine,
     NotUtf8,
+    UndefinedInfo,
+    UndefinedFormat,
+    UndefinedFilter,
+    FieldTypeMismatch,
+    FieldCountMismatch,
+    EndLenMismatch,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]

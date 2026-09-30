@@ -23,6 +23,8 @@ pub enum Number {
     R,
     /// Um valor por genótipo possível.
     G,
+    /// Um valor por alelo do GT (VCF 4.4+, ex.: PSL).
+    P,
     /// `.` ou outro valor variável.
     Unknown,
 }
@@ -33,6 +35,7 @@ impl Number {
             "A" => Number::A,
             "R" => Number::R,
             "G" => Number::G,
+            "P" => Number::P,
             n => n.parse().map(Number::Fixed).unwrap_or(Number::Unknown),
         }
     }
