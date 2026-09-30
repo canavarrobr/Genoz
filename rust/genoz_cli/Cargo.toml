@@ -1,0 +1,15 @@
+[package]
+name = "genoz_cli"
+description = "Ferramenta de linha de comando do Genoz para desenvolvimento e testes."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "genoz-cli"
+path = "src/main.rs"
+
+[dependencies]
+genoz_core.workspace = true
+serde_json.workspace = true
+clap = { version = "4", features = ["derive"] }

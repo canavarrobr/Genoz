@@ -1,0 +1,28 @@
+##fileformat=VCFv4.3
+##source=genoz test fixture (dados fictícios)
+##reference=GRCh38
+##contig=<ID=chr1,length=248956422>
+##contig=<ID=chr2,length=242193529>
+##contig=<ID=chrX,length=156040895>
+##contig=<ID=chrM,length=16569>
+##FILTER=<ID=PASS,Description="All filters passed">
+##FILTER=<ID=LowQual,Description="Baixa qualidade">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Profundidade total">
+##INFO=<ID=AF,Number=A,Type=Float,Description="Frequência alélica">
+##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Tipo estrutural">
+##INFO=<ID=END,Number=1,Type=Integer,Description="Fim">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genótipo">
+##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Profundidade por alelo">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Profundidade">
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Qualidade do genótipo">
+##FORMAT=<ID=PL,Number=G,Type=Integer,Description="Verossimilhanças">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	AMOSTRA_A	AMOSTRA_B
+chr1	10177	.	A	C	120.5	PASS	DP=30;AF=0.5	GT:AD:DP:GQ:PL	0/1:10,8:18:60:90,0,120	0/0:12,0:12:40:0,36,400
+chr1	10352	syn1	T	TA	80	PASS	DP=25;AF=0.5	GT:AD:DP:GQ:PL	0|1:6,7:13:50:70,0,80	1|1:0,12:12:30:300,30,0
+chr1	15000	.	GAT	G	45	PASS	DP=20;AF=0.25	GT:AD:DP:GQ:PL	0/1:9,4:13:45:40,0,200	./.:.:.:.:.
+chr1	20000	.	A	G,T	99	PASS	DP=40;AF=0.25,0.25	GT:AD:DP:GQ:PL	1/2:0,9,11:20:80:500,300,280,200,0,190	0/1:10,9,0:19:70:80,0,90,120,150,400
+chr1	30000	.	AC	GT	25	LowQual	DP=8;AF=0.5	GT:AD:DP:GQ:PL	0/1:3,2:5:20:30,0,40	0/0:4,0:4:12:0,12,100
+chr2	500000	.	C	<DEL>	60	PASS	DP=15;SVTYPE=DEL;END=500500;AF=0.5	GT:AD:DP:GQ:PL	0/1:7,6:13:55:60,0,70	0/0:9,0:9:27:0,27,200
+chr2	600000	.	G	A	150	PASS	DP=35;AF=1.0	GT:AD:DP:GQ:PL	1/1:0,17:17:51:500,51,0	1/1:0,18:18:54:520,54,0
+chrX	2800000	.	T	C	70	PASS	DP=12;AF=0.5	GT:DP	1:6	0/1:6
+chrM	16519	.	T	C	200	.	DP=500;AF=1.0	GT:DP	1:250	1:250

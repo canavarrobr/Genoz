@@ -1,0 +1,13 @@
+##fileformat=VCFv4.3
+##contig=<ID=1,length=249250621>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genótipo">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	S1
+1	100	.	A	G	50	PASS	.	GT	0/1
+1	abc	.	A	G	50	PASS	.	GT	0/1
+1	300	.	Z	G	50	PASS	.	GT	0/1
+1	400	.	A	G!	50	PASS	.	GT	0/1
+1	500	.	A	G	50	PASS	.	GT	0/2
+1	600	.	A	G	50	PASS	.	GT
+1	700	.	A	G	alto	PASS	.	GT	1/1
+1	650	.	C	T	50	PASS	.	GT	0/1
+chr7	100	.	C	T	50	PASS	.	GT	0/1

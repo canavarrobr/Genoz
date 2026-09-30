@@ -1,0 +1,9 @@
+##fileformat=VCFv4.2
+##reference=file:///ref/human_g1k_v37.fasta
+##contig=<ID=1,length=249250621>
+##contig=<ID=2,length=243199373>
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Profundidade">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	100000	.	C	T	50	PASS	DP=10
+1	100200	.	G	GA	.	.	DP=4
+2	5000	.	T	A	30	PASS	.

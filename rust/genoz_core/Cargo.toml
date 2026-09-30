@@ -1,0 +1,17 @@
+[package]
+name = "genoz_core"
+description = "Núcleo bioinformático do Genoz (local-first)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+flate2 = "1"
+crc32fast = "1"
+sha2 = "0.10"
+serde.workspace = true
+serde_json.workspace = true
+thiserror = "2"
+
+[dev-dependencies]
+proptest = "1"

@@ -1,0 +1,10 @@
+# Decisões de arquitetura (ADRs)
+
+ADR-001 a ADR-006 estão resumidas na [especificação v4, seção 3.1](../especificacao/Genoz_especificacao_tecnica_v4.md).
+As decisões tomadas durante o desenvolvimento ficam registradas aqui, uma por arquivo.
+
+| ADR | Título | Módulo |
+|---|---|---|
+| [ADR-007](ADR-007-toolchain-rust-windows.md) | Toolchain Rust GNU + MinGW em `C:\mingw64` no Windows | 1 |
+| [ADR-008](ADR-008-nucleo-sobre-read.md) | Núcleo trabalha sobre `Read`, não sobre caminhos | 1 |
+| [ADR-009](ADR-009-divisao-multialelicos.md) | Convenção de divisão de multialélicos | 1 |

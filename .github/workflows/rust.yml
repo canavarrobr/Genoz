@@ -1,0 +1,46 @@
+name: Núcleo Rust
+
+on:
+  push:
+    paths: ["rust/**", "test_fixtures/**", ".github/workflows/rust.yml"]
+  pull_request:
+    paths: ["rust/**", "test_fixtures/**", ".github/workflows/rust.yml"]
+
+jobs:
+  test:
+    name: testes (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+      - run: cargo fmt --all --check
+        if: matrix.os == 'ubuntu-latest'
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+        if: matrix.os == 'ubuntu-latest'
+      - run: cargo test --workspace
+
+  wasm:
+    name: compila para WebAssembly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+      - run: cargo build -p genoz_core --target wasm32-unknown-unknown --release
+        working-directory: rust
