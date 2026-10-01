@@ -25,7 +25,17 @@ jobs:
           flutter gen-l10n
           git diff --exit-code -- lib
       - run: flutter analyze
-      - run: flutter test --reporter github
+      - name: flutter test
+        # Em caso de falha, o trecho do erro vira anotação (visível sem login).
+        run: |
+          set +e
+          flutter test --reporter expanded > test.log 2>&1
+          status=$?
+          cat test.log
+          if [ $status -ne 0 ]; then
+            grep -n -B2 -A40 "\[E\]" test.log | head -120 | sed ':a;N;$!ba;s/%/%25/g;s/\n/%0A/g' | sed 's/^/::error title=flutter test::/'
+          fi
+          exit $status
 
   ponte-rust:
     name: ponte Rust compila
