@@ -398,13 +398,10 @@ pub fn density_cmd(args: DensityArgs) -> Result<(), GenozError> {
         return Ok(());
     }
     println!("{} linhas — faixas de {} pb", map.total, args.bin);
-    println!("{:<6}{:>8}{:>14}  {}", "chrom", "linhas", "maior pos", "categorias");
+    println!("{:<6}{:>8}{:>14}  categorias", "chrom", "linhas", "maior pos");
     for c in &map.chroms {
-        let cats: Vec<String> = c
-            .counts
-            .iter()
-            .map(|(cat, bins)| format!("{} {}", cat.label(), bins.iter().sum::<u32>()))
-            .collect();
+        let cats: Vec<String> =
+            c.counts.iter().map(|(cat, bins)| format!("{} {}", cat.label(), bins.iter().sum::<u32>())).collect();
         println!("{:<6}{:>8}{:>14}  {}", c.chrom, c.total, c.max_pos, cats.join(" · "));
     }
     Ok(())

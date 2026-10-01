@@ -23,7 +23,8 @@ Os dados genômicos são processados no próprio dispositivo; nada é enviado a 
 | 5 — Estética e identidade visual | concluído |
 | 6 — Web local-first (site de prévia) | concluído |
 | 7 — Android completo (APK de prévia) | concluído |
-| 8 — Visualização e modo estudante | próximo |
+| 8 — Visualização e modo estudante | concluído |
+| 9 — Arquivos de consumidor e multiamostra | próximo |
 
 ## Preparar o computador (Windows)
 
@@ -67,6 +68,17 @@ flutter run
 
 Na primeira vez a compilação demora alguns minutos, porque o núcleo Rust é compilado para Android.
 No app: **Novo projeto → Gerar exemplo sintético** (ou **Importar VCF**) → toque no arquivo para ver o relatório.
+
+## Aprender (Módulo 8)
+
+Menu ☰ → **Aprender**: trilhas guiadas com dados fictícios embutidos (comparar duas pessoas, ler genótipos,
+o genoma inteiro no mapa), exercícios corrigidos na hora e um glossário em português e inglês.
+Professores: numa análise, o botão **Criar pacote de aula** gera um arquivo `.genozaula` (os VCFs + as perguntas);
+os alunos o importam em Aprender e recebem a mesma comparação pronta. As respostas são calculadas no aparelho
+de cada aluno — o pacote não leva gabarito.
+
+Toda análise ganhou a aba **Mapa** (cromossomos em escala com a densidade de variantes; toque num cromossomo
+para ver as variantes de perto) e o **diagrama de interseções** no Resumo.
 
 ## Instalar no celular Android (Módulo 7)
 

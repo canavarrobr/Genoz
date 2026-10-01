@@ -2,7 +2,7 @@ name: genoz
 description: "Genoz - plataforma genômica local-first para ensino e pesquisa."
 publish_to: 'none'
 
-version: 0.7.0+7
+version: 0.8.0+8
 
 environment:
   sdk: ^3.13.2
@@ -30,6 +30,7 @@ dependencies:
   web: ^1.1.1
   local_auth: ^3.0.2
   crypto: ^3.0.7
+  archive: ^4.3.0
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +52,12 @@ flutter:
     - assets/marca/simbolo_escuro.svg
     - assets/fonts/OFL-Poppins.txt
     - assets/fonts/OFL-Inter.txt
+    # Modo estudante: trilhas, glossário e dados fictícios (Módulo 8).
+    - assets/aprender/trilhas.json
+    - assets/aprender/glossario.json
+    - assets/aprender/dados/pessoa_a.vcf
+    - assets/aprender/dados/pessoa_b.vcf
+    - assets/aprender/dados/sintetico_aula.vcf.gz
   # Fontes embutidas (licença OFL). Nada é baixado da internet, nem na Web.
   fonts:
     - family: Poppins

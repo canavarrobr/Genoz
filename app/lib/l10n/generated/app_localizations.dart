@@ -1952,6 +1952,222 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Os círculos não estão em escala: os números indicam as quantidades.'**
   String get vennNotProportional;
+
+  /// No description provided for @learnTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aprender'**
+  String get learnTitle;
+
+  /// No description provided for @learnIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trilhas guiadas com dados fictícios: comparar amostras, ler genótipos e explorar o mapa do genoma. Tudo roda no aparelho. Para ensino — não é diagnóstico.'**
+  String get learnIntro;
+
+  /// No description provided for @learnProgress.
+  ///
+  /// In pt, this message translates to:
+  /// **'{correct} de {total} exercícios certos'**
+  String learnProgress(int correct, int total);
+
+  /// No description provided for @glossaryTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Glossário'**
+  String get glossaryTitle;
+
+  /// No description provided for @glossarySubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} termos, em português e inglês'**
+  String glossarySubtitle(int count);
+
+  /// No description provided for @glossarySearch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar termo'**
+  String get glossarySearch;
+
+  /// No description provided for @glossaryNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum termo encontrado.'**
+  String get glossaryNone;
+
+  /// No description provided for @packageImport.
+  ///
+  /// In pt, this message translates to:
+  /// **'Importar pacote de aula'**
+  String get packageImport;
+
+  /// No description provided for @packageImportHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arquivo .genozaula recebido do professor'**
+  String get packageImportHint;
+
+  /// No description provided for @packageImporting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Importando a aula: conferindo arquivos e comparando…'**
+  String get packageImporting;
+
+  /// No description provided for @packageProjectDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aula importada de um pacote de professor.'**
+  String get packageProjectDescription;
+
+  /// No description provided for @packageImported.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aula \"{title}\" importada.'**
+  String packageImported(String title);
+
+  /// No description provided for @packageError.
+  ///
+  /// In pt, this message translates to:
+  /// **'{code, select, notPackage{Este arquivo não é um pacote de aula do Genoz.} newerVersion{Este pacote foi feito por uma versão mais nova do Genoz. Atualize o app.} missingFile{O pacote está incompleto (falta um arquivo).} corrupted{Um arquivo do pacote está corrompido (SHA-256 não confere). Nada foi importado.} tooLarge{O pacote é grande demais para este aparelho.} other{Não foi possível importar o pacote.}}'**
+  String packageError(String code);
+
+  /// No description provided for @learnProjectName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aula: {title}'**
+  String learnProjectName(String title);
+
+  /// No description provided for @learnProjectDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dados fictícios do modo estudante.'**
+  String get learnProjectDescription;
+
+  /// No description provided for @learnDataset.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dados: {title}'**
+  String learnDataset(String title);
+
+  /// No description provided for @learnOpenTab.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir {tab}'**
+  String learnOpenTab(String tab);
+
+  /// No description provided for @learnExercises.
+  ///
+  /// In pt, this message translates to:
+  /// **'Exercícios'**
+  String get learnExercises;
+
+  /// No description provided for @learnPrepare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Preparar os dados da aula'**
+  String get learnPrepare;
+
+  /// No description provided for @exerciseCorrect.
+  ///
+  /// In pt, this message translates to:
+  /// **'Respondido corretamente'**
+  String get exerciseCorrect;
+
+  /// No description provided for @exerciseCheck.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conferir'**
+  String get exerciseCheck;
+
+  /// No description provided for @exerciseReveal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver resposta'**
+  String get exerciseReveal;
+
+  /// No description provided for @exerciseUnavailable.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não dá para calcular esta resposta com estes dados.'**
+  String get exerciseUnavailable;
+
+  /// No description provided for @exerciseRight.
+  ///
+  /// In pt, this message translates to:
+  /// **'Certo!'**
+  String get exerciseRight;
+
+  /// No description provided for @exerciseWrong.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda não.'**
+  String get exerciseWrong;
+
+  /// No description provided for @exerciseAnswer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resposta: {answer}'**
+  String exerciseAnswer(String answer);
+
+  /// No description provided for @packageCreateTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Criar pacote de aula'**
+  String get packageCreateTitle;
+
+  /// No description provided for @packageCreateIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Transforma esta comparação num arquivo .genozaula para os alunos. Eles importam em Aprender e recebem os mesmos arquivos, a comparação pronta e as perguntas.'**
+  String get packageCreateIntro;
+
+  /// No description provided for @packageTitleField.
+  ///
+  /// In pt, this message translates to:
+  /// **'Título da aula'**
+  String get packageTitleField;
+
+  /// No description provided for @packageInstructionsField.
+  ///
+  /// In pt, this message translates to:
+  /// **'Instruções para os alunos (opcional)'**
+  String get packageInstructionsField;
+
+  /// No description provided for @packageQuestions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Perguntas (corrigidas automaticamente)'**
+  String get packageQuestions;
+
+  /// No description provided for @packagePrivacyNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'O pacote leva cópias dos arquivos VCF desta comparação. Use só dados fictícios ou com autorização. As respostas não vão no pacote: são calculadas no aparelho de cada aluno.'**
+  String get packagePrivacyNote;
+
+  /// No description provided for @packageSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar pacote'**
+  String get packageSave;
+
+  /// No description provided for @packageSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pacote de aula salvo.'**
+  String get packageSaved;
+
+  /// No description provided for @exerciseHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua resposta'**
+  String get exerciseHint;
+
+  /// No description provided for @packageOpenStep.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abra a comparação da aula: as respostas estão no Resumo, na Tabela e no Mapa.'**
+  String get packageOpenStep;
 }
 
 class _AppLocalizationsDelegate

@@ -8,6 +8,7 @@ import '../../persistence/app_storage.dart';
 import '../../persistence/database.dart';
 import '../../ui/labels.dart';
 import '../../ui/theme.dart';
+import '../learn/teacher_package_screen.dart';
 import 'export_sheet.dart';
 import 'intersection_diagram.dart';
 import 'map_tab.dart';
@@ -23,8 +24,11 @@ final analysisStatsProvider = FutureProvider.family<(SampleStats, SampleStats), 
 });
 
 class AnalysisScreen extends ConsumerWidget {
-  const AnalysisScreen({super.key, required this.analysisId});
+  const AnalysisScreen({super.key, required this.analysisId, this.initialTab = 0});
   final String analysisId;
+
+  /// Aba aberta ao entrar (0 Resumo, 1 Tabela, 2 Mapa, 3 QC) — usada pelas trilhas.
+  final int initialTab;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,10 +43,18 @@ class AnalysisScreen extends ConsumerWidget {
         final title = l.analysisVs(s.a.sample ?? 'A', s.b.sample ?? 'B');
         return DefaultTabController(
           length: 4,
+          initialIndex: initialTab,
           child: Scaffold(
             appBar: AppBar(
               title: Text(title, overflow: TextOverflow.ellipsis),
               actions: [
+                IconButton(
+                  tooltip: l.packageCreateTitle,
+                  icon: const Icon(Icons.co_present_outlined),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => TeacherPackageScreen(analysis: a)),
+                  ),
+                ),
                 IconButton(
                   tooltip: l.export,
                   icon: const Icon(Icons.file_download_outlined),

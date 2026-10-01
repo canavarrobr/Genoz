@@ -165,6 +165,7 @@ void main() {
     await file.writeAsString('##fileformat=VCFv4.3\n');
     final ctl = env.container.read(settingsProvider.notifier);
     await ctl.setPin('2580');
+    await env.storage.blobs.writeBytes('aprender/progresso.json', Uint8List.fromList('{}'.codeUnits));
 
     await wipeAll(db: env.db, storage: env.storage, core: env.core, settings: ctl);
 
@@ -173,6 +174,7 @@ void main() {
     }
     expect(await Directory(env.storage.absolute('projetos')).exists(), isFalse);
     expect(await env.storage.blobs.exists(settingsFile), isFalse);
+    expect(await env.storage.blobs.exists('aprender/progresso.json'), isFalse, reason: 'modo estudante também');
     expect(env.container.read(settingsProvider).lockEnabled, isFalse);
     await env.dispose();
   });

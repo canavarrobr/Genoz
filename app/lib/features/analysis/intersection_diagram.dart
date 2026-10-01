@@ -42,15 +42,15 @@ class IntersectionDiagram extends StatelessWidget {
                 final w = box.maxWidth, h = box.maxHeight;
                 final r = h * 0.46;
                 final ca = Offset(w * 0.5 - r * 0.62, h / 2), cb = Offset(w * 0.5 + r * 0.62, h / 2);
-                Widget label(Offset at, List<Widget> lines) => Positioned(
-                  left: at.dx - r * 0.55,
-                  width: r * 1.1,
+                Widget label(Offset at, double width, String number) => Positioned(
+                  left: at.dx - width / 2,
+                  width: width,
                   top: 0,
                   bottom: 0,
                   child: Center(
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: Column(mainAxisSize: MainAxisSize.min, children: lines),
+                      child: Text(number, style: t.headlineSmall),
                     ),
                   ),
                 );
@@ -68,31 +68,71 @@ class IntersectionDiagram extends StatelessWidget {
                         ),
                       ),
                     ),
-                    label(Offset(ca.dx - r * 0.45, 0), [
-                      Text(fmt.format(onlyA), style: t.headlineSmall),
-                      Text(l.vennOnly(nameA), style: t.bodySmall),
-                    ]),
-                    label(Offset(w / 2, 0), [
-                      Text(fmt.format(same + diff), style: t.headlineSmall),
-                      Text(l.vennBoth, style: t.bodySmall),
-                      Text(l.vennBreakdown(same, diff), style: t.labelSmall),
-                    ]),
-                    label(Offset(cb.dx + r * 0.45, 0), [
-                      Text(fmt.format(onlyB), style: t.headlineSmall),
-                      Text(l.vennOnly(nameB), style: t.bodySmall),
-                    ]),
+                    label(Offset(ca.dx - r * 0.5, 0), r * 0.9, fmt.format(onlyA)),
+                    label(Offset(w / 2, 0), r * 0.62, fmt.format(same + diff)),
+                    label(Offset(cb.dx + r * 0.5, 0), r * 0.9, fmt.format(onlyB)),
                   ],
                 );
               },
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
+          _LegendLine(color: scheme.primary, number: fmt.format(onlyA), text: l.vennOnly(nameA)),
+          _LegendLine(
+            color: Color.lerp(scheme.primary, palette.info, 0.5)!,
+            number: fmt.format(same + diff),
+            text: '${l.vennBoth} (${l.vennBreakdown(same, diff)})',
+          ),
+          _LegendLine(color: palette.info, number: fmt.format(onlyB), text: l.vennOnly(nameB)),
+          const SizedBox(height: 8),
           Text(l.vennOutside(missing, notAssessed), style: t.bodySmall),
           Text(l.vennNotProportional, style: t.bodySmall?.copyWith(color: palette.muted)),
         ],
       ),
     );
   }
+}
+
+class _LegendLine extends StatelessWidget {
+  const _LegendLine({required this.color, required this.number, required this.text});
+  final Color color;
+  final String number;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 2),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.35),
+              border: Border.all(color: color, width: 2),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '$number ',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                TextSpan(text: text),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _VennPainter extends CustomPainter {

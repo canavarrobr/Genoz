@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:genoz/core/compare_models.dart';
@@ -67,7 +68,10 @@ class FakeGenozCore implements GenozCore {
       return;
     }
     yield const ImportProgress(validating: true, bytesDone: 100, bytesTotal: 100);
-    yield ImportDone(reportJson!);
+    // Como o núcleo real: o SHA-256 do relatório é o do conteúdo copiado.
+    final report = jsonDecode(reportJson!) as Map<String, dynamic>;
+    (report['digest'] as Map<String, dynamic>)['sha256'] = sha256.convert(await dest.readAsBytes()).toString();
+    yield ImportDone(jsonEncode(report));
   }
 
   @override
@@ -215,7 +219,16 @@ class TestEnv {
   Future<void> dispose() async {
     container.dispose();
     await db.close();
-    await dir.delete(recursive: true);
+    // No Windows um arquivo recém-fechado pode continuar travado por instantes:
+    // tenta de novo e, se não der, deixa a pasta temporária para o sistema limpar.
+    for (var i = 0; i < 5; i++) {
+      try {
+        await dir.delete(recursive: true);
+        return;
+      } on FileSystemException {
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      }
+    }
   }
 }
 

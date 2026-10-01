@@ -1075,4 +1075,143 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get vennNotProportional =>
       'Os círculos não estão em escala: os números indicam as quantidades.';
+
+  @override
+  String get learnTitle => 'Aprender';
+
+  @override
+  String get learnIntro =>
+      'Trilhas guiadas com dados fictícios: comparar amostras, ler genótipos e explorar o mapa do genoma. Tudo roda no aparelho. Para ensino — não é diagnóstico.';
+
+  @override
+  String learnProgress(int correct, int total) {
+    return '$correct de $total exercícios certos';
+  }
+
+  @override
+  String get glossaryTitle => 'Glossário';
+
+  @override
+  String glossarySubtitle(int count) {
+    return '$count termos, em português e inglês';
+  }
+
+  @override
+  String get glossarySearch => 'Buscar termo';
+
+  @override
+  String get glossaryNone => 'Nenhum termo encontrado.';
+
+  @override
+  String get packageImport => 'Importar pacote de aula';
+
+  @override
+  String get packageImportHint => 'Arquivo .genozaula recebido do professor';
+
+  @override
+  String get packageImporting =>
+      'Importando a aula: conferindo arquivos e comparando…';
+
+  @override
+  String get packageProjectDescription =>
+      'Aula importada de um pacote de professor.';
+
+  @override
+  String packageImported(String title) {
+    return 'Aula \"$title\" importada.';
+  }
+
+  @override
+  String packageError(String code) {
+    String _temp0 = intl.Intl.selectLogic(code, {
+      'notPackage': 'Este arquivo não é um pacote de aula do Genoz.',
+      'newerVersion': 'Este pacote foi feito por uma versão mais nova do Genoz. Atualize o app.',
+      'missingFile': 'O pacote está incompleto (falta um arquivo).',
+      'corrupted': 'Um arquivo do pacote está corrompido (SHA-256 não confere). Nada foi importado.',
+      'tooLarge': 'O pacote é grande demais para este aparelho.',
+      'other': 'Não foi possível importar o pacote.',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String learnProjectName(String title) {
+    return 'Aula: $title';
+  }
+
+  @override
+  String get learnProjectDescription => 'Dados fictícios do modo estudante.';
+
+  @override
+  String learnDataset(String title) {
+    return 'Dados: $title';
+  }
+
+  @override
+  String learnOpenTab(String tab) {
+    return 'Abrir $tab';
+  }
+
+  @override
+  String get learnExercises => 'Exercícios';
+
+  @override
+  String get learnPrepare => 'Preparar os dados da aula';
+
+  @override
+  String get exerciseCorrect => 'Respondido corretamente';
+
+  @override
+  String get exerciseCheck => 'Conferir';
+
+  @override
+  String get exerciseReveal => 'Ver resposta';
+
+  @override
+  String get exerciseUnavailable =>
+      'Não dá para calcular esta resposta com estes dados.';
+
+  @override
+  String get exerciseRight => 'Certo!';
+
+  @override
+  String get exerciseWrong => 'Ainda não.';
+
+  @override
+  String exerciseAnswer(String answer) {
+    return 'Resposta: $answer';
+  }
+
+  @override
+  String get packageCreateTitle => 'Criar pacote de aula';
+
+  @override
+  String get packageCreateIntro =>
+      'Transforma esta comparação num arquivo .genozaula para os alunos. Eles importam em Aprender e recebem os mesmos arquivos, a comparação pronta e as perguntas.';
+
+  @override
+  String get packageTitleField => 'Título da aula';
+
+  @override
+  String get packageInstructionsField => 'Instruções para os alunos (opcional)';
+
+  @override
+  String get packageQuestions => 'Perguntas (corrigidas automaticamente)';
+
+  @override
+  String get packagePrivacyNote =>
+      'O pacote leva cópias dos arquivos VCF desta comparação. Use só dados fictícios ou com autorização. As respostas não vão no pacote: são calculadas no aparelho de cada aluno.';
+
+  @override
+  String get packageSave => 'Salvar pacote';
+
+  @override
+  String get packageSaved => 'Pacote de aula salvo.';
+
+  @override
+  String get exerciseHint => 'Sua resposta';
+
+  @override
+  String get packageOpenStep =>
+      'Abra a comparação da aula: as respostas estão no Resumo, na Tabela e no Mapa.';
 }

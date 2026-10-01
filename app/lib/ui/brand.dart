@@ -176,6 +176,7 @@ class GenozDrawer extends StatelessWidget {
           children: [
             const Padding(padding: EdgeInsets.fromLTRB(24, 24, 24, 24), child: GenozLogo(size: 28, onDark: true)),
             item(Icons.folder_outlined, l.menuProjects, '/'),
+            item(Icons.school_outlined, l.learnTitle, '/aprender'),
             item(Icons.info_outline, l.menuAbout, '/sobre'),
             item(Icons.verified_user_outlined, l.privacyCheckTitle, '/privacidade'),
             item(Icons.settings_outlined, l.settingsTitle, '/ajustes'),

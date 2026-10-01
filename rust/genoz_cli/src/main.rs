@@ -66,6 +66,9 @@ enum Command {
         no_chr: bool,
         #[arg(long)]
         phased: bool,
+        /// Cromossomos, separados por vírgula (ex.: `1,2,X`), ou `autossomos` (1–22).
+        #[arg(long, default_value = "20,21,22")]
+        chroms: String,
     },
     /// Divide multialélicos e apara bases redundantes; grava novo VCF.
     Split {
@@ -120,8 +123,14 @@ fn run(cli: Cli) -> Result<ExitCode, GenozError> {
             println!("{}  {}", d.sha256, file.display());
             Ok(ExitCode::SUCCESS)
         }
-        Command::Synth { out, seed, samples, variants_per_chrom, build, no_chr, phased } => {
+        Command::Synth { out, seed, samples, variants_per_chrom, build, no_chr, phased, chroms } => {
+            let chroms: Vec<String> = if chroms == "autossomos" {
+                (1..=22).map(|n| n.to_string()).collect()
+            } else {
+                chroms.split(',').map(|c| genoz_core::chrom::canonical_chrom(c.trim())).collect()
+            };
             let params = SynthParams {
+                chroms,
                 seed,
                 samples: (1..=samples).map(|i| format!("SINT_{i}")).collect(),
                 variants_per_chrom,

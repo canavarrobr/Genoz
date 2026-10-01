@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'features/about/about_screen.dart';
 import 'features/analysis/analysis_screen.dart';
 import 'features/compare/compare_setup_screen.dart';
+import 'features/learn/learn_screen.dart';
 import 'features/privacy/privacy_screen.dart';
 import 'features/projects/journal_screen.dart';
 import 'features/projects/project_screen.dart';
@@ -26,6 +27,7 @@ GoRouter buildRouter() => GoRouter(
         GoRoute(path: '/sobre', builder: (_, _) => const AboutScreen()),
         GoRoute(path: '/privacidade', builder: (_, _) => const PrivacyScreen()),
         GoRoute(path: '/ajustes', builder: (_, _) => const SettingsScreen()),
+        GoRoute(path: '/aprender', builder: (_, _) => const LearnScreen()),
         GoRoute(
           path: '/projeto/:id',
           builder: (_, s) => ProjectScreen(projectId: s.pathParameters['id']!),

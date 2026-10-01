@@ -168,10 +168,36 @@ class _Legend extends StatelessWidget {
         ),
         Text(l.mapMany, style: t),
         const SizedBox(width: 8),
-        Text('▾ ${l.mapCentromere}', style: t),
+        // Triângulo desenhado (o caractere ▾ não existe nas fontes embutidas).
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomPaint(size: const Size(8, 6), painter: _NotchPainter(Theme.of(context).colorScheme.outline)),
+            const SizedBox(width: 4),
+            Flexible(child: Text(l.mapCentromere, style: t)),
+          ],
+        ),
       ],
     );
   }
+}
+
+class _NotchPainter extends CustomPainter {
+  _NotchPainter(this.color);
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) => canvas.drawPath(
+    Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..close(),
+    Paint()..color = color,
+  );
+
+  @override
+  bool shouldRepaint(_NotchPainter old) => old.color != color;
 }
 
 class _ChromRow extends StatelessWidget {

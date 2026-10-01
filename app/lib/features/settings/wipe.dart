@@ -10,6 +10,8 @@ import '../../persistence/database.dart';
 import '../../persistence/project_repository.dart';
 import '../../platform/picker_cache.dart';
 import '../../ui/theme.dart';
+import '../learn/content.dart';
+import '../learn/progress.dart';
 import 'settings.dart';
 
 /// Apaga tudo o que o Genoz guardou neste aparelho/navegador.
@@ -32,6 +34,8 @@ Future<void> wipeAll({
   // Linhas apagadas continuam nas páginas livres do arquivo do SQLite até o VACUUM.
   await db.customStatement('VACUUM');
   await storage.deleteDir('projetos');
+  // Modo estudante: progresso e aulas importadas.
+  await storage.deleteDir(learnDir);
   await settings.reset();
 }
 
@@ -44,6 +48,8 @@ Future<void> wipeAllData(WidgetRef ref) async {
   );
   // Cópias que o seletor de arquivos possa ter deixado no cache.
   await clearPickerCache();
+  ref.invalidate(learnProgressProvider);
+  ref.invalidate(learnContentProvider);
 }
 
 /// Campo de confirmação: o botão só funciona depois de digitar a palavra pedida.

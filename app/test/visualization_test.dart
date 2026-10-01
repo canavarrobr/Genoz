@@ -88,7 +88,10 @@ void main() {
     expect(find.text('4'), findsOneWidget);
     expect(find.text('6'), findsOneWidget);
     expect(find.text('1'), findsOneWidget);
-    expect(find.text('5 iguais · 1 genótipo diferente'), findsOneWidget);
+    // Legenda abaixo do diagrama, com os nomes das amostras.
+    expect(find.textContaining('4 só em PESSOA_A', findRichText: true), findsOneWidget);
+    expect(find.textContaining('6 nos dois (5 iguais · 1 genótipo diferente)', findRichText: true), findsOneWidget);
+    expect(find.textContaining('1 só em PESSOA_B', findRichText: true), findsOneWidget);
     expect(find.textContaining('1 ausentes/incertas e 0 não avaliadas'), findsOneWidget);
   });
 

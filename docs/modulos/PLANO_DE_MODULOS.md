@@ -20,7 +20,7 @@ Um APK e um site de prévia aparecem já nos Módulos 6 e 7 (depois do módulo d
 | 5 ✅ | **Estética e identidade visual** | Logo, ícone, abertura, paleta, tipografia e componentes do [guia de estilo](../estilo/GUIA_DE_ESTILO.md) aplicados em todo o app | Web + Android |
 | 6 ✅ | Web local-first | **Site de prévia** (GitHub Pages) comparando VCF no navegador sem upload | Web |
 | 7 ✅ | Android completo | **APK de prévia** para instalar no celular; bloqueio do app; privacidade | Android |
-| 8 | Visualização + modo estudante | Ideograma, densidade, visualizador de região, trilhas guiadas, dados sintéticos | Web + Android |
+| 8 ✅ | Visualização + modo estudante | Ideograma, densidade, visualizador de região, trilhas guiadas, dados sintéticos | Web + Android |
 | 9 | Arquivos de consumidor + multiamostra | Importa 23andMe/AncestryDNA/MyHeritage; escolhe amostra em VCF multi-amostra | Web + Android |
 | 10 | Anotação local | Pacotes (genes, rsID, ClinVar, frequências) baixados uma vez; busca por gene | Web + Android |
 | 11 | Relatórios, reprodutibilidade e criptografia | Relatório HTML/PDF, "reexecutar manifesto", exportação `.genoz` cifrada | Web + Android |
@@ -396,3 +396,14 @@ Limitações: o bloqueio não criptografa os arquivos (Módulo 11); a assinatura
 **Erros:** build desconhecido (ideograma usa o maior posicionamento visto como comprimento e avisa); pacote de aula inválido ou de versão futura (mensagem clara, nada é importado pela metade); região inválida.
 
 **Testes:** Rust (densidade = contagem direta das linhas; filtro respeitado; caminho = memória); Dart (ideograma/visualizador/diagrama renderizam e batem com o resumo; respostas calculadas corretas para pessoa_a × pessoa_b; pacote de aula ida e volta; glossário pt/en com os mesmos termos); verificação no emulador e no navegador.
+
+**Status:** concluído em 01/10/2026. Verificado no emulador Android (API 35, APK de release) e no Edge (site, servidor sem cabeçalhos como o GitHub Pages):
+- Aprender → "O genoma inteiro no mapa" → Abrir Mapa: o app importa o dataset sintético embutido, compara SINT_1 × SINT_2 e abre o ideograma (22 cromossomos em escala, densidade, centrômero); mesmos números no Android e no navegador;
+- visualizador de região: faixas por categoria com cor e forma, zoom, régua em Mb; ficha da variante ao tocar (Web);
+- exercício "cromossomo com mais variantes só em A": resposta errada → explicação → "Ver resposta: 9"; conferido com `genoz-cli density --category only_a` (cromossomo 9, 29 variantes);
+- professor: "Criar pacote de aula" → `.genozaula` salvo pelo seletor do sistema (73,5 KB: `aula.json` + o VCF, SHA-256 igual ao original, sem respostas) → Aprender → Importar → aula aberta e resposta 428 calculada no aparelho do "aluno"; cache do seletor limpo;
+- Resumo: diagrama de interseções com legenda; nenhuma requisição externa no site.
+
+Achados corrigidos no caminho: tabela de comprimentos do núcleo só tinha 8 cromossomos (completada; MT não conta como evidência de build); régua do visualizador com rótulos sobrepostos e marcadores cortados nas pontas; textos do diagrama apertados dentro dos círculos (viraram legenda); dicas dos campos de resposta pareciam respostas ("0", "83.3"); aula importada sem instruções não tinha botão para abrir a comparação; o "▾" da legenda não existe nas fontes embutidas (no navegador virava um quadrado); `rootBundle.loadString` com cache prendia o carregamento entre testes.
+92 testes Dart + Rust (densidade, ponte memória = arquivo). Decisões em [ADR-014](../adr/ADR-014-modo-estudante-e-pacote-de-aula.md).
+Limitações: perguntas de múltipla escolha levam a alternativa certa no pacote (visível para quem abrir o ZIP); o professor escolhe entre perguntas prontas (calculadas) — perguntas livres ficam para depois.

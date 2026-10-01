@@ -1,0 +1,216 @@
+{
+  "schema": 1,
+  "datasets": {
+    "pessoas": {
+      "title": {"pt": "Pessoa A × Pessoa B (fictícias)", "en": "Person A × Person B (fictional)"},
+      "files": ["pessoa_a.vcf", "pessoa_b.vcf"],
+      "a": {"file": "pessoa_a.vcf"},
+      "b": {"file": "pessoa_b.vcf"}
+    },
+    "sintetico": {
+      "title": {"pt": "Genoma sintético (2 amostras fictícias, cromossomos 1–22)", "en": "Synthetic genome (2 fictional samples, chromosomes 1–22)"},
+      "files": ["sintetico_aula.vcf.gz"],
+      "a": {"file": "sintetico_aula.vcf.gz", "sample": "SINT_1"},
+      "b": {"file": "sintetico_aula.vcf.gz", "sample": "SINT_2"}
+    }
+  },
+  "lessons": [
+    {
+      "id": "primeiros_passos",
+      "dataset": "pessoas",
+      "title": {"pt": "Primeiros passos: comparar duas pessoas", "en": "First steps: comparing two people"},
+      "summary": {"pt": "O que é um VCF, o que é uma variante e como ler o resumo de uma comparação.", "en": "What a VCF is, what a variant is and how to read a comparison summary."},
+      "steps": [
+        {
+          "text": {
+            "pt": "Um arquivo VCF lista as variantes de uma pessoa: posições onde o DNA dela difere do genoma de referência. Aqui há duas pessoas fictícias, A e B, cada uma com seu VCF.",
+            "en": "A VCF file lists a person's variants: positions where their DNA differs from the reference genome. Here there are two fictional people, A and B, each with their own VCF."
+          },
+          "terms": ["vcf", "variante", "referencia"]
+        },
+        {
+          "text": {
+            "pt": "O Genoz compara as duas listas posição por posição. Abra o Resumo e veja o diagrama de interseções: o que só A tem, o que os dois têm e o que só B tem.",
+            "en": "Genoz compares the two lists position by position. Open the Summary and look at the intersection diagram: what only A has, what both have and what only B has."
+          },
+          "open": "summary"
+        },
+        {
+          "text": {
+            "pt": "Ter a mesma variante não significa ter o mesmo genótipo: uma pessoa pode ter uma cópia (0/1) e a outra duas (1/1). Por isso existe a categoria \"genótipo diferente\".",
+            "en": "Having the same variant does not mean having the same genotype: one person may have one copy (0/1) and the other two (1/1). That is why there is a \"different genotype\" category."
+          },
+          "terms": ["genotipo", "heterozigoto", "homozigoto"]
+        },
+        {
+          "text": {
+            "pt": "Na Tabela, cada linha é uma variante. Toque numa linha para ver os detalhes de A e de B lado a lado.",
+            "en": "In the Table, each row is a variant. Tap a row to see the details of A and B side by side."
+          },
+          "open": "table"
+        }
+      ],
+      "exercises": [
+        {
+          "id": "pp_so_a",
+          "kind": "number",
+          "compute": "count:only_a",
+          "prompt": {"pt": "Quantas variantes aparecem somente em A?", "en": "How many variants appear only in A?"},
+          "explain": {"pt": "Conte a categoria \"somente em A\" no Resumo.", "en": "Count the \"only in A\" category in the Summary."}
+        },
+        {
+          "id": "pp_nos_dois",
+          "kind": "number",
+          "compute": "count:shared+genotype_difference",
+          "prompt": {"pt": "Quantas variantes estão nas duas pessoas (com genótipo igual ou diferente)?", "en": "How many variants are in both people (with an equal or different genotype)?"},
+          "explain": {"pt": "É o centro do diagrama: compartilhadas + genótipo diferente.", "en": "It is the center of the diagram: shared + different genotype."}
+        },
+        {
+          "id": "pp_concordancia",
+          "kind": "percent",
+          "compute": "percent:concordance",
+          "prompt": {"pt": "Qual a concordância de genótipos, em %? (uma casa decimal)", "en": "What is the genotype concordance, in %? (one decimal place)"},
+          "explain": {"pt": "Iguais ÷ (iguais + genótipo diferente) × 100.", "en": "Equal ÷ (equal + different genotype) × 100."}
+        },
+        {
+          "id": "pp_somente_a_conceito",
+          "kind": "choice",
+          "prompt": {"pt": "Uma variante \"somente em A\" sem regiões avaliadas informadas significa que:", "en": "An \"only in A\" variant without assessed regions provided means that:"},
+          "choices": [
+            {"pt": "B certamente tem o alelo de referência nessa posição.", "en": "B certainly has the reference allele at that position."},
+            {"pt": "B não tem registro nessa posição — pode ser referência ou simplesmente não ter sido sequenciada.", "en": "B has no record at that position — it may be reference or simply not sequenced."},
+            {"pt": "A tem uma doença.", "en": "A has a disease."}
+          ],
+          "answer": 1,
+          "explain": {"pt": "Ausência de registro não é prova de referência. E nenhuma variante isolada é diagnóstico.", "en": "Absence of a record is not proof of reference. And no single variant is a diagnosis."}
+        }
+      ]
+    },
+    {
+      "id": "genotipos_qualidade",
+      "dataset": "pessoas",
+      "title": {"pt": "Genótipos e qualidade", "en": "Genotypes and quality"},
+      "summary": {"pt": "Ler 0/1, 1/1 e ./., e entender QUAL, DP e GQ.", "en": "Reading 0/1, 1/1 and ./., and understanding QUAL, DP and GQ."},
+      "steps": [
+        {
+          "text": {
+            "pt": "No VCF, 0 é o alelo de referência e 1 o alternativo. 0/1 = uma cópia da variante; 1/1 = duas; ./. = o programa não conseguiu decidir.",
+            "en": "In VCF, 0 is the reference allele and 1 the alternative. 0/1 = one copy of the variant; 1/1 = two; ./. = the program could not decide."
+          },
+          "terms": ["alelo", "genotipo", "fase"]
+        },
+        {
+          "text": {
+            "pt": "Nem todo genótipo é confiável. QUAL, DP e GQ dizem o quanto confiar. Na Tabela, toque numa variante e compare esses números entre A e B.",
+            "en": "Not every genotype is reliable. QUAL, DP and GQ tell how much to trust it. In the Table, tap a variant and compare these numbers between A and B."
+          },
+          "terms": ["qual", "dp", "gq", "filter"],
+          "open": "table"
+        },
+        {
+          "text": {
+            "pt": "A aba QC resume a qualidade de cada amostra inteira: proporção de heterozigotos, profundidade, tipos de variante.",
+            "en": "The QC tab summarizes the quality of each whole sample: heterozygote ratio, depth, variant types."
+          },
+          "open": "qc"
+        }
+      ],
+      "exercises": [
+        {
+          "id": "gq_gt_b_2000",
+          "kind": "genotype",
+          "compute": "gt:b:1:2000",
+          "prompt": {"pt": "Qual o genótipo de B na posição 1:2000?", "en": "What is B's genotype at position 1:2000?"},
+          "explain": {"pt": "Procure 1:2000 na Tabela (ou digite a região no Mapa) e leia o GT de B.", "en": "Find 1:2000 in the Table (or type the region in the Map) and read B's GT."}
+        },
+        {
+          "id": "gq_gt_a_3000",
+          "kind": "genotype",
+          "compute": "gt:a:1:3000",
+          "prompt": {"pt": "Qual o genótipo de A na posição 1:3000?", "en": "What is A's genotype at position 1:3000?"},
+          "explain": {"pt": "Na Tabela, a linha 1:3000 mostra o GT de A e de B.", "en": "In the Table, row 1:3000 shows the GT of A and B."}
+        },
+        {
+          "id": "gq_hom",
+          "kind": "choice",
+          "prompt": {"pt": "Qual destes genótipos é homozigoto para o alelo alternativo?", "en": "Which of these genotypes is homozygous for the alternative allele?"},
+          "choices": [{"pt": "0/0", "en": "0/0"}, {"pt": "0/1", "en": "0/1"}, {"pt": "1/1", "en": "1/1"}, {"pt": "./.", "en": "./."}],
+          "answer": 2,
+          "explain": {"pt": "Homozigoto = dois alelos iguais; alternativo = 1.", "en": "Homozygous = two equal alleles; alternative = 1."}
+        },
+        {
+          "id": "gq_fase",
+          "kind": "choice",
+          "prompt": {"pt": "A tem 1/0 e B tem 0|1 na mesma variante. O Genoz considera os genótipos:", "en": "A has 1/0 and B has 0|1 at the same variant. Genoz considers the genotypes:"},
+          "choices": [{"pt": "Iguais", "en": "Equal"}, {"pt": "Diferentes", "en": "Different"}],
+          "answer": 0,
+          "explain": {"pt": "A ordem e o separador (/ ou |) não mudam quais alelos a pessoa tem.", "en": "The order and the separator (/ or |) do not change which alleles the person has."}
+        }
+      ]
+    },
+    {
+      "id": "genoma_no_mapa",
+      "dataset": "sintetico",
+      "title": {"pt": "O genoma inteiro no mapa", "en": "The whole genome on the map"},
+      "summary": {"pt": "Ideograma, densidade de variantes e visualizador de região num genoma sintético maior.", "en": "Ideogram, variant density and region viewer on a larger synthetic genome."},
+      "steps": [
+        {
+          "text": {
+            "pt": "Agora o conjunto é maior: duas amostras sintéticas com variantes em todos os autossomos (1 a 22). Os dados são fictícios, gerados pelo próprio Genoz.",
+            "en": "Now the set is larger: two synthetic samples with variants on every autosome (1 to 22). The data are fictional, generated by Genoz itself."
+          },
+          "terms": ["cromossomo"]
+        },
+        {
+          "text": {
+            "pt": "Abra o Mapa. Cada barra é um cromossomo em escala; quanto mais forte a cor, mais variantes naquele trecho. Escolha uma categoria para ver só ela.",
+            "en": "Open the Map. Each bar is a chromosome to scale; the stronger the color, the more variants in that stretch. Pick a category to see only it."
+          },
+          "terms": ["ideograma", "centromero"],
+          "open": "map"
+        },
+        {
+          "text": {
+            "pt": "Toque num cromossomo para abrir o visualizador de região. Aproxime (toque duplo) até ver variantes individuais e toque numa delas.",
+            "en": "Tap a chromosome to open the region viewer. Zoom in (double-tap) until you see individual variants and tap one of them."
+          }
+        }
+      ],
+      "exercises": [
+        {
+          "id": "gm_top_so_a",
+          "kind": "text",
+          "compute": "top_chrom:only_a",
+          "prompt": {"pt": "Em qual cromossomo há mais variantes somente na amostra A? (ex.: 7)", "en": "Which chromosome has the most variants only in sample A? (e.g. 7)"},
+          "explain": {"pt": "No Mapa, escolha \"somente em A\" e compare os números à direita de cada cromossomo.", "en": "In the Map, pick \"only in A\" and compare the numbers to the right of each chromosome."}
+        },
+        {
+          "id": "gm_so_b",
+          "kind": "number",
+          "compute": "count:only_b",
+          "prompt": {"pt": "Quantas variantes estão somente na amostra B?", "en": "How many variants are only in sample B?"},
+          "explain": {"pt": "Está no Resumo, na categoria \"somente em B\".", "en": "It is in the Summary, under \"only in B\"."}
+        },
+        {
+          "id": "gm_jaccard",
+          "kind": "percent",
+          "compute": "percent:jaccard",
+          "prompt": {"pt": "Qual o índice de Jaccard entre as duas amostras, em %? (uma casa decimal)", "en": "What is the Jaccard index between the two samples, in %? (one decimal place)"},
+          "explain": {"pt": "Está no Resumo, ao lado da concordância.", "en": "It is in the Summary, next to the concordance."}
+        },
+        {
+          "id": "gm_centromero",
+          "kind": "choice",
+          "prompt": {"pt": "Por que regiões perto do centrômero costumam ter poucas variantes detectadas?", "en": "Why do regions near the centromere usually have few detected variants?"},
+          "choices": [
+            {"pt": "Porque lá não existe DNA.", "en": "Because there is no DNA there."},
+            {"pt": "Porque são sequências muito repetitivas, difíceis de sequenciar e de alinhar.", "en": "Because they are highly repetitive sequences, hard to sequence and align."},
+            {"pt": "Porque o centrômero nunca varia entre pessoas.", "en": "Because the centromere never varies between people."}
+          ],
+          "answer": 1,
+          "explain": {"pt": "Pouca variante detectada nem sempre é pouca variante existente: depende do que o sequenciamento consegue ler.", "en": "Few detected variants is not always few existing variants: it depends on what sequencing can read."}
+        }
+      ]
+    }
+  ]
+}

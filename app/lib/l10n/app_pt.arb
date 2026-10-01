@@ -685,5 +685,100 @@
       }
     }
   },
-  "vennNotProportional": "Os círculos não estão em escala: os números indicam as quantidades."
+  "vennNotProportional": "Os círculos não estão em escala: os números indicam as quantidades.",
+  "learnTitle": "Aprender",
+  "learnIntro": "Trilhas guiadas com dados fictícios: comparar amostras, ler genótipos e explorar o mapa do genoma. Tudo roda no aparelho. Para ensino — não é diagnóstico.",
+  "learnProgress": "{correct} de {total} exercícios certos",
+  "@learnProgress": {
+    "placeholders": {
+      "correct": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "glossaryTitle": "Glossário",
+  "glossarySubtitle": "{count} termos, em português e inglês",
+  "@glossarySubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "glossarySearch": "Buscar termo",
+  "glossaryNone": "Nenhum termo encontrado.",
+  "packageImport": "Importar pacote de aula",
+  "packageImportHint": "Arquivo .genozaula recebido do professor",
+  "packageImporting": "Importando a aula: conferindo arquivos e comparando…",
+  "packageProjectDescription": "Aula importada de um pacote de professor.",
+  "packageImported": "Aula \"{title}\" importada.",
+  "@packageImported": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "packageError": "{code, select, notPackage{Este arquivo não é um pacote de aula do Genoz.} newerVersion{Este pacote foi feito por uma versão mais nova do Genoz. Atualize o app.} missingFile{O pacote está incompleto (falta um arquivo).} corrupted{Um arquivo do pacote está corrompido (SHA-256 não confere). Nada foi importado.} tooLarge{O pacote é grande demais para este aparelho.} other{Não foi possível importar o pacote.}}",
+  "@packageError": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "learnProjectName": "Aula: {title}",
+  "@learnProjectName": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "learnProjectDescription": "Dados fictícios do modo estudante.",
+  "learnDataset": "Dados: {title}",
+  "@learnDataset": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "learnOpenTab": "Abrir {tab}",
+  "@learnOpenTab": {
+    "placeholders": {
+      "tab": {
+        "type": "String"
+      }
+    }
+  },
+  "learnExercises": "Exercícios",
+  "learnPrepare": "Preparar os dados da aula",
+  "exerciseCorrect": "Respondido corretamente",
+  "exerciseCheck": "Conferir",
+  "exerciseReveal": "Ver resposta",
+  "exerciseUnavailable": "Não dá para calcular esta resposta com estes dados.",
+  "exerciseRight": "Certo!",
+  "exerciseWrong": "Ainda não.",
+  "exerciseAnswer": "Resposta: {answer}",
+  "@exerciseAnswer": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "packageCreateTitle": "Criar pacote de aula",
+  "packageCreateIntro": "Transforma esta comparação num arquivo .genozaula para os alunos. Eles importam em Aprender e recebem os mesmos arquivos, a comparação pronta e as perguntas.",
+  "packageTitleField": "Título da aula",
+  "packageInstructionsField": "Instruções para os alunos (opcional)",
+  "packageQuestions": "Perguntas (corrigidas automaticamente)",
+  "packagePrivacyNote": "O pacote leva cópias dos arquivos VCF desta comparação. Use só dados fictícios ou com autorização. As respostas não vão no pacote: são calculadas no aparelho de cada aluno.",
+  "packageSave": "Salvar pacote",
+  "packageSaved": "Pacote de aula salvo.",
+  "exerciseHint": "Sua resposta",
+  "packageOpenStep": "Abra a comparação da aula: as respostas estão no Resumo, na Tabela e no Mapa."
 }

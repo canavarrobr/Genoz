@@ -1,0 +1,178 @@
+[
+  {
+    "id": "vcf",
+    "term": {"pt": "VCF (Variant Call Format)", "en": "VCF (Variant Call Format)"},
+    "def": {
+      "pt": "Formato de texto padrão para listar variantes genéticas. Cada linha traz a posição no genoma, a base de referência (REF), a base alternativa (ALT), indicadores de qualidade e, para cada amostra, o genótipo.",
+      "en": "Standard text format for listing genetic variants. Each line has the genome position, the reference base (REF), the alternative base (ALT), quality indicators and, for each sample, the genotype."
+    }
+  },
+  {
+    "id": "variante",
+    "term": {"pt": "Variante", "en": "Variant"},
+    "def": {
+      "pt": "Uma diferença entre o DNA de uma amostra e o genoma de referência numa posição. Ter variantes é normal: cada pessoa tem milhões delas.",
+      "en": "A difference between a sample's DNA and the reference genome at a position. Having variants is normal: every person has millions of them."
+    }
+  },
+  {
+    "id": "referencia",
+    "term": {"pt": "Genoma de referência (build)", "en": "Reference genome (build)"},
+    "def": {
+      "pt": "Sequência usada como régua para dar posições às variantes. As mais usadas são GRCh37 (hg19) e GRCh38 (hg38). A mesma variante tem posições diferentes em cada uma, por isso só se compara amostras do mesmo build.",
+      "en": "Sequence used as a ruler to give positions to variants. The most used are GRCh37 (hg19) and GRCh38 (hg38). The same variant has different positions in each, so only samples on the same build are compared."
+    }
+  },
+  {
+    "id": "ref_alt",
+    "term": {"pt": "REF e ALT", "en": "REF and ALT"},
+    "def": {
+      "pt": "REF é a base (ou bases) do genoma de referência naquela posição; ALT é a base encontrada na amostra. Em A > G, A é REF e G é ALT.",
+      "en": "REF is the reference genome base (or bases) at that position; ALT is the base found in the sample. In A > G, A is REF and G is ALT."
+    }
+  },
+  {
+    "id": "alelo",
+    "term": {"pt": "Alelo", "en": "Allele"},
+    "def": {
+      "pt": "Cada versão possível de uma posição. No VCF, 0 é o alelo de referência, 1 é o primeiro alternativo, 2 o segundo, e assim por diante.",
+      "en": "Each possible version of a position. In VCF, 0 is the reference allele, 1 the first alternative, 2 the second, and so on."
+    }
+  },
+  {
+    "id": "genotipo",
+    "term": {"pt": "Genótipo (GT)", "en": "Genotype (GT)"},
+    "def": {
+      "pt": "Os dois alelos que uma pessoa tem numa posição (um de cada cópia do cromossomo). 0/0 = os dois de referência; 0/1 = um de cada; 1/1 = os dois alternativos; ./. = não determinado.",
+      "en": "The two alleles a person carries at a position (one from each chromosome copy). 0/0 = both reference; 0/1 = one of each; 1/1 = both alternative; ./. = not determined."
+    }
+  },
+  {
+    "id": "heterozigoto",
+    "term": {"pt": "Heterozigoto", "en": "Heterozygous"},
+    "def": {
+      "pt": "Genótipo com dois alelos diferentes, como 0/1.",
+      "en": "Genotype with two different alleles, such as 0/1."
+    }
+  },
+  {
+    "id": "homozigoto",
+    "term": {"pt": "Homozigoto", "en": "Homozygous"},
+    "def": {
+      "pt": "Genótipo com dois alelos iguais: 0/0 (referência) ou 1/1 (alternativo).",
+      "en": "Genotype with two equal alleles: 0/0 (reference) or 1/1 (alternative)."
+    }
+  },
+  {
+    "id": "fase",
+    "term": {"pt": "Fase ( / e | )", "en": "Phase ( / and | )"},
+    "def": {
+      "pt": "Com barra (0/1) não se sabe de qual cópia do cromossomo veio cada alelo; com barra vertical (0|1) sabe-se. Para comparar se duas pessoas carregam a mesma variante, 0/1 e 0|1 contam como iguais.",
+      "en": "With a slash (0/1) it is unknown which chromosome copy each allele came from; with a pipe (0|1) it is known. When comparing whether two people carry the same variant, 0/1 and 0|1 count as equal."
+    }
+  },
+  {
+    "id": "snv",
+    "term": {"pt": "SNV", "en": "SNV"},
+    "def": {
+      "pt": "Variante de um único nucleotídeo: uma base trocada por outra (ex.: A > G).",
+      "en": "Single-nucleotide variant: one base replaced by another (e.g. A > G)."
+    }
+  },
+  {
+    "id": "indel",
+    "term": {"pt": "Indel", "en": "Indel"},
+    "def": {
+      "pt": "Inserção ou deleção de bases (ex.: T > TA insere um A). Costuma ser mais difícil de detectar e de comparar que SNVs.",
+      "en": "Insertion or deletion of bases (e.g. T > TA inserts an A). Usually harder to detect and compare than SNVs."
+    }
+  },
+  {
+    "id": "multialelico",
+    "term": {"pt": "Multialélico", "en": "Multiallelic"},
+    "def": {
+      "pt": "Posição com mais de um alelo alternativo (ALT = G,T). O Genoz divide cada alternativo numa linha própria para comparar um a um.",
+      "en": "Position with more than one alternative allele (ALT = G,T). Genoz splits each alternative into its own row to compare one at a time."
+    }
+  },
+  {
+    "id": "qual",
+    "term": {"pt": "QUAL", "en": "QUAL"},
+    "def": {
+      "pt": "Confiança de que existe uma variante na posição (escala Phred: 20 ≈ 1% de chance de erro, 30 ≈ 0,1%).",
+      "en": "Confidence that a variant exists at the position (Phred scale: 20 ≈ 1% chance of error, 30 ≈ 0.1%)."
+    }
+  },
+  {
+    "id": "dp",
+    "term": {"pt": "DP (profundidade)", "en": "DP (depth)"},
+    "def": {
+      "pt": "Quantas leituras de sequenciamento cobriram a posição. Profundidade baixa torna o genótipo menos confiável.",
+      "en": "How many sequencing reads covered the position. Low depth makes the genotype less reliable."
+    }
+  },
+  {
+    "id": "gq",
+    "term": {"pt": "GQ (qualidade do genótipo)", "en": "GQ (genotype quality)"},
+    "def": {
+      "pt": "Confiança no genótipo daquela amostra (escala Phred). GQ baixo = o genótipo pode estar errado.",
+      "en": "Confidence in that sample's genotype (Phred scale). Low GQ = the genotype may be wrong."
+    }
+  },
+  {
+    "id": "filter",
+    "term": {"pt": "FILTER", "en": "FILTER"},
+    "def": {
+      "pt": "Resultado dos filtros do programa que gerou o VCF: PASS se passou em todos; senão, o nome do filtro reprovado.",
+      "en": "Result of the filters of the program that produced the VCF: PASS if it passed all of them; otherwise, the name of the failed filter."
+    }
+  },
+  {
+    "id": "regioes_avaliadas",
+    "term": {"pt": "Regiões avaliadas", "en": "Assessed regions"},
+    "def": {
+      "pt": "Trechos do genoma que o sequenciamento realmente conseguiu ler. Uma variante 'ausente' numa região não avaliada não significa que a pessoa tem a referência: significa que não se sabe.",
+      "en": "Stretches of the genome the sequencing was actually able to read. A variant 'absent' in an unassessed region does not mean the person has the reference: it means it is unknown."
+    }
+  },
+  {
+    "id": "concordancia",
+    "term": {"pt": "Concordância de genótipos", "en": "Genotype concordance"},
+    "def": {
+      "pt": "Entre as variantes presentes nas duas amostras, a fração com o mesmo genótipo. No Genoz: iguais ÷ (iguais + genótipo diferente).",
+      "en": "Among variants present in both samples, the fraction with the same genotype. In Genoz: equal ÷ (equal + different genotype)."
+    }
+  },
+  {
+    "id": "jaccard",
+    "term": {"pt": "Índice de Jaccard", "en": "Jaccard index"},
+    "def": {
+      "pt": "Quanto dois conjuntos se sobrepõem: tamanho da interseção ÷ tamanho da união. 1 = idênticos, 0 = nada em comum.",
+      "en": "How much two sets overlap: size of the intersection ÷ size of the union. 1 = identical, 0 = nothing in common."
+    }
+  },
+  {
+    "id": "cromossomo",
+    "term": {"pt": "Cromossomo", "en": "Chromosome"},
+    "def": {
+      "pt": "Molécula longa de DNA. Os humanos têm 22 pares de autossomos (1 a 22) e os cromossomos sexuais X e Y, além do DNA mitocondrial (MT).",
+      "en": "Long DNA molecule. Humans have 22 pairs of autosomes (1 to 22) and the sex chromosomes X and Y, plus mitochondrial DNA (MT)."
+    }
+  },
+  {
+    "id": "centromero",
+    "term": {"pt": "Centrômero", "en": "Centromere"},
+    "def": {
+      "pt": "Região mais estreita do cromossomo, que o divide em braço curto (p) e braço longo (q). É rica em sequências repetitivas, difíceis de sequenciar.",
+      "en": "The narrowest region of the chromosome, dividing it into a short arm (p) and a long arm (q). It is rich in repetitive sequences that are hard to sequence."
+    }
+  },
+  {
+    "id": "ideograma",
+    "term": {"pt": "Ideograma", "en": "Ideogram"},
+    "def": {
+      "pt": "Desenho esquemático dos cromossomos em escala. No Genoz, as cores mostram onde há mais ou menos variantes.",
+      "en": "Schematic drawing of the chromosomes to scale. In Genoz, the colors show where there are more or fewer variants."
+    }
+  }
+]

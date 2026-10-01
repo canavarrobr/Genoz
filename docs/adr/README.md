@@ -12,3 +12,4 @@ As decisões tomadas durante o desenvolvimento ficam registradas aqui, uma por a
 | [ADR-011](ADR-011-fontes-e-marca.md) | Fontes embutidas e marca gerada por script | 5 |
 | [ADR-012](ADR-012-web-isolamento-por-service-worker.md) | Web: isolamento de origem por service worker, arquivos no OPFS | 6 |
 | [ADR-013](ADR-013-bloqueio-do-app.md) | Bloqueio do app por PIN/biometria (não é criptografia) | 7 |
+| [ADR-014](ADR-014-modo-estudante-e-pacote-de-aula.md) | Modo estudante: respostas calculadas e pacote de aula | 8 |

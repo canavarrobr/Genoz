@@ -193,7 +193,7 @@ class _RegionViewerScreenState extends ConsumerState<RegionViewerScreen> {
                         colors: {for (final c in lanes) c: context.palette.category(c, Theme.of(context).colorScheme)},
                         grid: Theme.of(context).colorScheme.outlineVariant,
                         text: Theme.of(context).textTheme.bodySmall!,
-                        format: fmt.format,
+                        format: (pos) => compactPosition(pos.round(), span, fmt),
                       ),
                     ),
                   ),
@@ -270,11 +270,12 @@ class _RegionViewerScreenState extends ConsumerState<RegionViewerScreen> {
     final lane = (p.dy / laneH).floor();
     if (lane < 0 || lane >= lanes.length) return;
     final span = _region.end - _region.start + 1;
+    final usable = width - 2 * trackInset;
     ComparisonRow? best;
     var bestDx = 14.0; // tolerância em pixels
     for (final r in _rows) {
       if (r.category != lanes[lane]) continue;
-      final x = (r.pos - _region.start + 0.5) / span * width;
+      final x = trackInset + (r.pos - _region.start + 0.5) / span * usable;
       final dx = (x - p.dx).abs();
       if (dx < bestDx) {
         bestDx = dx;
@@ -313,7 +314,9 @@ class RegionTrackPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final span = region.end - region.start + 1;
     final start = region.start + offsetBp;
-    double x(int pos) => (pos - start + 0.5) / span * size.width;
+    // Margem do tamanho do marcador: variantes nas pontas não ficam cortadas.
+    final usable = size.width - 2 * trackInset;
+    double x(int pos) => trackInset + (pos - start + 0.5) / span * usable;
     final line = Paint()
       ..color = grid
       ..strokeWidth = 1;
@@ -331,11 +334,17 @@ class RegionTrackPainter extends CustomPainter {
     // Régua: 5 marcas com a posição.
     final rulerY = lanes.length * laneHeight + 2;
     canvas.drawLine(Offset(0, rulerY), Offset(size.width, rulerY), line);
-    for (var i = 0; i <= 4; i++) {
-      final fx = size.width * i / 4;
+    // Quantas marcas cabem sem sobrepor os rótulos (1 a 4 intervalos).
+    final sample = TextPainter(
+      text: TextSpan(text: format(region.end), style: text),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final ticks = (usable / (sample.width + 16)).floor().clamp(1, 4);
+    for (var i = 0; i <= ticks; i++) {
+      final fx = trackInset + usable * i / ticks;
       canvas.drawLine(Offset(fx, rulerY), Offset(fx, rulerY + 4), line);
       final label = TextPainter(
-        text: TextSpan(text: format((start + span * i / 4).round()), style: text),
+        text: TextSpan(text: format((start + span * i / ticks).round()), style: text),
         textDirection: TextDirection.ltr,
       )..layout();
       final lx = (fx - label.width / 2).clamp(0.0, size.width - label.width);
@@ -346,6 +355,24 @@ class RegionTrackPainter extends CustomPainter {
   @override
   bool shouldRepaint(RegionTrackPainter old) =>
       old.region != region || old.offsetBp != offsetBp || old.rows != rows || old.lanes != lanes;
+}
+
+/// Margem lateral da trilha, do tamanho de um marcador.
+const trackInset = 7.0;
+
+/// Posição curta para a régua: "117 Mb" no cromossomo inteiro, "124,48 Mb" mais perto,
+/// número exato quando o trecho tem menos de 10 kb.
+String compactPosition(int pos, int span, NumberFormat exact) {
+  if (span < 10000) return exact.format(pos);
+  final decimals = span >= 20000000
+      ? 0
+      : span >= 2000000
+      ? 1
+      : span >= 200000
+      ? 2
+      : 3;
+  final mb = NumberFormat.decimalPatternDigits(locale: exact.locale, decimalDigits: decimals).format(pos / 1e6);
+  return '$mb Mb';
 }
 
 /// Forma de cada categoria (a cor nunca é a única pista).

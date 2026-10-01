@@ -1073,4 +1073,144 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get vennNotProportional =>
       'The circles are not to scale: the numbers give the amounts.';
+
+  @override
+  String get learnTitle => 'Learn';
+
+  @override
+  String get learnIntro =>
+      'Guided tracks with fictional data: compare samples, read genotypes and explore the genome map. Everything runs on the device. For teaching — not a diagnosis.';
+
+  @override
+  String learnProgress(int correct, int total) {
+    return '$correct of $total exercises right';
+  }
+
+  @override
+  String get glossaryTitle => 'Glossary';
+
+  @override
+  String glossarySubtitle(int count) {
+    return '$count terms, in Portuguese and English';
+  }
+
+  @override
+  String get glossarySearch => 'Search term';
+
+  @override
+  String get glossaryNone => 'No term found.';
+
+  @override
+  String get packageImport => 'Import lesson package';
+
+  @override
+  String get packageImportHint => '.genozaula file received from the teacher';
+
+  @override
+  String get packageImporting =>
+      'Importing the lesson: checking files and comparing…';
+
+  @override
+  String get packageProjectDescription =>
+      'Lesson imported from a teacher package.';
+
+  @override
+  String packageImported(String title) {
+    return 'Lesson \"$title\" imported.';
+  }
+
+  @override
+  String packageError(String code) {
+    String _temp0 = intl.Intl.selectLogic(code, {
+      'notPackage': 'This file is not a Genoz lesson package.',
+      'newerVersion':
+          'This package was made by a newer Genoz version. Update the app.',
+      'missingFile': 'The package is incomplete (a file is missing).',
+      'corrupted': 'A file in the package is corrupted (SHA-256 mismatch). Nothing was imported.',
+      'tooLarge': 'The package is too large for this device.',
+      'other': 'Could not import the package.',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String learnProjectName(String title) {
+    return 'Lesson: $title';
+  }
+
+  @override
+  String get learnProjectDescription => 'Fictional student-mode data.';
+
+  @override
+  String learnDataset(String title) {
+    return 'Data: $title';
+  }
+
+  @override
+  String learnOpenTab(String tab) {
+    return 'Open $tab';
+  }
+
+  @override
+  String get learnExercises => 'Exercises';
+
+  @override
+  String get learnPrepare => 'Prepare the lesson data';
+
+  @override
+  String get exerciseCorrect => 'Answered correctly';
+
+  @override
+  String get exerciseCheck => 'Check';
+
+  @override
+  String get exerciseReveal => 'Show answer';
+
+  @override
+  String get exerciseUnavailable =>
+      'This answer cannot be computed with these data.';
+
+  @override
+  String get exerciseRight => 'Right!';
+
+  @override
+  String get exerciseWrong => 'Not yet.';
+
+  @override
+  String exerciseAnswer(String answer) {
+    return 'Answer: $answer';
+  }
+
+  @override
+  String get packageCreateTitle => 'Create lesson package';
+
+  @override
+  String get packageCreateIntro =>
+      'Turns this comparison into a .genozaula file for students. They import it in Learn and get the same files, the comparison ready and the questions.';
+
+  @override
+  String get packageTitleField => 'Lesson title';
+
+  @override
+  String get packageInstructionsField => 'Instructions for students (optional)';
+
+  @override
+  String get packageQuestions => 'Questions (graded automatically)';
+
+  @override
+  String get packagePrivacyNote =>
+      'The package carries copies of this comparison\'s VCF files. Use only fictional data or data you are authorized to share. The answers are not in the package: they are computed on each student\'s device.';
+
+  @override
+  String get packageSave => 'Save package';
+
+  @override
+  String get packageSaved => 'Lesson package saved.';
+
+  @override
+  String get exerciseHint => 'Your answer';
+
+  @override
+  String get packageOpenStep =>
+      'Open the lesson\'s comparison: the answers are in the Summary, the Table and the Map.';
 }
