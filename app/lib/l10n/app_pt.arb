@@ -449,5 +449,45 @@
     }
   },
   "aboutLicenses": "Licenças de código aberto",
-  "aboutSource": "Código-fonte: github.com/canavarrobr/Genoz"
+  "aboutSource": "Código-fonte: github.com/canavarrobr/Genoz",
+  "privacyCheckTitle": "Verificar privacidade",
+  "privacyCheckIntro": "Estes números são medidos agora, neste dispositivo: o Genoz registra cada requisição de rede que faz.",
+  "checkUpload": "Arquivo genômico enviado",
+  "checkTelemetry": "Telemetria",
+  "checkLocal": "Análise local",
+  "checkExternalDuring": "Conexões externas durante análises",
+  "checkNo": "NÃO",
+  "checkYes": "SIM",
+  "checkRequestsTitle": "Requisições desde que o app abriu",
+  "checkOwnSite": "{count} do próprio site (carregar o app)",
+  "@checkOwnSite": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkExternal": "{count} para outros endereços",
+  "@checkExternal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkNoneNative": "Nenhuma conexão de rede foi aberta pelo app.",
+  "checkExport": "Exportar relatório de auditoria (JSON)",
+  "checkAirplane": "Dica: ative o modo avião e continue usando o Genoz — tudo funciona sem internet.",
+  "checkLastRequests": "Últimas requisições",
+  "checkWhyOwn": "No navegador, abrir o site baixa o próprio app (código, fontes e o núcleo WebAssembly). Depois disso, nada é enviado.",
+  "webTooLargeHint": "No navegador cada arquivo pode ter até {mb} MB. Para arquivos maiores, use o app Android.",
+  "@webTooLargeHint": {
+    "placeholders": {
+      "mb": {
+        "type": "int"
+      }
+    }
+  },
+  "webUnsupported": "Este navegador não oferece os recursos necessários (WebAssembly com threads e armazenamento privado). Use Chrome, Edge ou Firefox atualizados.",
+  "checkDuringTag": "durante análise"
 }

@@ -1,11 +1,11 @@
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/genoz_core.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../persistence/app_storage.dart';
 import '../../persistence/analysis_repository.dart';
 import '../../persistence/database.dart';
 import '../../persistence/project_repository.dart';
@@ -95,19 +95,16 @@ class ProjectScreen extends ConsumerWidget {
     // FileType.any: muitos seletores não reconhecem .vcf/.gz como tipo próprio.
     final file = await FilePicker.pickFile(type: FileType.any);
     if (file == null) return;
-    final controller = ref.read(importControllerProvider.notifier);
-    final path = file.path;
-    if (path != null) {
-      await controller.importFile(projectId: projectId, sourcePath: path, displayName: file.name);
-    } else {
-      // Android com `content://`: lemos como fluxo de bytes.
-      await controller.importStream(
-        projectId: projectId,
-        bytes: file.readAsByteStream(),
-        displayName: file.name,
-        totalBytes: await file.length(),
-      );
-    }
+    // No navegador (e no Android com `content://`) não há caminho: lemos como fluxo de bytes.
+    await ref.read(importControllerProvider.notifier).importFile(
+          projectId: projectId,
+          source: SourceFile(
+            name: file.name,
+            path: kIsWeb ? null : file.path,
+            open: file.readAsByteStream,
+            size: await file.length(),
+          ),
+        );
   }
 
   void _showOutcome(BuildContext context, WidgetRef ref, ImportState state) {
@@ -265,7 +262,7 @@ class _AnalysesSection extends ConsumerWidget {
                   final ok = await confirmDelete(context, title: l.deleteAnalysisTitle, body: l.deleteAnalysisBody);
                   if (!ok) return;
                   final repo = ref.read(analysisRepositoryProvider);
-                  ref.read(genozCoreProvider).forgetResult(ref.read(appStorageProvider).absolute(a.resultDir));
+                  ref.read(genozCoreProvider).forgetResult(a.resultDir);
                   await repo.deleteAnalysis(a);
                   await repo.log(projectId, 'delete_analysis', l.logDeleteAnalysis(analysisTitle(l, a)));
                 },

@@ -43,7 +43,7 @@ void main() {
     semantics.dispose();
   });
 
-  testWidgets('menu lateral destaca o item atual e abre privacidade', (tester) async {
+  testWidgets('menu lateral destaca o item atual e mostra a verificação de privacidade', (tester) async {
     await tester.pumpWidget(_app(const Scaffold(drawer: GenozDrawer(current: '/sobre'), body: SizedBox())));
     final state = tester.firstState<ScaffoldState>(find.byType(Scaffold));
     state.openDrawer();
@@ -51,9 +51,7 @@ void main() {
     expect(find.text('Projetos'), findsOneWidget);
     final active = tester.widget<ListTile>(find.ancestor(of: find.text('Sobre o Genoz'), matching: find.byType(ListTile)));
     expect(active.selected, isTrue);
-    await tester.tap(find.text('Privacidade'));
-    await tester.pumpAndSettle();
-    expect(find.text('Sua privacidade'), findsOneWidget);
+    expect(find.text('Verificar privacidade'), findsOneWidget);
   });
 
   testWidgets('tela Sobre também funciona em inglês e no tema escuro', (tester) async {

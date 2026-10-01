@@ -2,13 +2,13 @@
 // com progresso e cancelamento. Só grava no banco depois de validar.
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/genoz_core.dart';
 import '../../core/inspect_report.dart';
 import '../../persistence/analysis_repository.dart';
+import '../../platform/network_audit.dart';
 import '../../persistence/app_storage.dart';
 import '../../persistence/project_repository.dart';
 
@@ -65,68 +65,22 @@ class ImportController extends Notifier<ImportState> {
 
   bool get isRunning => state is ImportRunning;
 
-  /// Importa um arquivo que só pode ser lido como fluxo de bytes (ex.: `content://`
-  /// no Android). Os bytes vão direto para a pasta do projeto; o núcleo então
-  /// calcula o hash e valida no próprio lugar.
-  Future<void> importStream({
-    required String projectId,
-    required Stream<List<int>> bytes,
-    required String displayName,
-    int? totalBytes,
-  }) async {
-    if (isRunning) return;
-    final storage = ref.read(appStorageProvider);
-    final fileId = newId();
-    final relative = storage.newFileRelative(projectId, fileId, displayName);
-    final dest = File(storage.absolute(relative));
-    state = ImportRunning(jobId: fileId, fileName: displayName);
-    try {
-      await dest.parent.create(recursive: true);
-      final sink = dest.openWrite();
-      var done = 0;
-      await for (final chunk in bytes) {
-        sink.add(chunk);
-        done += chunk.length;
-        state = ImportRunning(
-          jobId: fileId,
-          fileName: displayName,
-          progress: ImportProgress(validating: false, bytesDone: done, bytesTotal: totalBytes ?? 0),
-        );
-      }
-      await sink.close();
-    } catch (e) {
-      if (await dest.exists()) await dest.delete();
-      state = ImportError(e.toString());
-      return;
-    }
-    state = const ImportIdle();
-    await importFile(
-      projectId: projectId,
-      sourcePath: dest.path,
-      displayName: displayName,
-      fileId: fileId,
-    );
-  }
-
-  /// Importa um arquivo escolhido pelo usuário a partir do caminho.
-  Future<void> importFile({
-    required String projectId,
-    required String sourcePath,
-    required String displayName,
-    String? fileId,
-  }) async {
+  /// Importa um arquivo escolhido pelo usuário (por caminho ou fluxo de bytes).
+  Future<void> importFile({required String projectId, required SourceFile source}) async {
     if (isRunning) return;
     final storage = ref.read(appStorageProvider);
     final repo = ref.read(projectRepositoryProvider);
     final core = ref.read(genozCoreProvider);
 
-    final id = fileId ?? newId();
+    final id = newId();
+    final displayName = source.name;
     final relative = storage.newFileRelative(projectId, id, displayName);
     state = ImportRunning(jobId: id, fileName: displayName);
 
+    NetworkAudit.instance.beginAnalysis();
     final done = Completer<void>();
     _sub = core
-        .importVcf(sourcePath: sourcePath, destPath: storage.absolute(relative), jobId: id)
+        .importVcf(source: source, destRelative: relative, jobId: id)
         .listen((event) async {
       switch (event) {
         case ImportProgress():
@@ -166,6 +120,7 @@ class ImportController extends Notifier<ImportState> {
       if (!done.isCompleted) done.complete();
     });
     await done.future;
+    NetworkAudit.instance.endAnalysis();
     await _sub?.cancel();
     _sub = null;
   }
@@ -180,14 +135,19 @@ class ImportController extends Notifier<ImportState> {
     final name = 'exemplo_sintetico_$seed.vcf.gz';
     state = ImportRunning(jobId: 'synth', fileName: name);
     try {
-      await core.writeSyntheticExample(
-        destPath: storage.absolute(tmpRelative),
-        seed: seed,
-        samples: 2,
-        variantsPerChrom: 2000,
-      );
+      await core.writeSyntheticExample(destRelative: tmpRelative, seed: seed, samples: 2, variantsPerChrom: 2000);
       state = const ImportIdle();
-      await importFile(projectId: projectId, sourcePath: storage.absolute(tmpRelative), displayName: name);
+      final native = storage.blobs.nativePath(tmpRelative);
+      await importFile(
+        projectId: projectId,
+        source: native != null
+            ? SourceFile(name: name, path: native)
+            : SourceFile(
+                name: name,
+                open: () => Stream.fromFuture(storage.blobs.readBytes(tmpRelative)),
+                size: await storage.blobs.size(tmpRelative),
+              ),
+      );
     } catch (e) {
       state = ImportError(e.toString());
     } finally {

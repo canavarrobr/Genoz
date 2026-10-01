@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +9,7 @@ import 'package:genoz/core/genoz_core.dart';
 import 'package:genoz/persistence/app_storage.dart';
 import 'package:genoz/persistence/database.dart';
 import 'package:genoz/persistence/project_repository.dart';
+import 'package:genoz/platform/blob_store_io.dart';
 
 String fixture(String name) => File('test/fixtures/$name').readAsStringSync();
 
@@ -25,6 +27,9 @@ class FakeGenozCore implements GenozCore {
   CompareInputFile? lastA;
   CompareInputFile? lastB;
 
+  /// Armazenamento do teste (definido por TestEnv).
+  late AppStorage storage;
+
   /// Se verdadeiro, a importação fica parada até `cancel()`.
   bool hold;
   final _cancelled = <String>{};
@@ -34,15 +39,15 @@ class FakeGenozCore implements GenozCore {
   String get coreVersion => '0.0.0-teste';
 
   @override
-  Stream<CoreImportEvent> importVcf({
-    required String sourcePath,
-    required String destPath,
-    required String jobId,
-  }) async* {
+  Stream<CoreImportEvent> importVcf({required SourceFile source, required String destRelative, required String jobId}) async* {
     yield const ImportProgress(validating: false, bytesDone: 10, bytesTotal: 100);
-    final dest = File(destPath);
+    final dest = File(storage.absolute(destRelative));
     await dest.parent.create(recursive: true);
-    if (sourcePath != destPath) await File(sourcePath).copy(destPath);
+    if (source.path != null) {
+      await File(source.path!).copy(dest.path);
+    } else {
+      await storage.blobs.writeStream(destRelative, source.open!());
+    }
     // Como o núcleo real, respeita um cancelamento que chegou antes da espera.
     if (hold && !_cancelled.contains(jobId)) {
       final c = _waiting[jobId] = Completer<void>();
@@ -70,13 +75,14 @@ class FakeGenozCore implements GenozCore {
 
   @override
   Future<void> writeSyntheticExample({
-    required String destPath,
+    required String destRelative,
     required int seed,
     required int samples,
     required int variantsPerChrom,
   }) async {
-    await File(destPath).parent.create(recursive: true);
-    await File(destPath).writeAsString('##fileformat=VCFv4.3\n');
+    final f = File(storage.absolute(destRelative));
+    await f.parent.create(recursive: true);
+    await f.writeAsString('##fileformat=VCFv4.3\n');
   }
 
   @override
@@ -84,7 +90,7 @@ class FakeGenozCore implements GenozCore {
     required CompareInputFile a,
     required CompareInputFile b,
     required CompareOptions options,
-    required String outDir,
+    required String outDirRelative,
     required String createdAt,
     required String jobId,
   }) async* {
@@ -97,6 +103,7 @@ class FakeGenozCore implements GenozCore {
       return;
     }
     // Resultado real (genoz-cli compare pessoa_a × pessoa_b), copiado para a pasta.
+    final outDir = storage.absolute(outDirRelative);
     await Directory(outDir).create(recursive: true);
     for (final (from, to) in [
       ('compare_summary.json', 'summary.json'),
@@ -120,28 +127,25 @@ class FakeGenozCore implements GenozCore {
       ];
 
   @override
-  Future<RowsPage> page({required String outDir, required RowFilter filter, required int start, required int count}) async {
+  Future<RowsPage> page({required String resultDirRelative, required RowFilter filter, required int start, required int count}) async {
     final all = _filtered(filter);
     return RowsPage(all.length, all.skip(start).take(count).toList());
   }
 
   @override
-  Future<int> export({
-    required String outDir,
+  Future<ExportResult> export({
+    required String resultDirRelative,
     required RowFilter filter,
     required ExportFormat format,
     required String sampleA,
     required String sampleB,
-    required String destPath,
   }) async {
     final rows = _filtered(filter);
-    await File(destPath).parent.create(recursive: true);
-    await File(destPath).writeAsString('${format.name}:${rows.length}');
-    return rows.length;
+    return ExportResult(Uint8List.fromList('${format.name}:${rows.length}'.codeUnits), rows.length);
   }
 
   @override
-  void forgetResult(String outDir) {}
+  void forgetResult(String resultDirRelative) {}
 
   @override
   Region? parseRegion(String text) {
@@ -164,8 +168,9 @@ class TestEnv {
   static Future<TestEnv> create({FakeGenozCore? core}) async {
     final dir = await Directory.systemTemp.createTemp('genoz_test_');
     final db = GenozDatabase(NativeDatabase.memory());
-    final storage = AppStorage(dir.path);
+    final storage = AppStorage(IoBlobStore(dir.path));
     final fake = core ?? FakeGenozCore(reportJson: fixture('report_valid.json'));
+    fake.storage = storage;
     final container = ProviderContainer(overrides: [
       databaseProvider.overrideWithValue(db),
       appStorageProvider.overrideWithValue(storage),

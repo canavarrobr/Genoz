@@ -761,4 +761,71 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get aboutSource => 'Código-fonte: github.com/canavarrobr/Genoz';
+
+  @override
+  String get privacyCheckTitle => 'Verificar privacidade';
+
+  @override
+  String get privacyCheckIntro =>
+      'Estes números são medidos agora, neste dispositivo: o Genoz registra cada requisição de rede que faz.';
+
+  @override
+  String get checkUpload => 'Arquivo genômico enviado';
+
+  @override
+  String get checkTelemetry => 'Telemetria';
+
+  @override
+  String get checkLocal => 'Análise local';
+
+  @override
+  String get checkExternalDuring => 'Conexões externas durante análises';
+
+  @override
+  String get checkNo => 'NÃO';
+
+  @override
+  String get checkYes => 'SIM';
+
+  @override
+  String get checkRequestsTitle => 'Requisições desde que o app abriu';
+
+  @override
+  String checkOwnSite(int count) {
+    return '$count do próprio site (carregar o app)';
+  }
+
+  @override
+  String checkExternal(int count) {
+    return '$count para outros endereços';
+  }
+
+  @override
+  String get checkNoneNative => 'Nenhuma conexão de rede foi aberta pelo app.';
+
+  @override
+  String get checkExport => 'Exportar relatório de auditoria (JSON)';
+
+  @override
+  String get checkAirplane =>
+      'Dica: ative o modo avião e continue usando o Genoz — tudo funciona sem internet.';
+
+  @override
+  String get checkLastRequests => 'Últimas requisições';
+
+  @override
+  String get checkWhyOwn =>
+      'No navegador, abrir o site baixa o próprio app (código, fontes e o núcleo WebAssembly). Depois disso, nada é enviado.';
+
+  @override
+  String webTooLargeHint(int mb) {
+    return 'No navegador cada arquivo pode ter até $mb MB. Para arquivos maiores, use o app Android.';
+  }
+
+  @override
+  String get webUnsupported =>
+      'Este navegador não oferece os recursos necessários (WebAssembly com threads e armazenamento privado). Use Chrome, Edge ou Firefox atualizados.';
+
+  @override
+  String get checkDuringTag => 'durante análise';
 }

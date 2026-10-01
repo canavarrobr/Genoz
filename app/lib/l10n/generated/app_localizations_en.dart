@@ -758,4 +758,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutSource => 'Source code: github.com/canavarrobr/Genoz';
+
+  @override
+  String get privacyCheckTitle => 'Check privacy';
+
+  @override
+  String get privacyCheckIntro =>
+      'These numbers are measured right now, on this device: Genoz records every network request it makes.';
+
+  @override
+  String get checkUpload => 'Genomic file uploaded';
+
+  @override
+  String get checkTelemetry => 'Telemetry';
+
+  @override
+  String get checkLocal => 'Local analysis';
+
+  @override
+  String get checkExternalDuring => 'External connections during analyses';
+
+  @override
+  String get checkNo => 'NO';
+
+  @override
+  String get checkYes => 'YES';
+
+  @override
+  String get checkRequestsTitle => 'Requests since the app opened';
+
+  @override
+  String checkOwnSite(int count) {
+    return '$count to this site (loading the app)';
+  }
+
+  @override
+  String checkExternal(int count) {
+    return '$count to other addresses';
+  }
+
+  @override
+  String get checkNoneNative =>
+      'The app has not opened any network connection.';
+
+  @override
+  String get checkExport => 'Export audit report (JSON)';
+
+  @override
+  String get checkAirplane =>
+      'Tip: turn on airplane mode and keep using Genoz — everything works offline.';
+
+  @override
+  String get checkLastRequests => 'Latest requests';
+
+  @override
+  String get checkWhyOwn =>
+      'In the browser, opening the site downloads the app itself (code, fonts and the WebAssembly core). After that, nothing is sent.';
+
+  @override
+  String webTooLargeHint(int mb) {
+    return 'In the browser each file can be up to $mb MB. For larger files, use the Android app.';
+  }
+
+  @override
+  String get webUnsupported =>
+      'This browser lacks required features (WebAssembly threads and private storage). Use an up-to-date Chrome, Edge or Firefox.';
+
+  @override
+  String get checkDuringTag => 'during analysis';
 }

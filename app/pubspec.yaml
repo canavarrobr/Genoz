@@ -2,7 +2,7 @@ name: genoz
 description: "Genoz - plataforma genômica local-first para ensino e pesquisa."
 publish_to: 'none'
 
-version: 0.5.0+5
+version: 0.6.0+6
 
 environment:
   sdk: ^3.13.2
@@ -27,6 +27,7 @@ dependencies:
   flutter_rust_bridge: 2.13.0
   freezed_annotation: ^3.1.0
   flutter_svg: ^2.3.0
+  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:

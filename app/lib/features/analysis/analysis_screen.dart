@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' as p;
 
 import '../../core/compare_models.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -17,9 +14,9 @@ import 'table_tab.dart';
 /// Estatísticas de QC de A e B, lidas dos arquivos da análise.
 final analysisStatsProvider = FutureProvider.family<(SampleStats, SampleStats), String>((ref, analysisId) async {
   final a = await ref.watch(analysisProvider(analysisId).future);
-  final dir = ref.read(appStorageProvider).absolute(a!.resultDir);
-  final sa = SampleStats.parse(await File(p.join(dir, 'stats_a.json')).readAsString());
-  final sb = SampleStats.parse(await File(p.join(dir, 'stats_b.json')).readAsString());
+  final blobs = ref.read(appStorageProvider).blobs;
+  final sa = SampleStats.parse(await blobs.readString('${a!.resultDir}/stats_a.json'));
+  final sb = SampleStats.parse(await blobs.readString('${a.resultDir}/stats_b.json'));
   return (sa, sb);
 });
 

@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' as p;
 
 import '../../core/genoz_core.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -47,23 +44,23 @@ Future<void> showExportSheet(BuildContext context, WidgetRef ref, Analysis analy
   final s = analysis.summary;
   final stamp = DateTime.now().toIso8601String().replaceAll(RegExp(r'[:.]'), '-').substring(0, 19);
   final name = 'genoz_${analysis.contentId.substring(0, 8)}_$stamp.${format.name}';
-  final dest = storage.absolute(p.join(storage.exportsRelative(analysis.projectId), name));
   final messenger = ScaffoldMessenger.of(context);
   try {
-    final n = await core.export(
-      outDir: storage.absolute(analysis.resultDir),
+    final result = await core.export(
+      resultDirRelative: analysis.resultDir,
       filter: filter,
       format: format,
       sampleA: s.a.sample ?? 'A',
       sampleB: s.b.sample ?? 'B',
-      destPath: dest,
     );
+    final n = result.rows;
     await ref.read(analysisRepositoryProvider).log(analysis.projectId, 'export', l.logExport(format.name.toUpperCase(), n));
-    await FilePicker.saveFile(fileName: name, bytes: await File(dest).readAsBytes());
+    // No celular abre o "Salvar como" do sistema; no navegador vira um download.
+    await FilePicker.saveFile(fileName: name, bytes: result.bytes);
     if (!context.mounted) return;
     messenger.showSnackBar(SnackBar(content: Text(l.exportDone(n))));
-    final manifest = File('$dest.manifest.json');
-    if (await manifest.exists() && context.mounted) {
+    final manifestRelative = '${analysis.resultDir}/manifest.json';
+    if (await storage.blobs.exists(manifestRelative) && context.mounted) {
       final also = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -75,7 +72,9 @@ Future<void> showExportSheet(BuildContext context, WidgetRef ref, Analysis analy
           ],
         ),
       );
-      if (also == true) await FilePicker.saveFile(fileName: '$name.manifest.json', bytes: await manifest.readAsBytes());
+      if (also == true) {
+        await FilePicker.saveFile(fileName: '$name.manifest.json', bytes: await storage.blobs.readBytes(manifestRelative));
+      }
     }
   } catch (e) {
     messenger.showSnackBar(SnackBar(content: Text('$e')));

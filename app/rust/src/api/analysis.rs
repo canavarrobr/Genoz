@@ -2,7 +2,7 @@
 //! Como no resto da ponte, só adapta o `genoz_core`.
 
 use std::fs::File;
-use std::io::{BufReader, BufWriter, Read};
+use std::io::{BufReader, BufWriter, Read, Seek};
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, LazyLock, Mutex};
@@ -154,32 +154,47 @@ fn run_compare(
             &to_json_bytes(&stored.outcome.stats_b),
         )?,
     ];
-    let input_ref =
-        |role: &str, side: &CompareSide, info: &genoz_core::compare::SideInfo| InputRef {
-            role: role.into(),
-            name: side.display_name.clone(),
-            sha256: side.sha256.clone(),
-            bytes: side.bytes,
-            build: Some(info.build.build.label().into()),
-            sample: info.sample.clone(),
-        };
-    let inputs = vec![input_ref("a", a, &s.a), input_ref("b", b, &s.b)];
-    let selector = |s: &Option<String>| {
-        s.clone()
-            .map_or(SampleSelector::First, SampleSelector::Name)
-    };
-    let parameters =
-        genoz_core::compare::manifest_parameters(&opts, &selector(&a.sample), &selector(&b.sample));
-    let platform = format!("app-{}-{}", std::env::consts::OS, std::env::consts::ARCH);
-    let manifest = Manifest::new(
-        "compare", inputs, parameters, outputs, &platform, created_at,
+    let manifest_json = manifest_json(
+        (&a.display_name, &a.sha256, a.bytes, &a.sample),
+        (&b.display_name, &b.sha256, b.bytes, &b.sample),
+        s,
+        &opts,
+        outputs,
+        created_at,
     );
-    let manifest_json = to_json_bytes(&manifest);
     std::fs::write(out_dir.join("manifest.json"), &manifest_json).map_err(|e| e.to_string())?;
     Ok((
         String::from_utf8(summary_json).expect("UTF-8"),
         String::from_utf8(manifest_json).expect("UTF-8"),
     ))
+}
+
+/// (nome, sha256, bytes, amostra) de um lado da comparação.
+pub(crate) type SideRef<'a> = (&'a str, &'a str, u64, &'a Option<String>);
+
+/// Manifesto da comparação. Única montagem para o caminho por arquivo e o por bytes,
+/// para que o ID da análise seja o mesmo em todas as plataformas.
+pub(crate) fn manifest_json(
+    a: SideRef,
+    b: SideRef,
+    s: &genoz_core::compare::CompareSummary,
+    opts: &CompareOptions,
+    outputs: Vec<OutputRef>,
+    created_at: &str,
+) -> Vec<u8> {
+    let input_ref = |role: &str, side: SideRef, info: &genoz_core::compare::SideInfo| InputRef {
+        role: role.into(),
+        name: side.0.to_string(),
+        sha256: side.1.to_string(),
+        bytes: side.2,
+        build: Some(info.build.build.label().into()),
+        sample: info.sample.clone(),
+    };
+    let inputs = vec![input_ref("a", a, &s.a), input_ref("b", b, &s.b)];
+    let selector = |s: &Option<String>| s.clone().map_or(SampleSelector::First, SampleSelector::Name);
+    let parameters = genoz_core::compare::manifest_parameters(opts, &selector(a.3), &selector(b.3));
+    let platform = format!("app-{}-{}", std::env::consts::OS, std::env::consts::ARCH);
+    to_json_bytes(&Manifest::new("compare", inputs, parameters, outputs, &platform, created_at))
 }
 
 /// Compara A × B e grava o resultado em `out_dir`. `options_json` segue
@@ -238,17 +253,17 @@ type FilterCache = Mutex<Vec<(CacheKey, Arc<Vec<u32>>)>>;
 static FILTER_CACHE: LazyLock<FilterCache> = LazyLock::new(|| Mutex::new(Vec::new()));
 const FILTER_CACHE_SIZE: usize = 6;
 
-fn parse_filter(filter_json: &str) -> Result<RowFilter, String> {
+pub(crate) fn parse_filter(filter_json: &str) -> Result<RowFilter, String> {
     serde_json::from_str(filter_json).map_err(|e| format!("filtro inválido: {e}"))
 }
 
-fn matching(
-    out_dir: &str,
+fn matching<R: Read + Seek>(
+    result_key: &str,
     filter: &RowFilter,
-    reader: &mut ResultReader<BufReader<File>>,
+    reader: &mut ResultReader<R>,
 ) -> Result<Arc<Vec<u32>>, String> {
     let key = (
-        out_dir.to_string(),
+        result_key.to_string(),
         serde_json::to_string(filter).expect("JSON"),
     );
     if let Some((_, v)) = FILTER_CACHE
@@ -276,8 +291,20 @@ pub fn result_page(
     start: u32,
     count: u32,
 ) -> Result<ResultPage, String> {
-    let filter = parse_filter(&filter_json)?;
     let mut reader = open_result(&out_dir)?;
+    page_of(&out_dir, &mut reader, &filter_json, start, count)
+}
+
+/// Página de qualquer resultado (arquivo ou memória). `result_key` identifica o
+/// resultado no cache de linhas filtradas.
+pub(crate) fn page_of<R: Read + Seek>(
+    result_key: &str,
+    reader: &mut ResultReader<R>,
+    filter_json: &str,
+    start: u32,
+    count: u32,
+) -> Result<ResultPage, String> {
+    let filter = parse_filter(filter_json)?;
     let (total, rows) = if filter == RowFilter::default() {
         let total = reader.total_rows() as u32;
         (
@@ -287,7 +314,7 @@ pub fn result_page(
                 .map_err(|e| e.user_message())?,
         )
     } else {
-        let m = matching(&out_dir, &filter, &mut reader)?;
+        let m = matching(result_key, &filter, reader)?;
         let from = (start as usize).min(m.len());
         let to = (from + count as usize).min(m.len());
         (
@@ -304,6 +331,10 @@ pub fn result_page(
 /// Esquece os índices em cache de um resultado (ao apagar a análise).
 #[flutter_rust_bridge::frb(sync)]
 pub fn forget_result(out_dir: String) {
+    forget_key(&out_dir);
+}
+
+pub(crate) fn forget_key(out_dir: &str) {
     FILTER_CACHE
         .lock()
         .expect("lock")

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:genoz/core/genoz_core.dart';
 import 'package:genoz/features/import/import_controller.dart';
 
 import 'support.dart';
@@ -23,7 +24,7 @@ void main() {
     final pid = await project();
     final src = await env.sourceFile('amostra.vcf.gz');
 
-    await controller().importFile(projectId: pid, sourcePath: src, displayName: 'amostra.vcf.gz');
+    await controller().importFile(projectId: pid, source: SourceFile(name: 'amostra.vcf.gz', path: src));
 
     expect(state(), isA<ImportSucceeded>());
     final files = await env.repo.watchFiles(pid).first;
@@ -36,7 +37,7 @@ void main() {
   test('arquivo inválido é recusado e a cópia é apagada', () async {
     env = await TestEnv.create(core: FakeGenozCore(reportJson: fixture('report_invalid.json')));
     final pid = await project();
-    await controller().importFile(projectId: pid, sourcePath: await env.sourceFile('c.vcf.gz'), displayName: 'c.vcf.gz');
+    await controller().importFile(projectId: pid, source: SourceFile(name: 'c.vcf.gz', path: await env.sourceFile('c.vcf.gz')));
 
     expect(state(), isA<ImportRejected>());
     expect(await env.repo.watchFiles(pid).first, isEmpty);
@@ -46,7 +47,7 @@ void main() {
   test('arquivo parcialmente válido é aceito', () async {
     env = await TestEnv.create(core: FakeGenozCore(reportJson: fixture('report_partial.json')));
     final pid = await project();
-    await controller().importFile(projectId: pid, sourcePath: await env.sourceFile('p.vcf'), displayName: 'p.vcf');
+    await controller().importFile(projectId: pid, source: SourceFile(name: 'p.vcf', path: await env.sourceFile('p.vcf')));
     expect(state(), isA<ImportSucceeded>());
   });
 
@@ -54,9 +55,9 @@ void main() {
     env = await TestEnv.create();
     final pid = await project();
     final src = await env.sourceFile('a.vcf');
-    await controller().importFile(projectId: pid, sourcePath: src, displayName: 'a.vcf');
+    await controller().importFile(projectId: pid, source: SourceFile(name: 'a.vcf', path: src));
     controller().acknowledge();
-    await controller().importFile(projectId: pid, sourcePath: src, displayName: 'copia.vcf');
+    await controller().importFile(projectId: pid, source: SourceFile(name: 'copia.vcf', path: src));
 
     expect(state(), isA<ImportDuplicate>());
     expect(await env.repo.watchFiles(pid).first, hasLength(1));
@@ -66,7 +67,7 @@ void main() {
   test('falha do núcleo vira mensagem e nada é gravado', () async {
     env = await TestEnv.create(core: FakeGenozCore(failWith: 'cabeçalho VCF inválido: linha #CHROM não encontrada'));
     final pid = await project();
-    await controller().importFile(projectId: pid, sourcePath: await env.sourceFile('x.txt'), displayName: 'x.txt');
+    await controller().importFile(projectId: pid, source: SourceFile(name: 'x.txt', path: await env.sourceFile('x.txt')));
 
     expect((state() as ImportError).message, contains('#CHROM'));
     expect(await storedFiles(pid), isEmpty);
@@ -75,7 +76,7 @@ void main() {
   test('cancelar interrompe e limpa', () async {
     env = await TestEnv.create(core: FakeGenozCore(reportJson: fixture('report_valid.json'), hold: true));
     final pid = await project();
-    final running = controller().importFile(projectId: pid, sourcePath: await env.sourceFile('g.vcf'), displayName: 'g.vcf');
+    final running = controller().importFile(projectId: pid, source: SourceFile(name: 'g.vcf', path: await env.sourceFile('g.vcf')));
     await pumpEventQueue();
     expect(state(), isA<ImportRunning>());
     controller().cancel();
@@ -89,14 +90,16 @@ void main() {
   test('fluxo de bytes (content:// no Android) grava direto no destino', () async {
     env = await TestEnv.create();
     final pid = await project();
-    await controller().importStream(
+    await controller().importFile(
       projectId: pid,
-      bytes: Stream.fromIterable([
-        '##fileformat=VCFv4.3\n'.codeUnits,
-        '#CHROM\tPOS\n'.codeUnits,
-      ]),
-      displayName: 'nuvem.vcf',
-      totalBytes: 33,
+      source: SourceFile(
+        name: 'nuvem.vcf',
+        open: () => Stream.fromIterable([
+          '##fileformat=VCFv4.3\n'.codeUnits,
+          '#CHROM\tPOS\n'.codeUnits,
+        ]),
+        size: 33,
+      ),
     );
     expect(state(), isA<ImportSucceeded>());
     final stored = (await env.repo.watchFiles(pid).first).single;

@@ -21,7 +21,8 @@ Os dados genômicos são processados no próprio dispositivo; nada é enviado a 
 | 3 — App Flutter + ponte + persistência | concluído |
 | 4 — Telas de análise (comparação, tabela, filtros, QC, exportação) | concluído |
 | 5 — Estética e identidade visual | concluído |
-| 6 — Web local-first (site de prévia) | próximo |
+| 6 — Web local-first (site de prévia) | concluído |
+| 7 — Android completo (APK de prévia) | próximo |
 
 ## Preparar o computador (Windows)
 
@@ -65,6 +66,18 @@ flutter run
 
 Na primeira vez a compilação demora alguns minutos, porque o núcleo Rust é compilado para Android.
 No app: **Novo projeto → Gerar exemplo sintético** (ou **Importar VCF**) → toque no arquivo para ver o relatório.
+
+## Rodar o site (Módulo 6)
+
+No PowerShell, dentro da pasta `Genoz`:
+
+```powershell
+.\tools\web.ps1
+```
+
+Depois abra http://127.0.0.1:8765/ no Chrome ou Edge. Tudo roda no navegador: os arquivos ficam
+no armazenamento privado do navegador (OPFS), nada é enviado, e depois da primeira visita o site
+funciona sem internet. A tela **Verificar privacidade** (menu ☰) mostra cada requisição feita.
 
 ## Estrutura
 

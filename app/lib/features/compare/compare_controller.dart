@@ -9,6 +9,7 @@ import '../../core/compare_models.dart';
 import '../../core/genoz_core.dart';
 import '../../persistence/analysis_repository.dart';
 import '../../persistence/app_storage.dart';
+import '../../platform/network_audit.dart';
 import '../../persistence/database.dart';
 
 sealed class CompareState {
@@ -69,20 +70,21 @@ class CompareController extends Notifier<CompareState> {
     final resultDir = storage.analysisRelative(projectId, analysisId);
     state = CompareRunning(analysisId);
     CompareInputFile side(CompareChoice c) => CompareInputFile(
-          path: storage.absolute(c.file.storedPath),
+          relativePath: c.file.storedPath,
           displayName: c.file.displayName,
           sha256: c.file.sha256,
           bytes: c.file.bytes,
           sample: c.sample,
         );
 
+    NetworkAudit.instance.beginAnalysis();
     final done = Completer<void>();
     _sub = core
         .compare(
           a: side(a),
           b: side(b),
           options: options,
-          outDir: storage.absolute(resultDir),
+          outDirRelative: resultDir,
           createdAt: DateTime.now().toUtc().toIso8601String(),
           jobId: analysisId,
         )
@@ -123,6 +125,7 @@ class CompareController extends Notifier<CompareState> {
       if (!done.isCompleted) done.complete();
     });
     await done.future;
+    NetworkAudit.instance.endAnalysis();
     await _sub?.cancel();
     _sub = null;
   }

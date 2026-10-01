@@ -10,3 +10,4 @@ As decisões tomadas durante o desenvolvimento ficam registradas aqui, uma por a
 | [ADR-009](ADR-009-divisao-multialelicos.md) | Convenção de divisão de multialélicos | 1 |
 | [ADR-010](ADR-010-ausencia-nao-e-referencia.md) | Ausência de registro não é genótipo de referência | 2 |
 | [ADR-011](ADR-011-fontes-e-marca.md) | Fontes embutidas e marca gerada por script | 5 |
+| [ADR-012](ADR-012-web-isolamento-por-service-worker.md) | Web: isolamento de origem por service worker, arquivos no OPFS | 6 |

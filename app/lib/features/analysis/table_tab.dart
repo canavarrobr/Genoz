@@ -5,7 +5,6 @@ import '../../core/compare_models.dart';
 import '../../core/genoz_core.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../persistence/analysis_repository.dart';
-import '../../persistence/app_storage.dart';
 import '../../persistence/database.dart';
 import '../../ui/labels.dart';
 import '../../ui/theme.dart';
@@ -47,7 +46,6 @@ class _TableTabState extends ConsumerState<TableTab> with AutomaticKeepAliveClie
   @override
   bool get wantKeepAlive => true;
 
-  String get _dir => ref.read(appStorageProvider).absolute(widget.analysis.resultDir);
 
   @override
   void dispose() {
@@ -68,7 +66,9 @@ class _TableTabState extends ConsumerState<TableTab> with AutomaticKeepAliveClie
     if (_loading.contains(page)) return;
     _loading.add(page);
     try {
-      final r = await ref.read(genozCoreProvider).page(outDir: _dir, filter: f, start: page * _pageSize, count: _pageSize);
+      final r = await ref
+          .read(genozCoreProvider)
+          .page(resultDirRelative: widget.analysis.resultDir, filter: f, start: page * _pageSize, count: _pageSize);
       if (!mounted || f != _loadedFor) return;
       setState(() {
         _pages[page] = r.rows;

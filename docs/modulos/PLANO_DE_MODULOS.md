@@ -18,7 +18,7 @@ Um APK e um site de prévia aparecem já nos Módulos 6 e 7 (depois do módulo d
 | 3 ✅ | App Flutter + ponte + persistência | App abre, cria projetos e importa VCF usando o núcleo Rust | Android (emulador) |
 | 4 ✅ | Telas de análise | Comparação, tabela, filtros, QC, exportação e manifesto no app | Android (emulador) |
 | 5 ✅ | **Estética e identidade visual** | Logo, ícone, abertura, paleta, tipografia e componentes do [guia de estilo](../estilo/GUIA_DE_ESTILO.md) aplicados em todo o app | Web + Android |
-| 6 | Web local-first | **Site de prévia** (GitHub Pages) comparando VCF no navegador sem upload | Web |
+| 6 ✅ | Web local-first | **Site de prévia** (GitHub Pages) comparando VCF no navegador sem upload | Web |
 | 7 | Android completo | **APK de prévia** para instalar no celular; bloqueio do app; privacidade | Android |
 | 8 | Visualização + modo estudante | Ideograma, densidade, visualizador de região, trilhas guiadas, dados sintéticos | Web + Android |
 | 9 | Arquivos de consumidor + multiamostra | Importa 23andMe/AncestryDNA/MyHeritage; escolhe amostra em VCF multi-amostra | Web + Android |
@@ -309,3 +309,32 @@ Pendências conhecidas: exportações muito grandes passam pela memória do Dart
 **Decisão registrada:** ADR-011 (fontes e geração da marca).
 
 **Status:** concluído em 30/09/2026. Símbolo redesenhado em vetor por script (versões clara e escura), ícone adaptativo Android + iOS + Web, abertura em azul profundo, Poppins + Inter embutidas (sem download), cabeçalho com gradiente, menu lateral, estados vazios, tela "Sobre" com pilares e licenças, tema escuro. Contraste WCAG verificado por 39 testes automáticos (61 testes Dart no total). Capturas em `docs/estilo/capturas/`.
+
+---
+
+## Contrato do Módulo 6 — Web local-first (antes de implementar)
+
+**Entradas:** o mesmo app Flutter, compilado para Web; arquivos escolhidos pelo navegador (sem caminhos).
+
+**Saídas:**
+- site estático (pasta `app/build/web`) que importa, valida, compara, filtra e exporta VCF **sem enviar nada**;
+- núcleo Rust em WASM com threads (flutter_rust_bridge build-web), rodando em Web Workers;
+- armazenamento: arquivos no **OPFS** do navegador; banco Drift em sqlite3.wasm;
+- **service worker próprio** (`genoz_sw.js`): cache offline de todo o app (PWA) + cabeçalhos COOP/COEP exigidos pelas threads WASM (o GitHub Pages não permite configurá-los no servidor);
+- **CSP estrita**: `connect-src 'self'`, nenhum script/fonte/estilo de terceiros;
+- **auditoria de rede real**: todas as requisições do app são observadas (Web: `PerformanceObserver`; nativo: `HttpOverrides`) e a tela "Verificar privacidade" mostra a contagem e a lista;
+- workflow do GitHub Actions que compila e publica no GitHub Pages (ativação do Pages confirmada pelo usuário).
+
+**Arquitetura:**
+- `BlobStore` (Dart): interface única de arquivos; implementação `dart:io` (nativo) e OPFS (Web), escolhida por import condicional — nenhuma tela usa `dart:io` diretamente;
+- ponte: além das funções por caminho (nativo, streaming), funções por bytes (`inspect_bytes`, `compare_bytes`, `result_load`/`result_page_loaded`, `export_loaded`, `synthetic_bytes`) — mesma lógica do núcleo;
+- `GenozCore` Web usa as funções por bytes; nativo continua com caminhos.
+
+**Invariantes:** nenhuma requisição de rede durante análises (só o carregamento do próprio site); mesmo arquivo → mesmos hashes e mesmo ID de análise que no Android e no PC; limite de tamanho por arquivo no navegador informado antes de processar (nunca fallback para servidor).
+
+**Erros:** navegador sem OPFS/WASM threads (mensagem clara); arquivo acima do limite; cota de armazenamento esgotada.
+
+**Testes:** Rust (funções por bytes = funções por caminho, mesmos hashes); Dart (BlobStore em memória, auditoria de rede); verificação manual no navegador embutido: comparação pessoa_a × pessoa_b com lista de requisições de rede registrada e mesmo ID de análise do PC.
+
+**Status:** concluído em 30/09/2026 (site pronto; publicação no GitHub Pages aguarda confirmação do usuário — variável `GENOZ_PAGES=1`). Verificado no Edge (headless, servidor estático **sem** cabeçalhos, como o GitHub Pages): o service worker deu isolamento de origem após um recarregamento → criar projeto → importar pessoa_a e pessoa_b pelo seletor → comparar → ID de análise `c7e0bc9d-f41f-8309-b678-5e20bea871b2`, idêntico ao do PC e do Android → "Verificar privacidade": 0 requisições externas → recarregar com o servidor desligado: app abre offline com os dados. 62 testes Dart. Decisões em [ADR-012](../adr/ADR-012-web-isolamento-por-service-worker.md).
+Limitações conhecidas: o painel de navegador embutido do app Claude bloqueia service workers (usar Chrome/Edge/Firefox); limite de 400 MB por arquivo no navegador; o CSP precisa de `'unsafe-eval'` por causa do código gerado do wasm-bindgen.

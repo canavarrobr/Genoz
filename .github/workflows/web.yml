@@ -1,0 +1,67 @@
+name: Site (Flutter Web)
+
+# Compila o Genoz para navegador (núcleo Rust em WebAssembly com threads) e,
+# quando a variável do repositório GENOZ_PAGES = 1, publica no GitHub Pages.
+# O GitHub Pages não deixa configurar cabeçalhos; o isolamento de origem
+# (COOP/COEP) exigido pelas threads vem do service worker web/genoz_sw.js.
+
+on:
+  push:
+    branches: [main]
+    paths: ["app/**", "rust/**", ".github/workflows/web.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: wasm32-unknown-unknown
+          components: rust-src
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app/rust
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack,flutter_rust_bridge_codegen@2.13.0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Núcleo Rust → WebAssembly (web/pkg)
+        run: flutter_rust_bridge_codegen build-web --release
+      - name: Site
+        run: flutter build web --release --no-web-resources-cdn --base-href "/${{ github.event.repository.name }}/"
+      - name: Nada de endereço externo no site
+        run: |
+          grep -q "connect-src 'self' blob:" build/web/index.html
+          test -f build/web/genoz_sw.js && test -f build/web/pkg/genoz_bridge_bg.wasm && test -f build/web/sqlite3.wasm
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/build/web
+
+  publicar:
+    needs: compilar
+    if: vars.GENOZ_PAGES == '1' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -1423,6 +1423,120 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Código-fonte: github.com/canavarrobr/Genoz'**
   String get aboutSource;
+
+  /// No description provided for @privacyCheckTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Verificar privacidade'**
+  String get privacyCheckTitle;
+
+  /// No description provided for @privacyCheckIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Estes números são medidos agora, neste dispositivo: o Genoz registra cada requisição de rede que faz.'**
+  String get privacyCheckIntro;
+
+  /// No description provided for @checkUpload.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arquivo genômico enviado'**
+  String get checkUpload;
+
+  /// No description provided for @checkTelemetry.
+  ///
+  /// In pt, this message translates to:
+  /// **'Telemetria'**
+  String get checkTelemetry;
+
+  /// No description provided for @checkLocal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Análise local'**
+  String get checkLocal;
+
+  /// No description provided for @checkExternalDuring.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conexões externas durante análises'**
+  String get checkExternalDuring;
+
+  /// No description provided for @checkNo.
+  ///
+  /// In pt, this message translates to:
+  /// **'NÃO'**
+  String get checkNo;
+
+  /// No description provided for @checkYes.
+  ///
+  /// In pt, this message translates to:
+  /// **'SIM'**
+  String get checkYes;
+
+  /// No description provided for @checkRequestsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Requisições desde que o app abriu'**
+  String get checkRequestsTitle;
+
+  /// No description provided for @checkOwnSite.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} do próprio site (carregar o app)'**
+  String checkOwnSite(int count);
+
+  /// No description provided for @checkExternal.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} para outros endereços'**
+  String checkExternal(int count);
+
+  /// No description provided for @checkNoneNative.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma conexão de rede foi aberta pelo app.'**
+  String get checkNoneNative;
+
+  /// No description provided for @checkExport.
+  ///
+  /// In pt, this message translates to:
+  /// **'Exportar relatório de auditoria (JSON)'**
+  String get checkExport;
+
+  /// No description provided for @checkAirplane.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dica: ative o modo avião e continue usando o Genoz — tudo funciona sem internet.'**
+  String get checkAirplane;
+
+  /// No description provided for @checkLastRequests.
+  ///
+  /// In pt, this message translates to:
+  /// **'Últimas requisições'**
+  String get checkLastRequests;
+
+  /// No description provided for @checkWhyOwn.
+  ///
+  /// In pt, this message translates to:
+  /// **'No navegador, abrir o site baixa o próprio app (código, fontes e o núcleo WebAssembly). Depois disso, nada é enviado.'**
+  String get checkWhyOwn;
+
+  /// No description provided for @webTooLargeHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'No navegador cada arquivo pode ter até {mb} MB. Para arquivos maiores, use o app Android.'**
+  String webTooLargeHint(int mb);
+
+  /// No description provided for @webUnsupported.
+  ///
+  /// In pt, this message translates to:
+  /// **'Este navegador não oferece os recursos necessários (WebAssembly com threads e armazenamento privado). Use Chrome, Edge ou Firefox atualizados.'**
+  String get webUnsupported;
+
+  /// No description provided for @checkDuringTag.
+  ///
+  /// In pt, this message translates to:
+  /// **'durante análise'**
+  String get checkDuringTag;
 }
 
 class _AppLocalizationsDelegate
