@@ -66,8 +66,7 @@ vcf = [
 ]
 for pos, r, a, gt in linhas_vcf:
     vcf.append(f'1\t{pos}\t.\t{r}\t{a}\t60\tPASS\t.\tGT\t{gt}')
-(AQUI / 'pessoa_ficticia_grch37.vcf').write_text('\n'.join(vcf) + '\n', encoding='utf-8', newline='
-')
+(AQUI / 'pessoa_ficticia_grch37.vcf').write_text('\n'.join(vcf) + '\n', encoding='utf-8', newline='\n')
 
 chip = [(f'rs{900000 + i}', pos, gt) for i, (pos, gt, _) in enumerate(casos)]
 chip.append(('i5000001', 14000, 'DI'))  # indel: ignorado
@@ -78,8 +77,7 @@ chip.append(('i5000001', 14000, 'DI'))  # indel: ignorado
     '# rsid\tchromosome\tposition\tgenotype\n'
     + ''.join(f'{r}\t1\t{p}\t{g}\n' for r, p, g in chip),
     encoding='utf-8',
-    newline='
-',
+    newline='\n',
 )
 
 
@@ -95,8 +93,7 @@ def alelos_ancestry(g):
     'rsid\tchromosome\tposition\tallele1\tallele2\n'
     + ''.join(f'{r}\t1\t{p}\t{a}\t{b}\n' for r, p, g in chip for a, b in [alelos_ancestry(g)]),
     encoding='utf-8',
-    newline='
-',
+    newline='\n',
 )
 (AQUI / 'chip_myheritage.csv').write_text(
     '# MyHeritage DNA raw data. (FICTÍCIO, fixture do Genoz)\n'
@@ -104,21 +101,18 @@ def alelos_ancestry(g):
     'RSID,CHROMOSOME,POSITION,RESULT\n'
     + ''.join(f'"{r}","1","{p}","{g}"\n' for r, p, g in chip),
     encoding='utf-8',
-    newline='
-',
+    newline='\n',
 )
 (AQUI / 'chip_ftdna.csv').write_text(
     'RSID,CHROMOSOME,POSITION,RESULT\n' + ''.join(f'"{r}","1","{p}","{g}"\n' for r, p, g in chip),
     encoding='utf-8',
-    newline='
-',
+    newline='\n',
 )
 
 linhas = [''.join(seq[i:i + 60]) for i in range(0, COMPRIMENTO, 60)]
 (AQUI / 'referencia_chr1_trecho.fa').write_text(
     '>1 trecho FICTÍCIO de 20 kb (não é a sequência humana real)\n' + '\n'.join(linhas) + '\n',
     encoding='utf-8',
-    newline='
-',
+    newline='\n',
 )
 print('ok:', len(chip), 'sítios de chip,', len(linhas_vcf), 'registros no VCF')
