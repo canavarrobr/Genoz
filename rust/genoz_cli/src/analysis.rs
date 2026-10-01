@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 
 use clap::{Args, ValueEnum};
 use genoz_core::call::SampleSelector;
-use genoz_core::compare::{compare_to_store, to_json_bytes, Category, CompareInput, CompareOptions, Truth};
+use genoz_core::compare::{to_json_bytes, Category, CompareInput, CompareOptions, Truth};
 use genoz_core::digest::sha256_reader;
 use genoz_core::filter::{parse_region, CallFilter, RowFilter};
 use genoz_core::manifest::{InputRef, Manifest, OutputRef};
@@ -61,6 +61,32 @@ pub struct CompareArgs {
     /// Trata A ou B como "verdade" e calcula precisão/sensibilidade/F1.
     #[arg(long, value_enum)]
     pub truth: Option<TruthArg>,
+    #[command(flatten)]
+    pub quality: QualityArgs,
+    #[arg(long)]
+    pub allow_build_mismatch: bool,
+    /// FASTA de referência local: alinha os indels à esquerda e confere o REF.
+    #[arg(long)]
+    pub fasta: Option<PathBuf>,
+}
+
+/// Chip de consumidor (A) × uma amostra de um VCF (B), restrito aos sítios do chip.
+#[derive(Args)]
+pub struct ChipCompareArgs {
+    /// Arquivo bruto do chip (23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA).
+    pub chip: PathBuf,
+    pub vcf: PathBuf,
+    #[arg(long)]
+    pub out: PathBuf,
+    /// Amostra do VCF (padrão: a primeira).
+    #[arg(long)]
+    pub sample: Option<String>,
+    /// BED de regiões avaliadas do VCF.
+    #[arg(long)]
+    pub bed: Option<PathBuf>,
+    /// FASTA de referência (GRCh37): permite julgar homozigotos sem registro no VCF.
+    #[arg(long)]
+    pub fasta: Option<PathBuf>,
     #[command(flatten)]
     pub quality: QualityArgs,
     #[arg(long)]
@@ -194,11 +220,29 @@ pub fn compare_cmd(args: CompareArgs) -> Result<(), GenozError> {
         }),
         allow_build_mismatch: args.allow_build_mismatch,
         force_in_memory: false,
+        normalize_with_reference: args.fasta.is_some(),
+    };
+    let mut fasta = match &args.fasta {
+        Some(path) => {
+            let (fa, created) = genoz_core::fasta::open_fasta(path)?;
+            if created {
+                println!("índice {}.fai criado", path.display());
+            }
+            inputs.push(input_ref("reference", path)?);
+            Some(fa)
+        }
+        None => None,
     };
 
     std::fs::create_dir_all(&args.out)?;
     let rows_file = BufWriter::new(File::create(args.out.join("rows.bgz"))?);
-    let stored = compare_to_store(&mut a, &mut b, &opts, rows_file)?;
+    let stored = genoz_core::compare::compare_to_store_with(
+        &mut a,
+        &mut b,
+        &opts,
+        fasta.as_mut().map(|f| f as &mut dyn genoz_core::fasta::SequenceSource),
+        rows_file,
+    )?;
     drop(stored.rows_out);
     let s = &stored.outcome.summary;
 
@@ -404,5 +448,86 @@ pub fn density_cmd(args: DensityArgs) -> Result<(), GenozError> {
             c.counts.iter().map(|(cat, bins)| format!("{} {}", cat.label(), bins.iter().sum::<u32>())).collect();
         println!("{:<6}{:>8}{:>14}  {}", c.chrom, c.total, c.max_pos, cats.join(" · "));
     }
+    Ok(())
+}
+
+pub fn chip_compare_cmd(args: ChipCompareArgs) -> Result<(), GenozError> {
+    let Some((header, calls, rejected)) = genoz_core::consumer::read_chip(File::open(&args.chip)?)? else {
+        return Err(GenozError::InvalidParam(format!(
+            "{} não é um arquivo de chip reconhecido (23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA)",
+            args.chip.display()
+        )));
+    };
+    let chip = genoz_core::chip_compare::ChipInput { label: "A".into(), header, calls, rejected_lines: rejected };
+    let mut vcf = file_input("B", &args.vcf, selector(&args.sample));
+    let mut inputs = vec![input_ref("a", &args.chip)?, input_ref("b", &args.vcf)?];
+    if let Some(path) = &args.bed {
+        let (set, issues) = read_bed(File::open(path)?)?;
+        if let Some(i) = issues.first() {
+            return Err(GenozError::InvalidParam(format!("BED {} linha {}: {}", path.display(), i.line, i.message)));
+        }
+        vcf.callable = Some(set);
+        inputs.push(input_ref("callable_b", path)?);
+    }
+    let mut fasta = match &args.fasta {
+        Some(path) => {
+            let (fa, _) = genoz_core::fasta::open_fasta(path)?;
+            inputs.push(input_ref("reference", path)?);
+            Some(fa)
+        }
+        None => None,
+    };
+    let opts = CompareOptions {
+        call_filter: args.quality.filter(),
+        allow_build_mismatch: args.allow_build_mismatch,
+        ..Default::default()
+    };
+    std::fs::create_dir_all(&args.out)?;
+    let rows_file = BufWriter::new(File::create(args.out.join("rows.bgz"))?);
+    let stored = genoz_core::chip_compare::compare_chip_to_store(
+        chip,
+        &mut vcf,
+        &opts,
+        fasta.as_mut().map(|f| f as &mut dyn genoz_core::fasta::SequenceSource),
+        rows_file,
+    )?;
+    drop(stored.rows_out);
+    let s = &stored.outcome.summary;
+    let mut outputs = vec![output_ref(&args.out, "rows.bgz")?];
+    outputs.push(write_output(&args.out, "rows.idx", &stored.index.to_bytes())?);
+    outputs.push(write_output(&args.out, "summary.json", &to_json_bytes(s))?);
+    outputs.push(write_output(&args.out, "stats_a.json", &to_json_bytes(&stored.outcome.stats_a))?);
+    outputs.push(write_output(&args.out, "stats_b.json", &to_json_bytes(&stored.outcome.stats_b))?);
+    inputs[0].build = Some(s.a.build.build.label().into());
+    inputs[0].sample = s.a.sample.clone();
+    inputs[1].build = Some(s.b.build.build.label().into());
+    inputs[1].sample = s.b.sample.clone();
+    let parameters = genoz_core::compare::manifest_parameters(&opts, &SampleSelector::First, &selector(&args.sample));
+    let platform = format!("cli-{}-{}", std::env::consts::OS, std::env::consts::ARCH);
+    let manifest = Manifest::new("compare_chip", inputs, parameters, outputs, &platform, &now_utc());
+    std::fs::write(args.out.join("manifest.json"), to_json_bytes(&manifest))?;
+
+    let chip_info = s.chip.as_ref().expect("comparação de chip");
+    println!("Chip × sequenciamento (só os sítios do chip)");
+    println!("  A: {} — {}", args.chip.display(), s.a.sample.as_deref().unwrap_or("chip"));
+    println!("  B: {} — amostra {}", args.vcf.display(), s.b.sample.as_deref().unwrap_or("(apenas sítios)"));
+    println!();
+    for c in Category::ALL {
+        println!("  {:<22}{:>10}", c.label(), s.counts.get(&c).copied().unwrap_or(0));
+    }
+    println!("  {:<22}{:>10}", "total", s.rows);
+    println!();
+    println!("  sítios do chip:                 {}", chip_info.sites);
+    println!("  sem chamada no chip:            {}", chip_info.no_calls);
+    println!("  homozigotos sem referência:     {}", chip_info.unknown_reference);
+    println!("  variantes do VCF fora do chip:  {}", chip_info.vcf_variants_off_chip);
+    println!("  Concordância de genótipos:      {}", pct(s.genotype_concordance));
+    println!("  Concordância fora da referência: {}", pct(chip_info.nonref_concordance));
+    for w in &s.warnings {
+        println!("  aviso: {w}");
+    }
+    println!();
+    println!("Resultado gravado em {}", args.out.display());
+    println!("ID da análise: {}", manifest.analysis_id);
     Ok(())
 }

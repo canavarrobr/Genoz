@@ -1,0 +1,17 @@
+#AncestryDNA raw data download (FICTÍCIO, fixture do Genoz)
+#Genotypes are reported on the forward (+) strand of build 37.1
+rsid	chromosome	position	allele1	allele2
+rs900000	1	1000	G	A
+rs900001	1	2000	A	A
+rs900002	1	3000	T	A
+rs900003	1	4000	G	A
+rs900004	1	5000	A	A
+rs900005	1	6000	A	C
+rs900006	1	7000	A	C
+rs900007	1	8000	C	C
+rs900008	1	9000	C	A
+rs900009	1	10500	G	A
+rs900010	1	11000	G	G
+rs900011	1	11500	0	0
+rs900012	1	12000	0	0
+i5000001	1	14000	D	I

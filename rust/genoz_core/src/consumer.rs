@@ -515,6 +515,34 @@ pub fn read_chip<R: Read>(source: R) -> Result<Option<(ChipHeader, Vec<ChipCall>
     Ok(Some((header, calls, rejected)))
 }
 
+/// Inspeção que reconhece o formato pelo conteúdo: chip de consumidor ou VCF.
+/// `fonte` é chamada duas vezes (espiar + ler), como em [`crate::compare::CompareInput`].
+pub fn inspect_any<'a>(
+    mut source: impl FnMut() -> Result<Box<dyn Read + 'a>>,
+    opts: &crate::inspect::InspectOptions,
+) -> Result<(InspectReport, Option<ChipSummary>)> {
+    let mut prefix = Vec::new();
+    {
+        let (_, mut r) = open_reader(source()?)?;
+        r.by_ref().take(64 * 1024).read_to_end(&mut prefix)?;
+    }
+    if sniff(&String::from_utf8_lossy(&prefix)).is_some() {
+        if let Some((report, chip)) = inspect_chip(source()?, opts.max_issues)? {
+            return Ok((report, Some(chip)));
+        }
+    }
+    Ok((crate::inspect::inspect(source()?, opts)?, None))
+}
+
+/// JSON do relatório; para chip, com o bloco `chip` acrescentado.
+pub fn report_json(report: &InspectReport, chip: Option<&ChipSummary>) -> String {
+    let mut v = serde_json::to_value(report).expect("relatório serializável");
+    if let (Some(chip), Some(obj)) = (chip, v.as_object_mut()) {
+        obj.insert("chip".into(), serde_json::to_value(chip).expect("serializável"));
+    }
+    serde_json::to_string(&v).expect("serializável")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -607,6 +635,21 @@ RSID,CHROMOSOME,POSITION,RESULT\n\
         assert_eq!(r.verdict, Verdict::PartiallyValid);
         let lines: Vec<u64> = r.issues.iter().map(|i| i.line).collect();
         assert_eq!(lines, [4, 5, 6]);
+    }
+
+    #[test]
+    fn inspect_any_escolhe_o_formato() {
+        let opts = crate::inspect::InspectOptions::default();
+        let (r, chip) = inspect_any(|| Ok(Box::new(T23.as_bytes()) as Box<dyn Read>), &opts).unwrap();
+        assert!(chip.is_some());
+        assert!(report_json(&r, chip.as_ref()).contains("\"vendor_label\":\"23andMe\""));
+        let vcf = "##fileformat=VCFv4.3
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	5	.	A	G	.	.	.
+";
+        let (r, chip) = inspect_any(|| Ok(Box::new(vcf.as_bytes()) as Box<dyn Read>), &opts).unwrap();
+        assert!(chip.is_none());
+        assert!(!report_json(&r, None).contains("\"chip\""));
     }
 
     #[test]

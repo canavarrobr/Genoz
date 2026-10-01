@@ -20,7 +20,7 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand, ValueEnum};
 use genoz_core::build::GenomeBuild;
 use genoz_core::digest::sha256_reader;
-use genoz_core::inspect::{inspect_path, InspectOptions, InspectReport, Verdict};
+use genoz_core::inspect::{InspectOptions, InspectReport, Verdict};
 use genoz_core::io::BgzfWriter;
 use genoz_core::normalize::split_multiallelic;
 use genoz_core::reader::{Severity, VcfReader};
@@ -86,6 +86,10 @@ enum Command {
     Export(analysis::ExportArgs),
     /// Densidade de variantes por cromossomo e faixa (dados do ideograma).
     Density(analysis::DensityArgs),
+    /// Chip de consumidor × amostra de VCF, restrito aos sítios do chip.
+    CompareChip(analysis::ChipCompareArgs),
+    /// Cria o índice .fai de um FASTA (igual ao `samtools faidx`).
+    Faidx { fasta: PathBuf },
 }
 
 #[derive(Clone, Copy, ValueEnum)]
@@ -107,11 +111,29 @@ fn main() -> ExitCode {
 fn run(cli: Cli) -> Result<ExitCode, GenozError> {
     match cli.command {
         Command::Inspect { file, json, max_issues } => {
-            let report = inspect_path(&file, &InspectOptions { max_issues })?;
+            // Reconhece chip de consumidor ou VCF pelo conteúdo.
+            let path = file.clone();
+            let (mut report, chip) = genoz_core::consumer::inspect_any(
+                || Ok(Box::new(File::open(&path)?) as Box<dyn std::io::Read>),
+                &InspectOptions { max_issues },
+            )?;
+            report.digest = Some(sha256_reader(File::open(&file)?)?);
             if json {
-                println!("{}", serde_json::to_string_pretty(&report).expect("relatório serializável"));
+                let v: serde_json::Value =
+                    serde_json::from_str(&genoz_core::consumer::report_json(&report, chip.as_ref())).expect("JSON");
+                println!("{}", serde_json::to_string_pretty(&v).expect("relatório serializável"));
             } else {
                 print_report(&file, &report);
+                if let Some(c) = &chip {
+                    println!(
+                        "Chip:         {} — {} sítios, {} chamados, {} sem chamada, {} indels ignorados",
+                        c.vendor_label, c.sites, c.called, c.no_calls, c.indels
+                    );
+                    println!(
+                        "              {} heterozigotos, {} homozigotos, {} haploides",
+                        c.heterozygous, c.homozygous, c.haploid
+                    );
+                }
             }
             Ok(match report.verdict {
                 Verdict::Valid | Verdict::ValidWithWarnings => ExitCode::SUCCESS,
@@ -174,6 +196,14 @@ fn run(cli: Cli) -> Result<ExitCode, GenozError> {
         Command::View(args) => analysis::view_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::Export(args) => analysis::export_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::Density(args) => analysis::density_cmd(args).map(|()| ExitCode::SUCCESS),
+        Command::CompareChip(args) => analysis::chip_compare_cmd(args).map(|()| ExitCode::SUCCESS),
+        Command::Faidx { fasta } => {
+            let index = genoz_core::fasta::FastaIndex::build(File::open(&fasta)?)?;
+            let out = format!("{}.fai", fasta.display());
+            std::fs::write(&out, index.to_fai())?;
+            println!("{} sequências; índice gravado em {out}", index.entries.len());
+            Ok(ExitCode::SUCCESS)
+        }
     }
 }
 

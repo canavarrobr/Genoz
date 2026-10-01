@@ -1,0 +1,17 @@
+##fileformat=VCFv4.3
+##source=Genoz fixture FICTÍCIA (Módulo 9)
+##contig=<ID=1,length=249250621,assembly=GRCh37>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genótipo">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	PESSOA_FICTICIA
+1	1000	.	G	A	60	PASS	.	GT	0/1
+1	2000	.	T	A	60	PASS	.	GT	1/1
+1	3000	.	T	A	60	PASS	.	GT	1/1
+1	4000	.	G	A	60	PASS	.	GT	0/1
+1	5000	.	C	A	60	PASS	.	GT	1/1
+1	6000	.	A	C	60	PASS	.	GT	1/1
+1	7000	.	A	C	60	PASS	.	GT	0/1
+1	8000	.	A	C	60	PASS	.	GT	1/1
+1	9000	.	C	A	60	PASS	.	GT	1/1
+1	12000	.	G	A	60	PASS	.	GT	0/1
+1	13000	.	T	A	60	PASS	.	GT	0/1
+1	15005	.	TT	T	60	PASS	.	GT	0/1

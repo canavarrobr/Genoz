@@ -867,8 +867,19 @@ pub fn compare_to_store<W: std::io::Write>(
     opts: &CompareOptions,
     rows_out: W,
 ) -> Result<StoredComparison<W>> {
+    compare_to_store_with(a, b, opts, None, rows_out)
+}
+
+/// Como [`compare_to_store`], com normalização por FASTA opcional.
+pub fn compare_to_store_with<W: std::io::Write>(
+    a: &mut CompareInput,
+    b: &mut CompareInput,
+    opts: &CompareOptions,
+    reference: Option<&mut dyn SequenceSource>,
+    rows_out: W,
+) -> Result<StoredComparison<W>> {
     let mut writer = crate::results::ResultWriter::new(rows_out)?;
-    let outcome = compare(a, b, opts, &mut |row| writer.push(row))?;
+    let outcome = compare_with_reference(a, b, opts, reference, &mut |row| writer.push(row))?;
     let (rows_out, index) = writer.finish()?;
     Ok(StoredComparison { rows_out, index, outcome })
 }

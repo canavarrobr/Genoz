@@ -185,6 +185,30 @@ impl<R: Read + Seek> SequenceSource for IndexedFasta<R> {
     }
 }
 
+/// Abre um FASTA do disco: usa `<arquivo>.fai` se existir; senão cria o índice
+/// (e tenta gravá-lo ao lado, como o `samtools faidx`). Devolve também se o
+/// índice foi criado agora.
+pub fn open_fasta(path: &std::path::Path) -> Result<(IndexedFasta<std::io::BufReader<std::fs::File>>, bool)> {
+    let mut head = [0u8; 2];
+    let n = std::fs::File::open(path)?.read(&mut head)?;
+    if n == 2 && head == [0x1f, 0x8b] {
+        return Err(GenozError::InvalidParam(
+            "FASTA compactado: descompacte (gunzip) para permitir a busca por posição".into(),
+        ));
+    }
+    let fai = std::path::PathBuf::from(format!("{}.fai", path.display()));
+    let (index, created) = match std::fs::read_to_string(&fai) {
+        Ok(text) => (FastaIndex::parse(&text)?, false),
+        Err(_) => {
+            let index = FastaIndex::build(std::fs::File::open(path)?)?;
+            let _ = std::fs::write(&fai, index.to_fai());
+            (index, true)
+        }
+    };
+    let reader = std::io::BufReader::with_capacity(64 * 1024, std::fs::File::open(path)?);
+    Ok((IndexedFasta::new(reader, index), created))
+}
+
 /// Resultado da normalização de uma variante.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Normalized {

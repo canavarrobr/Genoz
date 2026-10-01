@@ -589,6 +589,36 @@ chr1\t14000\t.\tA\tG\t50\tPASS\t.\tGT\t0/0\n";
     }
 
     #[test]
+    fn os_quatro_formatos_dao_o_mesmo_resultado() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../test_fixtures/consumidor");
+        let vcf_text = std::fs::read_to_string(dir.join("pessoa_ficticia_grch37.vcf")).unwrap();
+        let mut results = Vec::new();
+        for name in ["chip_23andme.txt", "chip_ancestrydna.txt", "chip_myheritage.csv", "chip_ftdna.csv"] {
+            let bytes = std::fs::read(dir.join(name)).unwrap();
+            let (header, calls, rejected) = read_chip(&bytes[..]).unwrap().unwrap();
+            let chip = ChipInput { label: "chip".into(), header, calls, rejected_lines: rejected };
+            let text = vcf_text.clone();
+            let mut vcf = CompareInput {
+                label: "seq".into(),
+                open: Box::new(move || {
+                    Ok(Box::new(std::io::Cursor::new(text.clone().into_bytes())) as Box<dyn std::io::Read>)
+                }),
+                sample: SampleSelector::First,
+                callable: None,
+            };
+            let mut rows = Vec::new();
+            let out = compare_chip(chip, &mut vcf, &CompareOptions::default(), None, &mut |r| {
+                rows.push(r.clone());
+                Ok(())
+            })
+            .unwrap();
+            assert_eq!(out.summary.rows, 11, "{name}");
+            results.push(rows);
+        }
+        assert!(results.windows(2).all(|w| w[0] == w[1]), "mesmas linhas em todos os formatos");
+    }
+
+    #[test]
     fn build_diferente_e_recusado() {
         let (header, calls, rejected) = read_chip(CHIP.as_bytes()).unwrap().unwrap();
         let chip = ChipInput { label: "chip".into(), header, calls, rejected_lines: rejected };
