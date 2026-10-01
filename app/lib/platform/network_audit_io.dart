@@ -1,4 +1,4 @@
-// Auditoria de rede no Android/iOS: toda conexão HTTP criada pelo Dart é registrada.
+// Auditoria de rede no Android/iOS: toda requisição HTTP feita pelo Dart é registrada.
 
 import 'dart:io';
 
@@ -20,13 +20,11 @@ class _AuditingOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     final client = previous?.createHttpClient(context) ?? super.createHttpClient(context);
-    client.connectionFactory = (uri, proxyHost, proxyPort) {
+    // findProxy é consultado a cada requisição (inclusive em conexões reaproveitadas
+    // por keep-alive), então registra pedidos, não só conexões novas.
+    client.findProxy = (uri) {
       audit.record(uri.toString(), 'http');
-      final host = proxyHost ?? uri.host;
-      final port = proxyPort ?? uri.port;
-      return uri.scheme == 'https' && proxyHost == null
-          ? SecureSocket.startConnect(host, port, context: context)
-          : Socket.startConnect(host, port);
+      return HttpClient.findProxyFromEnvironment(uri);
     };
     return client;
   }
