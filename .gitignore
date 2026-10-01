@@ -33,6 +33,8 @@ Thumbs.db
 *.bam
 *.cram
 !test_fixtures/**
+# Dados didáticos FICTÍCIOS embutidos no app (modo estudante, Módulo 8; ver ADR-014)
+!app/assets/aprender/dados/**
 
 # Artigos com copyright de editora: ficam só localmente (ver docs/referencias/artigos/README.md)
 docs/referencias/artigos/*.pdf
