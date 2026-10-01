@@ -371,3 +371,28 @@ Limitações conhecidas: o painel de navegador embutido do app Claude bloqueia s
 Achados corrigidos no caminho: o seletor de arquivos deixava cópias dos VCF no cache do app (agora apagadas após cada importação e em "Apagar todos os dados"); linhas apagadas do SQLite ficavam nas páginas livres (VACUUM); o logo com assinatura e as linhas da tabela estouravam em tela de 320 px com fonte 130% (novo teste cobre todas as telas principais).
 77 testes Dart. Decisões em [ADR-013](../adr/ADR-013-bloqueio-do-app.md).
 Limitações: o bloqueio não criptografa os arquivos (Módulo 11); a assinatura definitiva do APK depende de secrets no repositório (até lá, chave de depuração — instalar uma versão nova pode exigir desinstalar a anterior).
+
+---
+
+## Contrato do Módulo 8 — Visualização e modo estudante (antes de implementar)
+
+**Entradas:** resultados de comparação dos Módulos 2–4 (`rows.bgz` + índice, resumo); dados didáticos fictícios embutidos no app.
+
+**Saídas — visualização (aba "Mapa" da análise e Resumo):**
+- **núcleo:** `density` — contagem de variantes por cromossomo, faixa (bin) de tamanho fixo e categoria, respeitando o filtro de linhas; disponível no CLI (`genoz-cli density`), na ponte por caminho (Android/iOS) e por memória (Web);
+- **ideograma:** cromossomos 1–22, X e Y em escala, com o centrômero marcado (posição aproximada, só para orientação), pintados pela densidade da categoria escolhida; cromossomo sem variantes aparece vazio, nunca omitido;
+- **visualizador de região:** trilha horizontal com as variantes de um trecho (cor **e** forma por categoria), zoom e arraste, região digitável (`chr1:1.000.000-2.000.000`), lista do trecho abaixo e ficha da variante ao tocar;
+- **diagrama de interseções** (A × B) no Resumo: só em A, compartilhadas (iguais / genótipo diferente) e só em B, com as não avaliadas/incertas ao lado — áreas proporcionais só quando não enganam (rótulos com números sempre).
+
+**Saídas — modo estudante (menu ☰ → Aprender):**
+- **datasets didáticos embutidos** (fictícios): par pequeno "Pessoa A × Pessoa B" e um par sintético maior (todas as autossomas) gerado pelo núcleo com semente fixa — mesmo conteúdo em qualquer aparelho;
+- **trilhas guiadas** (pt/en): passos com texto, termos do glossário e botões que abrem o dataset já comparado na tela certa (Resumo, Tabela, Mapa, QC);
+- **exercícios com correção automática**: as respostas são **calculadas do resultado real** (contagens por categoria, concordância, cromossomo com mais variantes, genótipo numa posição), mais perguntas conceituais de múltipla escolha; correção imediata com explicação; progresso salvo no aparelho;
+- **glossário** pt/en pesquisável (VCF, alelo, genótipo, SNV, indel, QUAL/DP/GQ, FILTER, build, regiões avaliadas, concordância, Jaccard…);
+- **pacote de aula do professor** (`.genozaula`): um projeto vira um arquivo (VCFs + `aula.json` com título, instruções e perguntas escolhidas); ao importar, o aluno ganha o projeto e a aula. Perguntas calculadas não levam gabarito no pacote (a resposta é calculada no aparelho do aluno).
+
+**Invariantes:** tudo local (nenhum dado didático é baixado); dados didáticos marcados como fictícios; cor nunca é a única pista (forma/rótulo também); números do ideograma/diagrama batem com o resumo da análise; nada disso é diagnóstico.
+
+**Erros:** build desconhecido (ideograma usa o maior posicionamento visto como comprimento e avisa); pacote de aula inválido ou de versão futura (mensagem clara, nada é importado pela metade); região inválida.
+
+**Testes:** Rust (densidade = contagem direta das linhas; filtro respeitado; caminho = memória); Dart (ideograma/visualizador/diagrama renderizam e batem com o resumo; respostas calculadas corretas para pessoa_a × pessoa_b; pacote de aula ida e volta; glossário pt/en com os mesmos termos); verificação no emulador e no navegador.

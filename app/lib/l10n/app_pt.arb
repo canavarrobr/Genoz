@@ -312,6 +312,7 @@
   "kindsLabel": "Tipos de variante",
   "regionLabel": "Região",
   "regionInvalid": "Região inválida (ex.: chr1:1000-2000)",
+  "regionOutside": "Região inválida. Use posições do cromossomo {chrom}, ex.: {chrom}:1000-5000.",
   "idLabel": "ID contém",
   "apply": "Aplicar",
   "stateLabel": "Estado",
@@ -561,5 +562,128 @@
   "pinCurrent": "Digite o PIN atual",
   "pinNew": "Escolha um PIN",
   "pinRepeat": "Repita o PIN",
-  "pinRule": "De 4 a 8 dígitos"
+  "pinRule": "De 4 a 8 dígitos",
+  "tabMap": "Mapa",
+  "mapAll": "Todas",
+  "mapUnknownBuild": "Build de referência desconhecido: cada cromossomo é desenhado até a maior posição encontrada, sem centrômero.",
+  "mapFew": "poucas",
+  "mapMany": "muitas",
+  "mapCentromere": "centrômero (posição aproximada)",
+  "mapChromSemantics": "Cromossomo {chrom}: {count} variantes. Toque para ver a região.",
+  "@mapChromSemantics": {
+    "placeholders": {
+      "chrom": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regionTitle": "Cromossomo {chrom}",
+  "@regionTitle": {
+    "placeholders": {
+      "chrom": {
+        "type": "String"
+      }
+    }
+  },
+  "regionField": "Região (ex.: 1:1.000.000-2.000.000)",
+  "regionZoomIn": "Aproximar",
+  "regionZoomOut": "Afastar",
+  "@regionOutside": {
+    "placeholders": {
+      "chrom": {
+        "type": "String"
+      }
+    }
+  },
+  "regionTrackSemantics": "Trilha da região {region} com {count} variantes. Toque duas vezes para aproximar; arraste para os lados para mover.",
+  "@regionTrackSemantics": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regionLoading": "Carregando…",
+  "regionShowing": "Mostrando {shown} de {total} variantes — aproxime para ver todas.",
+  "@regionShowing": {
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "regionCount": "{count} variantes neste trecho",
+  "@regionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regionNoVariants": "Nenhuma variante neste trecho.",
+  "vennTitle": "Interseções",
+  "vennSemantics": "Diagrama de interseções: {onlyA} variantes só em {a}, {both} nos dois ({diff} com genótipo diferente), {onlyB} só em {b}.",
+  "@vennSemantics": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      },
+      "b": {
+        "type": "String"
+      },
+      "onlyA": {
+        "type": "int"
+      },
+      "both": {
+        "type": "int"
+      },
+      "diff": {
+        "type": "int"
+      },
+      "onlyB": {
+        "type": "int"
+      }
+    }
+  },
+  "vennOnly": "só em {name}",
+  "@vennOnly": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "vennBoth": "nos dois",
+  "vennBreakdown": "{same} iguais · {diff} genótipo diferente",
+  "@vennBreakdown": {
+    "placeholders": {
+      "same": {
+        "type": "int"
+      },
+      "diff": {
+        "type": "int"
+      }
+    }
+  },
+  "vennOutside": "Fora do diagrama: {missing} ausentes/incertas e {notAssessed} não avaliadas.",
+  "@vennOutside": {
+    "placeholders": {
+      "missing": {
+        "type": "int"
+      },
+      "notAssessed": {
+        "type": "int"
+      }
+    }
+  },
+  "vennNotProportional": "Os círculos não estão em escala: os números indicam as quantidades."
 }

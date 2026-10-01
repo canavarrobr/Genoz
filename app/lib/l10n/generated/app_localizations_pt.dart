@@ -549,6 +549,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get regionInvalid => 'Região inválida (ex.: chr1:1000-2000)';
 
   @override
+  String regionOutside(String chrom) {
+    return 'Região inválida. Use posições do cromossomo $chrom, ex.: $chrom:1000-5000.';
+  }
+
+  @override
   String get idLabel => 'ID contém';
 
   @override
@@ -974,4 +979,100 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get pinRule => 'De 4 a 8 dígitos';
+
+  @override
+  String get tabMap => 'Mapa';
+
+  @override
+  String get mapAll => 'Todas';
+
+  @override
+  String get mapUnknownBuild =>
+      'Build de referência desconhecido: cada cromossomo é desenhado até a maior posição encontrada, sem centrômero.';
+
+  @override
+  String get mapFew => 'poucas';
+
+  @override
+  String get mapMany => 'muitas';
+
+  @override
+  String get mapCentromere => 'centrômero (posição aproximada)';
+
+  @override
+  String mapChromSemantics(String chrom, int count) {
+    return 'Cromossomo $chrom: $count variantes. Toque para ver a região.';
+  }
+
+  @override
+  String regionTitle(String chrom) {
+    return 'Cromossomo $chrom';
+  }
+
+  @override
+  String get regionField => 'Região (ex.: 1:1.000.000-2.000.000)';
+
+  @override
+  String get regionZoomIn => 'Aproximar';
+
+  @override
+  String get regionZoomOut => 'Afastar';
+
+  @override
+  String regionTrackSemantics(String region, int count) {
+    return 'Trilha da região $region com $count variantes. Toque duas vezes para aproximar; arraste para os lados para mover.';
+  }
+
+  @override
+  String get regionLoading => 'Carregando…';
+
+  @override
+  String regionShowing(int shown, int total) {
+    return 'Mostrando $shown de $total variantes — aproxime para ver todas.';
+  }
+
+  @override
+  String regionCount(int count) {
+    return '$count variantes neste trecho';
+  }
+
+  @override
+  String get regionNoVariants => 'Nenhuma variante neste trecho.';
+
+  @override
+  String get vennTitle => 'Interseções';
+
+  @override
+  String vennSemantics(
+    String a,
+    String b,
+    int onlyA,
+    int both,
+    int diff,
+    int onlyB,
+  ) {
+    return 'Diagrama de interseções: $onlyA variantes só em $a, $both nos dois ($diff com genótipo diferente), $onlyB só em $b.';
+  }
+
+  @override
+  String vennOnly(String name) {
+    return 'só em $name';
+  }
+
+  @override
+  String get vennBoth => 'nos dois';
+
+  @override
+  String vennBreakdown(int same, int diff) {
+    return '$same iguais · $diff genótipo diferente';
+  }
+
+  @override
+  String vennOutside(int missing, int notAssessed) {
+    return 'Fora do diagrama: $missing ausentes/incertas e $notAssessed não avaliadas.';
+  }
+
+  @override
+  String get vennNotProportional =>
+      'Os círculos não estão em escala: os números indicam as quantidades.';
 }

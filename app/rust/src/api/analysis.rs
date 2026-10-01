@@ -295,6 +295,22 @@ pub fn result_page(
     page_of(&out_dir, &mut reader, &filter_json, start, count)
 }
 
+/// Densidade de variantes por cromossomo/faixa/categoria (JSON de `genoz_core::density`).
+pub fn result_density(out_dir: String, filter_json: String, bin_size: u64) -> Result<String, String> {
+    let mut reader = open_result(&out_dir)?;
+    density_of(&mut reader, &filter_json, bin_size)
+}
+
+pub(crate) fn density_of<R: Read + Seek>(
+    reader: &mut ResultReader<R>,
+    filter_json: &str,
+    bin_size: u64,
+) -> Result<String, String> {
+    let filter = parse_filter(filter_json)?;
+    let map = genoz_core::density::density(reader, &filter, bin_size).map_err(|e| e.user_message())?;
+    serde_json::to_string(&map).map_err(|e| e.to_string())
+}
+
 /// Página de qualquer resultado (arquivo ou memória). `result_key` identifica o
 /// resultado no cache de linhas filtradas.
 pub(crate) fn page_of<R: Read + Seek>(

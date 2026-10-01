@@ -18,6 +18,8 @@ import '../src/rust/api/analysis.dart' as rust_analysis;
 import '../src/rust/api/genoz.dart' as rust;
 import '../src/rust/api/memory.dart' as rust_memory;
 import 'compare_models.dart';
+import 'density.dart';
+export 'density.dart';
 
 // ---- Importação ------------------------------------------------------------
 
@@ -159,6 +161,9 @@ abstract interface class GenozCore {
     required String sampleB,
   });
 
+  /// Densidade de variantes por cromossomo/faixa/categoria (ideograma).
+  Future<DensityMap> density({required String resultDirRelative, required RowFilter filter, int binSize = 1000000});
+
   void forgetResult(String resultDirRelative);
 
   /// Interpreta `chr7:117.5M-117.6M`, `chr1:1000`, `X`... `null` se não for região.
@@ -259,6 +264,14 @@ class NativeGenozCore implements GenozCore {
                 rust_analysis.CompareEvent_Failed(:final message) => CompareFailed(message),
                 rust_analysis.CompareEvent_Cancelled() => const CompareCancelled(),
               });
+
+  @override
+  Future<DensityMap> density({required String resultDirRelative, required RowFilter filter, int binSize = 1000000}) async =>
+      DensityMap.parse(await rust_analysis.resultDensity(
+        outDir: storage.absolute(resultDirRelative),
+        filterJson: filter.toJsonString(),
+        binSize: BigInt.from(binSize),
+      ));
 
   @override
   Future<RowsPage> page({required String resultDirRelative, required RowFilter filter, required int start, required int count}) async {
@@ -432,6 +445,16 @@ class WebGenozCore implements GenozCore {
       rowsBgz: await storage.blobs.readBytes('$resultDirRelative/rows.bgz'),
       rowsIdx: await storage.blobs.readBytes('$resultDirRelative/rows.idx'),
     );
+  }
+
+  @override
+  Future<DensityMap> density({required String resultDirRelative, required RowFilter filter, int binSize = 1000000}) async {
+    await _ensureLoaded(resultDirRelative);
+    return DensityMap.parse(await rust_memory.resultDensityLoaded(
+      key: resultDirRelative,
+      filterJson: filter.toJsonString(),
+      binSize: BigInt.from(binSize),
+    ));
   }
 
   @override

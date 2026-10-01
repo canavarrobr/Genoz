@@ -1046,6 +1046,12 @@ abstract class AppLocalizations {
   /// **'Região inválida (ex.: chr1:1000-2000)'**
   String get regionInvalid;
 
+  /// No description provided for @regionOutside.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região inválida. Use posições do cromossomo {chrom}, ex.: {chrom}:1000-5000.'**
+  String regionOutside(String chrom);
+
   /// No description provided for @idLabel.
   ///
   /// In pt, this message translates to:
@@ -1801,6 +1807,151 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'De 4 a 8 dígitos'**
   String get pinRule;
+
+  /// No description provided for @tabMap.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mapa'**
+  String get tabMap;
+
+  /// No description provided for @mapAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todas'**
+  String get mapAll;
+
+  /// No description provided for @mapUnknownBuild.
+  ///
+  /// In pt, this message translates to:
+  /// **'Build de referência desconhecido: cada cromossomo é desenhado até a maior posição encontrada, sem centrômero.'**
+  String get mapUnknownBuild;
+
+  /// No description provided for @mapFew.
+  ///
+  /// In pt, this message translates to:
+  /// **'poucas'**
+  String get mapFew;
+
+  /// No description provided for @mapMany.
+  ///
+  /// In pt, this message translates to:
+  /// **'muitas'**
+  String get mapMany;
+
+  /// No description provided for @mapCentromere.
+  ///
+  /// In pt, this message translates to:
+  /// **'centrômero (posição aproximada)'**
+  String get mapCentromere;
+
+  /// No description provided for @mapChromSemantics.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cromossomo {chrom}: {count} variantes. Toque para ver a região.'**
+  String mapChromSemantics(String chrom, int count);
+
+  /// No description provided for @regionTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cromossomo {chrom}'**
+  String regionTitle(String chrom);
+
+  /// No description provided for @regionField.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região (ex.: 1:1.000.000-2.000.000)'**
+  String get regionField;
+
+  /// No description provided for @regionZoomIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aproximar'**
+  String get regionZoomIn;
+
+  /// No description provided for @regionZoomOut.
+  ///
+  /// In pt, this message translates to:
+  /// **'Afastar'**
+  String get regionZoomOut;
+
+  /// No description provided for @regionTrackSemantics.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trilha da região {region} com {count} variantes. Toque duas vezes para aproximar; arraste para os lados para mover.'**
+  String regionTrackSemantics(String region, int count);
+
+  /// No description provided for @regionLoading.
+  ///
+  /// In pt, this message translates to:
+  /// **'Carregando…'**
+  String get regionLoading;
+
+  /// No description provided for @regionShowing.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostrando {shown} de {total} variantes — aproxime para ver todas.'**
+  String regionShowing(int shown, int total);
+
+  /// No description provided for @regionCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} variantes neste trecho'**
+  String regionCount(int count);
+
+  /// No description provided for @regionNoVariants.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma variante neste trecho.'**
+  String get regionNoVariants;
+
+  /// No description provided for @vennTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Interseções'**
+  String get vennTitle;
+
+  /// No description provided for @vennSemantics.
+  ///
+  /// In pt, this message translates to:
+  /// **'Diagrama de interseções: {onlyA} variantes só em {a}, {both} nos dois ({diff} com genótipo diferente), {onlyB} só em {b}.'**
+  String vennSemantics(
+    String a,
+    String b,
+    int onlyA,
+    int both,
+    int diff,
+    int onlyB,
+  );
+
+  /// No description provided for @vennOnly.
+  ///
+  /// In pt, this message translates to:
+  /// **'só em {name}'**
+  String vennOnly(String name);
+
+  /// No description provided for @vennBoth.
+  ///
+  /// In pt, this message translates to:
+  /// **'nos dois'**
+  String get vennBoth;
+
+  /// No description provided for @vennBreakdown.
+  ///
+  /// In pt, this message translates to:
+  /// **'{same} iguais · {diff} genótipo diferente'**
+  String vennBreakdown(int same, int diff);
+
+  /// No description provided for @vennOutside.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fora do diagrama: {missing} ausentes/incertas e {notAssessed} não avaliadas.'**
+  String vennOutside(int missing, int notAssessed);
+
+  /// No description provided for @vennNotProportional.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os círculos não estão em escala: os números indicam as quantidades.'**
+  String get vennNotProportional;
 }
 
 class _AppLocalizationsDelegate

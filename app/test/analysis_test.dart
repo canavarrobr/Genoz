@@ -7,12 +7,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genoz/core/compare_models.dart';
-import 'package:genoz/core/inspect_report.dart';
 import 'package:genoz/features/analysis/analysis_screen.dart';
 import 'package:genoz/features/compare/compare_controller.dart';
 import 'package:genoz/features/projects/projects_screen.dart';
 import 'package:genoz/features/projects/project_screen.dart';
 import 'package:genoz/features/compare/compare_setup_screen.dart';
+import 'package:genoz/features/analysis/region_viewer.dart';
 import 'package:genoz/l10n/generated/app_localizations.dart';
 import 'package:genoz/persistence/analysis_repository.dart';
 import 'package:genoz/persistence/database.dart';
@@ -21,21 +21,6 @@ import 'package:genoz/ui/theme.dart';
 import 'support.dart';
 
 /// Dois arquivos importados num projeto novo.
-Future<(String, ProjectFile, ProjectFile)> projectWithTwoFiles(TestEnv env) async {
-  final p = await env.repo.createProject('Comparação');
-  final report = InspectReport.parse(fixture('report_valid.json'));
-  for (final id in ['fa', 'fb']) {
-    await env.repo.addImportedFile(
-      projectId: p.id,
-      fileId: id,
-      displayName: '$id.vcf',
-      storedPath: 'projetos/${p.id}/arquivos/$id.vcf',
-      report: report,
-      reportJson: fixture('report_valid.json'),
-    );
-  }
-  return (p.id, (await env.repo.getFile('fa'))!, (await env.repo.getFile('fb'))!);
-}
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -191,6 +176,7 @@ void main() {
     expect(find.text('PESSOA_A × PESSOA_B'), findsOneWidget);
     expect(find.text('12 linhas'), findsOneWidget);
     expect(find.text('Somente em A'), findsWidgets);
+    await tester.scrollUntilVisible(find.text('83.3%'), 200, scrollable: find.byType(Scrollable).last);
     expect(find.text('83.3%'), findsOneWidget); // concordância 5/6
 
     await tester.tap(find.text('Tabela'));
@@ -257,6 +243,9 @@ void main() {
     await show(AnalysisScreen(analysisId: id));
     await show(AnalysisScreen(analysisId: id), tab: 'Tabela');
     await show(AnalysisScreen(analysisId: id), tab: 'QC');
+    await show(AnalysisScreen(analysisId: id), tab: 'Mapa');
+    final analysis = (await tester.runAsync(() => env.container.read(analysisProvider(id).future)))!;
+    await show(RegionViewerScreen(analysis: analysis, initial: const Region('1', 1, 248956422)));
 
     await tester.pumpWidget(const SizedBox());
     await tester.runAsync(env.dispose);

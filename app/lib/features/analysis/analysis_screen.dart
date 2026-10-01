@@ -9,6 +9,8 @@ import '../../persistence/database.dart';
 import '../../ui/labels.dart';
 import '../../ui/theme.dart';
 import 'export_sheet.dart';
+import 'intersection_diagram.dart';
+import 'map_tab.dart';
 import 'table_tab.dart';
 
 /// Estatísticas de QC de A e B, lidas dos arquivos da análise.
@@ -36,7 +38,7 @@ class AnalysisScreen extends ConsumerWidget {
         final s = a.summary;
         final title = l.analysisVs(s.a.sample ?? 'A', s.b.sample ?? 'B');
         return DefaultTabController(
-          length: 3,
+          length: 4,
           child: Scaffold(
             appBar: AppBar(
               title: Text(title, overflow: TextOverflow.ellipsis),
@@ -47,12 +49,13 @@ class AnalysisScreen extends ConsumerWidget {
                   onPressed: () => showExportSheet(context, ref, a),
                 ),
               ],
-              bottom: TabBar(tabs: [Tab(text: l.tabSummary), Tab(text: l.tabTable), Tab(text: l.tabQc)]),
+              bottom: TabBar(tabs: [Tab(text: l.tabSummary), Tab(text: l.tabTable), Tab(text: l.tabMap), Tab(text: l.tabQc)]),
             ),
             body: TabBarView(
               children: [
                 _SummaryTab(summary: s),
                 TableTab(analysis: a),
+                MapTab(analysis: a),
                 _QcTab(analysisId: analysisId),
               ],
             ),
@@ -90,6 +93,7 @@ class _SummaryTab extends StatelessWidget {
             ),
           ),
         ),
+        Card(child: Padding(padding: const EdgeInsets.all(16), child: IntersectionDiagram(summary: s))),
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16),

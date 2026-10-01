@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 638176587;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 581572737;
 
 // Section: executor
 
@@ -461,6 +461,84 @@ fn wire__crate__api__analysis__parse_region_impl(
                 let output_ok = Ok::<_, ()>(crate::api::analysis::parse_region(api_text))?;
                 std::result::Result::Ok(output_ok)
             })())
+        },
+    )
+}
+fn wire__crate__api__analysis__result_density_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "result_density",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_out_dir = <String>::sse_decode(&mut deserializer);
+            let api_filter_json = <String>::sse_decode(&mut deserializer);
+            let api_bin_size = <u64>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::analysis::result_density(
+                        api_out_dir,
+                        api_filter_json,
+                        api_bin_size,
+                    )?;
+                    std::result::Result::Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__memory__result_density_loaded_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "result_density_loaded",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_key = <String>::sse_decode(&mut deserializer);
+            let api_filter_json = <String>::sse_decode(&mut deserializer);
+            let api_bin_size = <u64>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::memory::result_density_loaded(
+                        api_key,
+                        api_filter_json,
+                        api_bin_size,
+                    )?;
+                    std::result::Result::Ok(output_ok)
+                })())
+            }
         },
     )
 }
@@ -1008,11 +1086,15 @@ fn pde_ffi_dispatcher_primary_impl(
         8 => wire__crate__api__genoz__import_vcf_impl(port, ptr, rust_vec_len, data_len),
         9 => wire__crate__api__genoz__init_app_impl(port, ptr, rust_vec_len, data_len),
         10 => wire__crate__api__memory__inspect_bytes_impl(port, ptr, rust_vec_len, data_len),
-        13 => wire__crate__api__memory__result_load_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__analysis__result_page_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__api__memory__result_page_loaded_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire__crate__api__memory__synthetic_bytes_impl(port, ptr, rust_vec_len, data_len),
-        18 => {
+        12 => wire__crate__api__analysis__result_density_impl(port, ptr, rust_vec_len, data_len),
+        13 => {
+            wire__crate__api__memory__result_density_loaded_impl(port, ptr, rust_vec_len, data_len)
+        }
+        15 => wire__crate__api__memory__result_load_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__analysis__result_page_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__memory__result_page_loaded_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__api__memory__synthetic_bytes_impl(port, ptr, rust_vec_len, data_len),
+        20 => {
             wire__crate__api__genoz__write_synthetic_example_impl(port, ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -1031,8 +1113,8 @@ fn pde_ffi_dispatcher_sync_impl(
         4 => wire__crate__api__genoz__core_version_impl(ptr, rust_vec_len, data_len),
         7 => wire__crate__api__analysis__forget_result_impl(ptr, rust_vec_len, data_len),
         11 => wire__crate__api__analysis__parse_region_impl(ptr, rust_vec_len, data_len),
-        12 => wire__crate__api__memory__result_is_loaded_impl(ptr, rust_vec_len, data_len),
-        16 => wire__crate__api__memory__result_unload_impl(ptr, rust_vec_len, data_len),
+        14 => wire__crate__api__memory__result_is_loaded_impl(ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__memory__result_unload_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }

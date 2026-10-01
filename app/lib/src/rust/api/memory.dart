@@ -60,6 +60,17 @@ Future<ResultPage> resultPageLoaded({
   count: count,
 );
 
+/// Densidade de um resultado carregado (mesma lógica de `result_density`).
+Future<String> resultDensityLoaded({
+  required String key,
+  required String filterJson,
+  required BigInt binSize,
+}) => RustLib.instance.api.crateApiMemoryResultDensityLoaded(
+  key: key,
+  filterJson: filterJson,
+  binSize: binSize,
+);
+
 /// Exporta as linhas filtradas de um resultado carregado (`csv`, `tsv`, `json`, `vcf`).
 Future<ExportedBytes> exportLoaded({
   required String key,

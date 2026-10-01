@@ -7,6 +7,7 @@ import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:genoz/core/compare_models.dart';
 import 'package:genoz/core/genoz_core.dart';
+import 'package:genoz/core/inspect_report.dart';
 import 'package:genoz/persistence/app_storage.dart';
 import 'package:genoz/persistence/database.dart';
 import 'package:genoz/persistence/project_repository.dart';
@@ -147,6 +148,26 @@ class FakeGenozCore implements GenozCore {
   }
 
   @override
+  Future<DensityMap> density({required String resultDirRelative, required RowFilter filter, int binSize = 1000000}) async {
+    // Mesma regra do núcleo: faixa = (pos - 1) ~/ binSize; listas do tamanho da maior posição.
+    final byChrom = <String, List<ComparisonRow>>{};
+    for (final r in _filtered(filter)) {
+      byChrom.putIfAbsent(r.chrom, () => []).add(r);
+    }
+    final chroms = <ChromDensity>[];
+    for (final e in byChrom.entries) {
+      final maxPos = e.value.map((r) => r.pos).reduce((a, b) => a > b ? a : b);
+      final bins = (maxPos - 1) ~/ binSize + 1;
+      final counts = <String, List<int>>{};
+      for (final r in e.value) {
+        counts.putIfAbsent(r.category, () => List.filled(bins, 0))[(r.pos - 1) ~/ binSize]++;
+      }
+      chroms.add(ChromDensity(chrom: e.key, maxPos: maxPos, total: e.value.length, counts: counts));
+    }
+    return DensityMap(binSize: binSize, total: chroms.fold(0, (a, c) => a + c.total), chroms: chroms);
+  }
+
+  @override
   void forgetResult(String resultDirRelative) {}
 
   @override
@@ -236,4 +257,21 @@ class MemoryBlobStore implements BlobStore {
 
   @override
   String? nativePath(String relative) => null;
+}
+
+/// Projeto com dois arquivos já importados (relatório real do núcleo), pronto para comparar.
+Future<(String, ProjectFile, ProjectFile)> projectWithTwoFiles(TestEnv env) async {
+  final p = await env.repo.createProject('Comparação');
+  final report = InspectReport.parse(fixture('report_valid.json'));
+  for (final id in ['fa', 'fb']) {
+    await env.repo.addImportedFile(
+      projectId: p.id,
+      fileId: id,
+      displayName: '$id.vcf',
+      storedPath: 'projetos/${p.id}/arquivos/$id.vcf',
+      report: report,
+      reportJson: fixture('report_valid.json'),
+    );
+  }
+  return (p.id, (await env.repo.getFile('fa'))!, (await env.repo.getFile('fb'))!);
 }

@@ -81,6 +81,8 @@ enum Command {
     View(analysis::ViewArgs),
     /// Exporta as linhas de um resultado (csv, tsv, json ou vcf), com filtros.
     Export(analysis::ExportArgs),
+    /// Densidade de variantes por cromossomo e faixa (dados do ideograma).
+    Density(analysis::DensityArgs),
 }
 
 #[derive(Clone, Copy, ValueEnum)]
@@ -162,6 +164,7 @@ fn run(cli: Cli) -> Result<ExitCode, GenozError> {
         Command::Stats(args) => analysis::stats_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::View(args) => analysis::view_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::Export(args) => analysis::export_cmd(args).map(|()| ExitCode::SUCCESS),
+        Command::Density(args) => analysis::density_cmd(args).map(|()| ExitCode::SUCCESS),
     }
 }
 

@@ -546,6 +546,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get regionInvalid => 'Invalid region (e.g. chr1:1000-2000)';
 
   @override
+  String regionOutside(String chrom) {
+    return 'Invalid region. Use positions on chromosome $chrom, e.g. $chrom:1000-5000.';
+  }
+
+  @override
   String get idLabel => 'ID contains';
 
   @override
@@ -972,4 +977,100 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pinRule => '4 to 8 digits';
+
+  @override
+  String get tabMap => 'Map';
+
+  @override
+  String get mapAll => 'All';
+
+  @override
+  String get mapUnknownBuild =>
+      'Unknown reference build: each chromosome is drawn up to the largest position found, without a centromere.';
+
+  @override
+  String get mapFew => 'few';
+
+  @override
+  String get mapMany => 'many';
+
+  @override
+  String get mapCentromere => 'centromere (approximate position)';
+
+  @override
+  String mapChromSemantics(String chrom, int count) {
+    return 'Chromosome $chrom: $count variants. Tap to see the region.';
+  }
+
+  @override
+  String regionTitle(String chrom) {
+    return 'Chromosome $chrom';
+  }
+
+  @override
+  String get regionField => 'Region (e.g. 1:1,000,000-2,000,000)';
+
+  @override
+  String get regionZoomIn => 'Zoom in';
+
+  @override
+  String get regionZoomOut => 'Zoom out';
+
+  @override
+  String regionTrackSemantics(String region, int count) {
+    return 'Track of region $region with $count variants. Double-tap to zoom in; drag sideways to move.';
+  }
+
+  @override
+  String get regionLoading => 'Loading…';
+
+  @override
+  String regionShowing(int shown, int total) {
+    return 'Showing $shown of $total variants — zoom in to see all.';
+  }
+
+  @override
+  String regionCount(int count) {
+    return '$count variants in this stretch';
+  }
+
+  @override
+  String get regionNoVariants => 'No variants in this stretch.';
+
+  @override
+  String get vennTitle => 'Intersections';
+
+  @override
+  String vennSemantics(
+    String a,
+    String b,
+    int onlyA,
+    int both,
+    int diff,
+    int onlyB,
+  ) {
+    return 'Intersection diagram: $onlyA variants only in $a, $both in both ($diff with a different genotype), $onlyB only in $b.';
+  }
+
+  @override
+  String vennOnly(String name) {
+    return 'only in $name';
+  }
+
+  @override
+  String get vennBoth => 'in both';
+
+  @override
+  String vennBreakdown(int same, int diff) {
+    return '$same equal · $diff different genotype';
+  }
+
+  @override
+  String vennOutside(int missing, int notAssessed) {
+    return 'Outside the diagram: $missing missing/uncertain and $notAssessed not assessed.';
+  }
+
+  @override
+  String get vennNotProportional =>
+      'The circles are not to scale: the numbers give the amounts.';
 }

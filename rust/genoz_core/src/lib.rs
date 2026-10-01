@@ -13,6 +13,7 @@ pub mod build;
 pub mod call;
 pub mod chrom;
 pub mod compare;
+pub mod density;
 pub mod digest;
 pub mod error;
 pub mod fields;

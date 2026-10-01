@@ -16,7 +16,7 @@ use genoz_core::manifest::OutputRef;
 use genoz_core::results::{export_rows, ExportFormat, ResultReader, RowIndex};
 use genoz_core::synth::{write_synthetic_vcf, SynthParams};
 
-use super::analysis::{forget_key, manifest_json, page_of, parse_filter, ResultPage};
+use super::analysis::{density_of, forget_key, manifest_json, page_of, parse_filter, ResultPage};
 
 /// Inspeciona um VCF já em memória e devolve o relatório em JSON (com SHA-256).
 pub fn inspect_bytes(data: Vec<u8>) -> Result<String, String> {
@@ -145,6 +145,12 @@ pub fn result_page_loaded(key: String, filter_json: String, start: u32, count: u
     page_of(&mem_key(&key), &mut reader, &filter_json, start, count)
 }
 
+/// Densidade de um resultado carregado (mesma lógica de `result_density`).
+pub fn result_density_loaded(key: String, filter_json: String, bin_size: u64) -> Result<String, String> {
+    let mut reader = reader_for(&key)?;
+    density_of(&mut reader, &filter_json, bin_size)
+}
+
 pub struct ExportedBytes {
     pub data: Vec<u8>,
     pub rows: u64,
@@ -205,11 +211,22 @@ mod tests {
         // Mesmo ID de análise da CLI e do Android.
         assert!(out.manifest_json.contains("\"analysis_id\": \"c7e0bc9d-f41f-8309-b678-5e20bea871b2\""));
 
+        let (rows_bgz, rows_idx) = (out.rows_bgz.clone(), out.rows_idx.clone());
         result_load("t1".into(), out.rows_bgz, out.rows_idx).unwrap();
         let page = result_page_loaded("t1".into(), r#"{"categories":["only_a"]}"#.into(), 0, 10).unwrap();
         assert_eq!(page.total, 4);
         let csv = export_loaded("t1".into(), "{}".into(), "csv".into(), "A".into(), "B".into()).unwrap();
         assert_eq!(csv.rows, 12);
+        // Densidade: memória = arquivo, e soma = total de linhas.
+        let mem = result_density_loaded("t1".into(), "{}".into(), 1_000_000).unwrap();
+        let dir = std::env::temp_dir().join(format!("genoz_density_{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("rows.bgz"), &rows_bgz).unwrap();
+        std::fs::write(dir.join("rows.idx"), &rows_idx).unwrap();
+        let disk = super::super::analysis::result_density(dir.to_string_lossy().into(), "{}".into(), 1_000_000).unwrap();
+        std::fs::remove_dir_all(&dir).ok();
+        assert_eq!(mem, disk);
+        assert!(mem.contains("\"total\":12"), "{mem}");
         result_unload("t1".into());
         assert!(!result_is_loaded("t1".into()));
     }

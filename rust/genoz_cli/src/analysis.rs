@@ -96,6 +96,20 @@ pub struct ViewArgs {
     pub filter: RowFilterArgs,
 }
 
+#[derive(Args)]
+pub struct DensityArgs {
+    /// Pasta de resultado criada por `compare`.
+    pub dir: PathBuf,
+    /// Tamanho de cada faixa, em pares de bases.
+    #[arg(long, default_value_t = genoz_core::density::DEFAULT_BIN_SIZE)]
+    pub bin: u64,
+    /// Saída em JSON (a mesma estrutura que o app desenha no ideograma).
+    #[arg(long)]
+    pub json: bool,
+    #[command(flatten)]
+    pub filter: RowFilterArgs,
+}
+
 fn selector(name: &Option<String>) -> SampleSelector {
     name.clone().map_or(SampleSelector::First, SampleSelector::Name)
 }
@@ -371,6 +385,27 @@ pub fn view_cmd(args: ViewArgs) -> Result<(), GenozError> {
             r.a.gt.as_deref().unwrap_or("·"),
             r.b.gt.as_deref().unwrap_or("·")
         );
+    }
+    Ok(())
+}
+
+pub fn density_cmd(args: DensityArgs) -> Result<(), GenozError> {
+    let mut reader = open_result(&args.dir)?;
+    let filter = args.filter.filter()?;
+    let map = genoz_core::density::density(&mut reader, &filter, args.bin)?;
+    if args.json {
+        println!("{}", serde_json::to_string_pretty(&map).map_err(|e| GenozError::InvalidParam(e.to_string()))?);
+        return Ok(());
+    }
+    println!("{} linhas — faixas de {} pb", map.total, args.bin);
+    println!("{:<6}{:>8}{:>14}  {}", "chrom", "linhas", "maior pos", "categorias");
+    for c in &map.chroms {
+        let cats: Vec<String> = c
+            .counts
+            .iter()
+            .map(|(cat, bins)| format!("{} {}", cat.label(), bins.iter().sum::<u32>()))
+            .collect();
+        println!("{:<6}{:>8}{:>14}  {}", c.chrom, c.total, c.max_pos, cats.join(" · "));
     }
     Ok(())
 }
