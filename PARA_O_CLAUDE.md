@@ -1,19 +1,28 @@
 # Recado do Claude para o próximo Claude
 
-**Atualizado em:** 01/10/2026, ao concluir o **Módulo 7 — Android completo** (commit `aebc2b9`).
-**Uso de tokens ao escrever:** ~160 mil de 15 milhões neste trecho (bem abaixo de 90%), então:
+**Atualizado em:** 01/10/2026, ao concluir o **Módulo 8 — Visualização e modo estudante** (commit `29c73e7`).
+**Uso de tokens ao escrever:** ~275 mil de 15 milhões neste trecho (bem abaixo de 90%), então:
 
-## ✅ Pode começar o Módulo 8 — Visualização e modo estudante
+## ✅ Pode começar o Módulo 9 — Arquivos de consumidor e multiamostra
 
 Regra do usuário: ao fim de cada módulo, atualizar este recado dizendo que o próximo pode começar, **somente se o uso de tokens estiver abaixo de 90%**.
 
 ### Pendências que dependem do usuário (ações públicas ou de conta)
 - **Site no GitHub Pages** (Módulo 6): Settings → Pages → Source: GitHub Actions; e variável de repositório `GENOZ_PAGES` = `1`.
-- **Release do APK** (Módulo 7): criar a tag `v0.7.0` (o workflow "APK Android e iOS" anexa os APKs a um pre-release). Só com o "sim" do usuário.
+- **Release do APK** (Módulo 7): criar a tag da versão atual, ex.: `v0.8.0` (o workflow "APK Android e iOS" anexa os APKs a um pre-release). Só com o "sim" do usuário.
 - **Chave de assinatura** do APK: sem os secrets `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` o APK sai com chave de depuração (cada runner tem uma diferente → atualizar pode exigir desinstalar). Gerar a chave com `keytool` e o usuário colar os 4 secrets (ou deixar para o Módulo 13).
 
-### O que fazer no Módulo 8
-Seção "Módulo 8" de `docs/modulos/PLANO_DE_MODULOS.md` (escrever o contrato antes de implementar).
+### O que fazer no Módulo 9
+Seção "Módulo 9" de `docs/modulos/PLANO_DE_MODULOS.md` (escrever o contrato antes de implementar).
+Já existe: seleção de amostra no núcleo (`SampleSelector`) e na tela de comparação; arquivos 23andMe são
+recusados com mensagem (`test_fixtures/vcf/not_vcf_23andme_like.txt`). Pendência que cai aqui: exportações
+grandes ainda passam pela memória do Dart (streaming).
+
+### Como o modo estudante funciona (Módulo 8)
+- Conteúdo em `app/assets/aprender/` (trilhas.json, glossario.json, dados/). Perguntas novas: `compute` em
+  `lib/features/learn/grading.dart` (respostas são CALCULADAS do resultado, ADR-014).
+- O dataset sintético foi gerado com `genoz-cli synth --seed 2026 --samples 2 --variants-per-chrom 120 --chroms autossomos`.
+- Ao mexer em textos, confira os glifos (ver "Ambiente"): caractere fora de Inter/Poppins vira quadrado no navegador.
 
 ### Ambiente (Windows) — lembretes
 - **Flutter: usar PowerShell com `flutter.bat`.** No Git Bash, o script `flutter` resolve a junction `C:\flutter` para o caminho real com espaço, e os build hooks quebram ("'C:\Users\Cauan' não é reconhecido").
@@ -29,7 +38,11 @@ Seção "Módulo 8" de `docs/modulos/PLANO_DE_MODULOS.md` (escrever o contrato a
 - Telas do sistema com FLAG_SECURE saem pretas no screencap: ler a tela com `uiautomator dump`.
 - Se rodar `dart run flutter_native_splash:create` de novo, conferir que os temas em `android/app/src/main/res/values*/styles.xml` continuam `Theme.AppCompat.*` (exigência da biometria).
 - Depois de `flutter_rust_bridge_codegen generate`, rodar `dart run build_runner build --delete-conflicting-outputs`.
-- Verificação: `cargo test --workspace` + clippy em `rust/` e `app/rust/`; `flutter analyze` + `flutter test` em `app/`.
+- Verificação: `cargo fmt --all --check` + `cargo clippy --workspace --all-targets -- -D warnings` + `cargo test --workspace` em `rust/` (o CI exige os três); `flutter analyze` + `flutter test` em `app/`.
+- **`dart format` reformata arquivos inteiros** (estilo novo): rode só em arquivos NOVOS, nunca em arquivos existentes.
+- Glifos: conferir que todo caractere visível existe em `assets/fonts/Inter-*.ttf` (fontTools, `getBestCmap()`); o site não baixa fontes de reserva.
+- Testes de widget: `rootBundle.loadString` com cache prende Futures entre testes (usar `cache: false`); listas preguiçosas não constroem itens fora da tela (use `ensureVisible`/`scrollUntilVisible` com `scrollable:` explícito).
+- Emulador: tela de bloqueio do aparelho tem PIN 1111 (acordar: `input keyevent 224`, deslizar, digitar 1111).
 
 ### Pendências conhecidas
 - Exportações muito grandes passam pela memória do Dart (Módulo 9: streaming); no navegador, limite de 400 MB por arquivo.
