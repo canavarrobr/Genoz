@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -214,7 +215,8 @@ class _TableTabState extends ConsumerState<TableTab> with AutomaticKeepAliveClie
     return Scrollbar(
       child: ListView.builder(
         itemCount: total,
-        itemExtent: _rowHeight,
+        // Altura fixa (rolagem rápida em milhões de linhas), mas que cresce com a fonte do sistema.
+        itemExtent: max(_rowHeight, 20 + MediaQuery.textScalerOf(context).scale(46)),
         itemBuilder: (context, i) {
           final page = i ~/ _pageSize;
           final rows = _pages[page];

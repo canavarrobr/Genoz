@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'features/about/about_screen.dart';
@@ -10,7 +11,11 @@ import 'features/projects/journal_screen.dart';
 import 'features/projects/project_screen.dart';
 import 'features/projects/projects_screen.dart';
 import 'features/report/file_report_screen.dart';
+import 'features/settings/lock.dart';
+import 'features/settings/settings.dart';
+import 'features/settings/settings_screen.dart';
 import 'l10n/generated/app_localizations.dart';
+import 'platform/device_security.dart';
 import 'ui/theme.dart';
 
 GoRouter buildRouter() => GoRouter(
@@ -20,6 +25,7 @@ GoRouter buildRouter() => GoRouter(
         GoRoute(path: '/', builder: (_, _) => const ProjectsScreen()),
         GoRoute(path: '/sobre', builder: (_, _) => const AboutScreen()),
         GoRoute(path: '/privacidade', builder: (_, _) => const PrivacyScreen()),
+        GoRoute(path: '/ajustes', builder: (_, _) => const SettingsScreen()),
         GoRoute(
           path: '/projeto/:id',
           builder: (_, s) => ProjectScreen(projectId: s.pathParameters['id']!),
@@ -45,29 +51,42 @@ GoRouter buildRouter() => GoRouter(
       ],
     );
 
-class GenozApp extends StatefulWidget {
+class GenozApp extends ConsumerStatefulWidget {
   const GenozApp({super.key});
 
   @override
-  State<GenozApp> createState() => _GenozAppState();
+  ConsumerState<GenozApp> createState() => _GenozAppState();
 }
 
-class _GenozAppState extends State<GenozApp> {
+class _GenozAppState extends ConsumerState<GenozApp> {
   late final GoRouter _router = buildRouter();
 
   @override
-  Widget build(BuildContext context) => MaterialApp.router(
-        onGenerateTitle: (ctx) => AppLocalizations.of(ctx).appTitle,
-        debugShowCheckedModeBanner: false,
-        theme: genozTheme(Brightness.light),
-        darkTheme: genozTheme(Brightness.dark),
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: AppLocalizations.supportedLocales,
-        routerConfig: _router,
-      );
+  void initState() {
+    super.initState();
+    SecureScreen.set(ref.read(settingsProvider).secureScreen);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(settingsProvider.select((s) => s.secureScreen), (_, on) => SecureScreen.set(on));
+    final settings = ref.watch(settingsProvider);
+    return MaterialApp.router(
+      onGenerateTitle: (ctx) => AppLocalizations.of(ctx).appTitle,
+      debugShowCheckedModeBanner: false,
+      theme: genozTheme(Brightness.light),
+      darkTheme: genozTheme(Brightness.dark),
+      themeMode: settings.themeMode,
+      locale: settings.locale == null ? null : Locale(settings.locale!),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: _router,
+      builder: (context, child) => LockGate(child: child ?? const SizedBox.shrink()),
+    );
+  }
 }

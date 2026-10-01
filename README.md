@@ -22,7 +22,8 @@ Os dados genômicos são processados no próprio dispositivo; nada é enviado a 
 | 4 — Telas de análise (comparação, tabela, filtros, QC, exportação) | concluído |
 | 5 — Estética e identidade visual | concluído |
 | 6 — Web local-first (site de prévia) | concluído |
-| 7 — Android completo (APK de prévia) | próximo |
+| 7 — Android completo (APK de prévia) | concluído |
+| 8 — Visualização e modo estudante | próximo |
 
 ## Preparar o computador (Windows)
 
@@ -66,6 +67,19 @@ flutter run
 
 Na primeira vez a compilação demora alguns minutos, porque o núcleo Rust é compilado para Android.
 No app: **Novo projeto → Gerar exemplo sintético** (ou **Importar VCF**) → toque no arquivo para ver o relatório.
+
+## Instalar no celular Android (Módulo 7)
+
+O GitHub Actions gera o APK a cada mudança (workflow **APK Android e iOS** → artefato `genoz-apk`).
+Para compilar no próprio computador, no PowerShell, dentro de `Genoz\app`:
+
+```powershell
+flutter build apk --release --split-per-abi
+```
+
+O arquivo `build\app\outputs\flutter-apk\app-arm64-v8a-release.apk` serve para a maioria dos celulares.
+O app **não pede permissão de internet** nem de acesso aos arquivos: o seletor do sistema entrega só o arquivo
+escolhido. Em **Ajustes** (menu ☰): tema, idioma, bloqueio por PIN/digital, proteção de tela e "Apagar todos os dados".
 
 ## Rodar o site (Módulo 6)
 

@@ -1537,6 +1537,270 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'durante análise'**
   String get checkDuringTag;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ajustes'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsAppearance.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aparência'**
+  String get settingsAppearance;
+
+  /// No description provided for @settingsTheme.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tema'**
+  String get settingsTheme;
+
+  /// No description provided for @settingsSystem.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sistema'**
+  String get settingsSystem;
+
+  /// No description provided for @settingsLight.
+  ///
+  /// In pt, this message translates to:
+  /// **'Claro'**
+  String get settingsLight;
+
+  /// No description provided for @settingsDark.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escuro'**
+  String get settingsDark;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Idioma'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsLock.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bloqueio'**
+  String get settingsLock;
+
+  /// No description provided for @settingsPinLock.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bloquear com PIN'**
+  String get settingsPinLock;
+
+  /// No description provided for @settingsPinOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Genoz pede o PIN ao abrir'**
+  String get settingsPinOn;
+
+  /// No description provided for @settingsPinOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desligado'**
+  String get settingsPinOff;
+
+  /// No description provided for @settingsChangePin.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar o PIN'**
+  String get settingsChangePin;
+
+  /// No description provided for @settingsLockAfter.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedir de novo após'**
+  String get settingsLockAfter;
+
+  /// No description provided for @minutes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} min'**
+  String minutes(int count);
+
+  /// No description provided for @settingsBiometrics.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desbloquear com biometria'**
+  String get settingsBiometrics;
+
+  /// No description provided for @settingsBiometricsUnavailable.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma digital ou rosto cadastrado neste aparelho'**
+  String get settingsBiometricsUnavailable;
+
+  /// No description provided for @settingsLockNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'O bloqueio impede que outra pessoa abra o Genoz neste aparelho. Ele não criptografa os arquivos. O PIN não pode ser recuperado: se você o esquecer, a única saída é apagar todos os dados.'**
+  String get settingsLockNote;
+
+  /// No description provided for @settingsScreen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tela'**
+  String get settingsScreen;
+
+  /// No description provided for @settingsSecureScreen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Proteger a tela'**
+  String get settingsSecureScreen;
+
+  /// No description provided for @settingsSecureScreenHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bloqueia capturas de tela e esconde o conteúdo na lista de apps recentes'**
+  String get settingsSecureScreenHint;
+
+  /// No description provided for @settingsData.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dados'**
+  String get settingsData;
+
+  /// No description provided for @wipeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apagar todos os dados'**
+  String get wipeTitle;
+
+  /// No description provided for @wipeSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Projetos, arquivos, resultados, diário, ajustes e PIN'**
+  String get wipeSubtitle;
+
+  /// No description provided for @wipeBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Isto apaga do aparelho tudo o que o Genoz guardou: projetos, cópias dos arquivos VCF, resultados das comparações, anotações, diário, ajustes e PIN. Os arquivos originais que você escolheu ao importar não são tocados. Não há como desfazer.'**
+  String get wipeBody;
+
+  /// No description provided for @wipeWord.
+  ///
+  /// In pt, this message translates to:
+  /// **'APAGAR'**
+  String get wipeWord;
+
+  /// No description provided for @wipeTypeWord.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para confirmar, digite {word}:'**
+  String wipeTypeWord(String word);
+
+  /// No description provided for @wipeButton.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apagar tudo'**
+  String get wipeButton;
+
+  /// No description provided for @wipeDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os dados foram apagados.'**
+  String get wipeDone;
+
+  /// No description provided for @lockTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Genoz bloqueado'**
+  String get lockTitle;
+
+  /// No description provided for @lockWrongPin.
+  ///
+  /// In pt, this message translates to:
+  /// **'PIN incorreto'**
+  String get lockWrongPin;
+
+  /// No description provided for @lockWait.
+  ///
+  /// In pt, this message translates to:
+  /// **'Muitas tentativas. Aguarde {seconds} s.'**
+  String lockWait(int seconds);
+
+  /// No description provided for @lockUseBiometrics.
+  ///
+  /// In pt, this message translates to:
+  /// **'Usar biometria'**
+  String get lockUseBiometrics;
+
+  /// No description provided for @lockForgot.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esqueci o PIN'**
+  String get lockForgot;
+
+  /// No description provided for @lockForgotBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'O PIN não fica guardado em lugar nenhum, só uma impressão dele que não pode ser revertida. Para voltar a usar o Genoz sem o PIN, é preciso apagar todos os dados deste aparelho. Os arquivos originais que você importou não são tocados.'**
+  String get lockForgotBody;
+
+  /// No description provided for @lockBack.
+  ///
+  /// In pt, this message translates to:
+  /// **'Voltar'**
+  String get lockBack;
+
+  /// No description provided for @lockBiometricReason.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desbloquear o Genoz'**
+  String get lockBiometricReason;
+
+  /// No description provided for @pinDigitsEntered.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} dígitos digitados'**
+  String pinDigitsEntered(int count);
+
+  /// No description provided for @pinErase.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apagar dígito'**
+  String get pinErase;
+
+  /// No description provided for @pinConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirmar'**
+  String get pinConfirm;
+
+  /// No description provided for @pinMismatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os PINs não conferem. Comece de novo.'**
+  String get pinMismatch;
+
+  /// No description provided for @pinCurrent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite o PIN atual'**
+  String get pinCurrent;
+
+  /// No description provided for @pinNew.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha um PIN'**
+  String get pinNew;
+
+  /// No description provided for @pinRepeat.
+  ///
+  /// In pt, this message translates to:
+  /// **'Repita o PIN'**
+  String get pinRepeat;
+
+  /// No description provided for @pinRule.
+  ///
+  /// In pt, this message translates to:
+  /// **'De 4 a 8 dígitos'**
+  String get pinRule;
 }
 
 class _AppLocalizationsDelegate

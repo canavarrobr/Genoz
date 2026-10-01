@@ -15,7 +15,11 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>genoz</string>
+		<string>Genoz</string>
+		<key>NSFaceIDUsageDescription</key>
+		<string>O Genoz usa o Face ID só para desbloquear o app, se você ativar essa opção nos Ajustes.</string>
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>

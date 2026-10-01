@@ -828,4 +828,150 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get checkDuringTag => 'durante análise';
+
+  @override
+  String get settingsTitle => 'Ajustes';
+
+  @override
+  String get settingsAppearance => 'Aparência';
+
+  @override
+  String get settingsTheme => 'Tema';
+
+  @override
+  String get settingsSystem => 'Sistema';
+
+  @override
+  String get settingsLight => 'Claro';
+
+  @override
+  String get settingsDark => 'Escuro';
+
+  @override
+  String get settingsLanguage => 'Idioma';
+
+  @override
+  String get settingsLock => 'Bloqueio';
+
+  @override
+  String get settingsPinLock => 'Bloquear com PIN';
+
+  @override
+  String get settingsPinOn => 'O Genoz pede o PIN ao abrir';
+
+  @override
+  String get settingsPinOff => 'Desligado';
+
+  @override
+  String get settingsChangePin => 'Trocar o PIN';
+
+  @override
+  String get settingsLockAfter => 'Pedir de novo após';
+
+  @override
+  String minutes(int count) {
+    return '$count min';
+  }
+
+  @override
+  String get settingsBiometrics => 'Desbloquear com biometria';
+
+  @override
+  String get settingsBiometricsUnavailable =>
+      'Nenhuma digital ou rosto cadastrado neste aparelho';
+
+  @override
+  String get settingsLockNote =>
+      'O bloqueio impede que outra pessoa abra o Genoz neste aparelho. Ele não criptografa os arquivos. O PIN não pode ser recuperado: se você o esquecer, a única saída é apagar todos os dados.';
+
+  @override
+  String get settingsScreen => 'Tela';
+
+  @override
+  String get settingsSecureScreen => 'Proteger a tela';
+
+  @override
+  String get settingsSecureScreenHint =>
+      'Bloqueia capturas de tela e esconde o conteúdo na lista de apps recentes';
+
+  @override
+  String get settingsData => 'Dados';
+
+  @override
+  String get wipeTitle => 'Apagar todos os dados';
+
+  @override
+  String get wipeSubtitle =>
+      'Projetos, arquivos, resultados, diário, ajustes e PIN';
+
+  @override
+  String get wipeBody =>
+      'Isto apaga do aparelho tudo o que o Genoz guardou: projetos, cópias dos arquivos VCF, resultados das comparações, anotações, diário, ajustes e PIN. Os arquivos originais que você escolheu ao importar não são tocados. Não há como desfazer.';
+
+  @override
+  String get wipeWord => 'APAGAR';
+
+  @override
+  String wipeTypeWord(String word) {
+    return 'Para confirmar, digite $word:';
+  }
+
+  @override
+  String get wipeButton => 'Apagar tudo';
+
+  @override
+  String get wipeDone => 'Todos os dados foram apagados.';
+
+  @override
+  String get lockTitle => 'Genoz bloqueado';
+
+  @override
+  String get lockWrongPin => 'PIN incorreto';
+
+  @override
+  String lockWait(int seconds) {
+    return 'Muitas tentativas. Aguarde $seconds s.';
+  }
+
+  @override
+  String get lockUseBiometrics => 'Usar biometria';
+
+  @override
+  String get lockForgot => 'Esqueci o PIN';
+
+  @override
+  String get lockForgotBody =>
+      'O PIN não fica guardado em lugar nenhum, só uma impressão dele que não pode ser revertida. Para voltar a usar o Genoz sem o PIN, é preciso apagar todos os dados deste aparelho. Os arquivos originais que você importou não são tocados.';
+
+  @override
+  String get lockBack => 'Voltar';
+
+  @override
+  String get lockBiometricReason => 'Desbloquear o Genoz';
+
+  @override
+  String pinDigitsEntered(int count) {
+    return '$count dígitos digitados';
+  }
+
+  @override
+  String get pinErase => 'Apagar dígito';
+
+  @override
+  String get pinConfirm => 'Confirmar';
+
+  @override
+  String get pinMismatch => 'Os PINs não conferem. Comece de novo.';
+
+  @override
+  String get pinCurrent => 'Digite o PIN atual';
+
+  @override
+  String get pinNew => 'Escolha um PIN';
+
+  @override
+  String get pinRepeat => 'Repita o PIN';
+
+  @override
+  String get pinRule => 'De 4 a 8 dígitos';
 }

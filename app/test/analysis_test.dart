@@ -10,6 +10,9 @@ import 'package:genoz/core/compare_models.dart';
 import 'package:genoz/core/inspect_report.dart';
 import 'package:genoz/features/analysis/analysis_screen.dart';
 import 'package:genoz/features/compare/compare_controller.dart';
+import 'package:genoz/features/projects/projects_screen.dart';
+import 'package:genoz/features/projects/project_screen.dart';
+import 'package:genoz/features/compare/compare_setup_screen.dart';
 import 'package:genoz/l10n/generated/app_localizations.dart';
 import 'package:genoz/persistence/analysis_repository.dart';
 import 'package:genoz/persistence/database.dart';
@@ -194,6 +197,66 @@ void main() {
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));
     await tester.pumpAndSettle();
     expect(find.text('1:1000  A > G'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.runAsync(env.dispose);
+  });
+
+  testWidgets('telas principais cabem em tela pequena (320×568) com fonte 130%', (tester) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    final env = await tester.runAsync(TestEnv.create);
+    final (pid, a, b) = (await tester.runAsync(() => projectWithTwoFiles(env!)))!;
+    await tester.runAsync(() => env!.container.read(compareControllerProvider.notifier).run(
+          projectId: pid,
+          a: (file: a, sample: null),
+          b: (file: b, sample: null),
+          options: const CompareOptions(),
+          journalMessage: (x, y, id) => '',
+        ));
+    final id = (env!.container.read(compareControllerProvider) as CompareSucceeded).analysisId;
+
+    Future<void> show(Widget screen, {String? tab}) async {
+      await tester.pumpWidget(UncontrolledProviderScope(
+        container: env.container,
+        child: MaterialApp(
+          theme: genozTheme(Brightness.light),
+          locale: const Locale('pt'),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: screen,
+        ),
+      ));
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));
+      await tester.pumpAndSettle();
+      if (tab != null) {
+        await tester.tap(find.text(tab));
+        // A aba lê arquivos do disco em vários passos: alterna espera real e quadros até o carregamento sumir.
+        for (var i = 0; i < 40; i++) {
+          await tester.pump(const Duration(milliseconds: 100));
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+          if (i > 3 && find.byType(CircularProgressIndicator).evaluate().isEmpty) break;
+        }
+        await tester.pumpAndSettle();
+      }
+      expect(tester.takeException(), isNull, reason: '${screen.runtimeType} ${tab ?? ''}');
+    }
+
+    await show(const ProjectsScreen());
+    await show(ProjectScreen(projectId: pid));
+    await show(CompareSetupScreen(projectId: pid));
+    await show(AnalysisScreen(analysisId: id));
+    await show(AnalysisScreen(analysisId: id), tab: 'Tabela');
+    await show(AnalysisScreen(analysisId: id), tab: 'QC');
 
     await tester.pumpWidget(const SizedBox());
     await tester.runAsync(env.dispose);

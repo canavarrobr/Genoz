@@ -489,5 +489,77 @@
     }
   },
   "webUnsupported": "Este navegador não oferece os recursos necessários (WebAssembly com threads e armazenamento privado). Use Chrome, Edge ou Firefox atualizados.",
-  "checkDuringTag": "durante análise"
+  "checkDuringTag": "durante análise",
+  "settingsTitle": "Ajustes",
+  "settingsAppearance": "Aparência",
+  "settingsTheme": "Tema",
+  "settingsSystem": "Sistema",
+  "settingsLight": "Claro",
+  "settingsDark": "Escuro",
+  "settingsLanguage": "Idioma",
+  "settingsLock": "Bloqueio",
+  "settingsPinLock": "Bloquear com PIN",
+  "settingsPinOn": "O Genoz pede o PIN ao abrir",
+  "settingsPinOff": "Desligado",
+  "settingsChangePin": "Trocar o PIN",
+  "settingsLockAfter": "Pedir de novo após",
+  "minutes": "{count} min",
+  "@minutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsBiometrics": "Desbloquear com biometria",
+  "settingsBiometricsUnavailable": "Nenhuma digital ou rosto cadastrado neste aparelho",
+  "settingsLockNote": "O bloqueio impede que outra pessoa abra o Genoz neste aparelho. Ele não criptografa os arquivos. O PIN não pode ser recuperado: se você o esquecer, a única saída é apagar todos os dados.",
+  "settingsScreen": "Tela",
+  "settingsSecureScreen": "Proteger a tela",
+  "settingsSecureScreenHint": "Bloqueia capturas de tela e esconde o conteúdo na lista de apps recentes",
+  "settingsData": "Dados",
+  "wipeTitle": "Apagar todos os dados",
+  "wipeSubtitle": "Projetos, arquivos, resultados, diário, ajustes e PIN",
+  "wipeBody": "Isto apaga do aparelho tudo o que o Genoz guardou: projetos, cópias dos arquivos VCF, resultados das comparações, anotações, diário, ajustes e PIN. Os arquivos originais que você escolheu ao importar não são tocados. Não há como desfazer.",
+  "wipeWord": "APAGAR",
+  "wipeTypeWord": "Para confirmar, digite {word}:",
+  "@wipeTypeWord": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "wipeButton": "Apagar tudo",
+  "wipeDone": "Todos os dados foram apagados.",
+  "lockTitle": "Genoz bloqueado",
+  "lockWrongPin": "PIN incorreto",
+  "lockWait": "Muitas tentativas. Aguarde {seconds} s.",
+  "@lockWait": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "lockUseBiometrics": "Usar biometria",
+  "lockForgot": "Esqueci o PIN",
+  "lockForgotBody": "O PIN não fica guardado em lugar nenhum, só uma impressão dele que não pode ser revertida. Para voltar a usar o Genoz sem o PIN, é preciso apagar todos os dados deste aparelho. Os arquivos originais que você importou não são tocados.",
+  "lockBack": "Voltar",
+  "lockBiometricReason": "Desbloquear o Genoz",
+  "pinDigitsEntered": "{count} dígitos digitados",
+  "@pinDigitsEntered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pinErase": "Apagar dígito",
+  "pinConfirm": "Confirmar",
+  "pinMismatch": "Os PINs não conferem. Comece de novo.",
+  "pinCurrent": "Digite o PIN atual",
+  "pinNew": "Escolha um PIN",
+  "pinRepeat": "Repita o PIN",
+  "pinRule": "De 4 a 8 dígitos"
 }

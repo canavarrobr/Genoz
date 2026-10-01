@@ -826,4 +826,150 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checkDuringTag => 'during analysis';
+
+  @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsAppearance => 'Appearance';
+
+  @override
+  String get settingsTheme => 'Theme';
+
+  @override
+  String get settingsSystem => 'System';
+
+  @override
+  String get settingsLight => 'Light';
+
+  @override
+  String get settingsDark => 'Dark';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsLock => 'Lock';
+
+  @override
+  String get settingsPinLock => 'Lock with PIN';
+
+  @override
+  String get settingsPinOn => 'Genoz asks for the PIN when opened';
+
+  @override
+  String get settingsPinOff => 'Off';
+
+  @override
+  String get settingsChangePin => 'Change PIN';
+
+  @override
+  String get settingsLockAfter => 'Ask again after';
+
+  @override
+  String minutes(int count) {
+    return '$count min';
+  }
+
+  @override
+  String get settingsBiometrics => 'Unlock with biometrics';
+
+  @override
+  String get settingsBiometricsUnavailable =>
+      'No fingerprint or face enrolled on this device';
+
+  @override
+  String get settingsLockNote =>
+      'The lock stops other people from opening Genoz on this device. It does not encrypt the files. The PIN cannot be recovered: if you forget it, the only way out is to delete all data.';
+
+  @override
+  String get settingsScreen => 'Screen';
+
+  @override
+  String get settingsSecureScreen => 'Protect the screen';
+
+  @override
+  String get settingsSecureScreenHint =>
+      'Blocks screenshots and hides the content in the recent apps list';
+
+  @override
+  String get settingsData => 'Data';
+
+  @override
+  String get wipeTitle => 'Delete all data';
+
+  @override
+  String get wipeSubtitle =>
+      'Projects, files, results, journal, settings and PIN';
+
+  @override
+  String get wipeBody =>
+      'This deletes everything Genoz stored on this device: projects, copies of the VCF files, comparison results, notes, journal, settings and PIN. The original files you picked when importing are not touched. This cannot be undone.';
+
+  @override
+  String get wipeWord => 'DELETE';
+
+  @override
+  String wipeTypeWord(String word) {
+    return 'To confirm, type $word:';
+  }
+
+  @override
+  String get wipeButton => 'Delete everything';
+
+  @override
+  String get wipeDone => 'All data was deleted.';
+
+  @override
+  String get lockTitle => 'Genoz is locked';
+
+  @override
+  String get lockWrongPin => 'Wrong PIN';
+
+  @override
+  String lockWait(int seconds) {
+    return 'Too many attempts. Wait $seconds s.';
+  }
+
+  @override
+  String get lockUseBiometrics => 'Use biometrics';
+
+  @override
+  String get lockForgot => 'I forgot the PIN';
+
+  @override
+  String get lockForgotBody =>
+      'The PIN is not stored anywhere — only a fingerprint of it that cannot be reversed. To use Genoz again without the PIN, all data on this device must be deleted. The original files you imported are not touched.';
+
+  @override
+  String get lockBack => 'Back';
+
+  @override
+  String get lockBiometricReason => 'Unlock Genoz';
+
+  @override
+  String pinDigitsEntered(int count) {
+    return '$count digits entered';
+  }
+
+  @override
+  String get pinErase => 'Erase digit';
+
+  @override
+  String get pinConfirm => 'Confirm';
+
+  @override
+  String get pinMismatch => 'The PINs don\'t match. Start over.';
+
+  @override
+  String get pinCurrent => 'Enter the current PIN';
+
+  @override
+  String get pinNew => 'Choose a PIN';
+
+  @override
+  String get pinRepeat => 'Repeat the PIN';
+
+  @override
+  String get pinRule => '4 to 8 digits';
 }

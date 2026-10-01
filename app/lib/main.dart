@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
+import 'features/settings/settings.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'platform/network_audit.dart';
 import 'persistence/app_storage.dart';
@@ -21,9 +22,13 @@ Future<void> main() async {
     return;
   }
   final storage = await AppStorage.open();
+  final settings = await AppSettings.load(storage.blobs);
   runApp(
     ProviderScope(
-      overrides: [appStorageProvider.overrideWithValue(storage)],
+      overrides: [
+        appStorageProvider.overrideWithValue(storage),
+        initialSettingsProvider.overrideWithValue(settings),
+      ],
       child: const GenozApp(),
     ),
   );

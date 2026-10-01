@@ -19,7 +19,7 @@ Um APK e um site de prévia aparecem já nos Módulos 6 e 7 (depois do módulo d
 | 4 ✅ | Telas de análise | Comparação, tabela, filtros, QC, exportação e manifesto no app | Android (emulador) |
 | 5 ✅ | **Estética e identidade visual** | Logo, ícone, abertura, paleta, tipografia e componentes do [guia de estilo](../estilo/GUIA_DE_ESTILO.md) aplicados em todo o app | Web + Android |
 | 6 ✅ | Web local-first | **Site de prévia** (GitHub Pages) comparando VCF no navegador sem upload | Web |
-| 7 | Android completo | **APK de prévia** para instalar no celular; bloqueio do app; privacidade | Android |
+| 7 ✅ | Android completo | **APK de prévia** para instalar no celular; bloqueio do app; privacidade | Android |
 | 8 | Visualização + modo estudante | Ideograma, densidade, visualizador de região, trilhas guiadas, dados sintéticos | Web + Android |
 | 9 | Arquivos de consumidor + multiamostra | Importa 23andMe/AncestryDNA/MyHeritage; escolhe amostra em VCF multi-amostra | Web + Android |
 | 10 | Anotação local | Pacotes (genes, rsID, ClinVar, frequências) baixados uma vez; busca por gene | Web + Android |
@@ -338,3 +338,36 @@ Pendências conhecidas: exportações muito grandes passam pela memória do Dart
 
 **Status:** concluído em 30/09/2026 (site pronto; publicação no GitHub Pages aguarda confirmação do usuário — variável `GENOZ_PAGES=1`). Verificado no Edge (headless, servidor estático **sem** cabeçalhos, como o GitHub Pages): o service worker deu isolamento de origem após um recarregamento → criar projeto → importar pessoa_a e pessoa_b pelo seletor → comparar → ID de análise `c7e0bc9d-f41f-8309-b678-5e20bea871b2`, idêntico ao do PC e do Android → "Verificar privacidade": 0 requisições externas → recarregar com o servidor desligado: app abre offline com os dados. 62 testes Dart. Decisões em [ADR-012](../adr/ADR-012-web-isolamento-por-service-worker.md).
 Limitações conhecidas: o painel de navegador embutido do app Claude bloqueia service workers (usar Chrome/Edge/Firefox); limite de 400 MB por arquivo no navegador; o CSP precisa de `'unsafe-eval'` por causa do código gerado do wasm-bindgen.
+
+---
+
+## Contrato do Módulo 7 — Android completo (antes de implementar)
+
+**Entradas:** o app dos Módulos 3–6; aparelho Android (emulador API 35) e o navegador para as opções que fazem sentido na Web.
+
+**Saídas:**
+- tela **Ajustes** (menu ☰): tema (sistema/claro/escuro), idioma (sistema/português/inglês), bloqueio do app, proteção de tela, apagar todos os dados;
+- **bloqueio por PIN** (4–8 dígitos; guardado só como hash PBKDF2-SHA256 com sal; tentativas erradas geram espera crescente) e **biometria** opcional (impressão digital/rosto do sistema). O app bloqueia ao abrir e ao voltar depois de um tempo escolhido (1, 5 ou 15 min) em segundo plano;
+- **proteção de tela** (`FLAG_SECURE`): impede capturas e esconde o conteúdo na lista de apps recentes (Android);
+- **Apagar todos os dados**: projetos, arquivos, resultados, diário, ajustes e PIN — confirmação digitando uma palavra;
+- APK de release **sem a permissão INTERNET** (nem nenhuma de armazenamento: o seletor do sistema dá acesso só ao arquivo escolhido); backup em nuvem e transferência entre aparelhos continuam excluídos;
+- workflow do GitHub Actions que gera o APK a cada push (artefato) e, numa tag `v*`, o anexa a um release (criar release é ação pública: só com confirmação do usuário);
+- configuração iOS pronta: o workflow compila para iOS sem assinatura.
+
+**Invariantes:** o bloqueio não é criptografia (os arquivos continuam legíveis por quem tiver acesso de root ao aparelho; criptografia é o Módulo 11) — a tela diz isso; o PIN nunca é guardado em texto; esquecer o PIN só tem uma saída: apagar todos os dados; nada disso usa rede.
+
+**Erros:** biometria indisponível ou não cadastrada (opção desabilitada com explicação); PIN e confirmação diferentes; muitas tentativas erradas (espera).
+
+**Testes:** ajustes persistem e são reaplicados; hash do PIN (mesmo PIN confere, outro não, sal diferente a cada definição); espera crescente; bloqueio aparece ao iniciar e depois do tempo em segundo plano; apagar tudo deixa banco e pasta vazios; telas principais sem estouro de layout em tela pequena (320×568) com fonte 130%; verificação no emulador: permissões do APK (`aapt dump permissions`), bloqueio por PIN e por digital (`adb emu finger touch`), `FLAG_SECURE`.
+
+**Status:** concluído em 01/10/2026 (APK gerado pelo CI; release no GitHub aguarda confirmação do usuário — tag `v*`). Verificado no emulador Android (API 35), com o APK de release:
+- `aapt dump permissions`: só `USE_BIOMETRIC`/`USE_FINGERPRINT` — **sem INTERNET, sem armazenamento**; o CI falha se alguma aparecer.
+- ajustes de idioma e tema aplicados na hora e mantidos depois de fechar o app; PIN definido (duas vezes) → app reaberto bloqueado → PIN errado recusado, certo aceito;
+- digital cadastrada no emulador (`adb emu finger touch`) → biometria ligada e usada no desbloqueio;
+- 10 s em segundo plano não bloqueia; 65 s bloqueia (prazo de 1 min);
+- `FLAG_SECURE`: captura sai preta e a flag volta depois de reiniciar o app;
+- "Esqueci o PIN" → digitar APAGAR → app vazio, desbloqueado, ajustes padrão; nenhum arquivo de projeto, nem as cópias do seletor de arquivos em `cache/file_picker`, nem o nome do projeto antigo dentro do `genoz.sqlite` (VACUUM).
+
+Achados corrigidos no caminho: o seletor de arquivos deixava cópias dos VCF no cache do app (agora apagadas após cada importação e em "Apagar todos os dados"); linhas apagadas do SQLite ficavam nas páginas livres (VACUUM); o logo com assinatura e as linhas da tabela estouravam em tela de 320 px com fonte 130% (novo teste cobre todas as telas principais).
+77 testes Dart. Decisões em [ADR-013](../adr/ADR-013-bloqueio-do-app.md).
+Limitações: o bloqueio não criptografa os arquivos (Módulo 11); a assinatura definitiva do APK depende de secrets no repositório (até lá, chave de depuração — instalar uma versão nova pode exigir desinstalar a anterior).

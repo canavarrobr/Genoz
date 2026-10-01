@@ -19,13 +19,13 @@ class GenozSymbol extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SvgPicture.asset(
-        (onDark ?? Theme.of(context).brightness == Brightness.dark)
-            ? 'assets/marca/simbolo_escuro.svg'
-            : 'assets/marca/simbolo.svg',
-        height: height,
-        semanticsLabel: semanticLabel,
-        excludeFromSemantics: semanticLabel == null,
-      );
+    (onDark ?? Theme.of(context).brightness == Brightness.dark)
+        ? 'assets/marca/simbolo_escuro.svg'
+        : 'assets/marca/simbolo.svg',
+    height: height,
+    semanticsLabel: semanticLabel,
+    excludeFromSemantics: semanticLabel == null,
+  );
 }
 
 /// Símbolo + "Genoz" (+ assinatura opcional), como no logo do guia.
@@ -47,42 +47,47 @@ class GenozLogo extends StatelessWidget {
       image: true,
       label: 'Genoz',
       child: ExcludeSemantics(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GenozSymbol(height: size * (showSignature ? 1.9 : 1.25), onDark: dark),
-            SizedBox(width: size * 0.35),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Genoz',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    fontSize: size,
-                    height: 1.0,
-                    color: color,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                if (showSignature) ...[
-                  SizedBox(height: size * 0.18),
+        // Em telas estreitas (ou fonte grande) o logo encolhe em vez de estourar.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: AlignmentDirectional.centerStart,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GenozSymbol(height: size * (showSignature ? 1.9 : 1.25), onDark: dark),
+              SizedBox(width: size * 0.35),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    l.brandSignature,
+                    'Genoz',
                     style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                      fontSize: size * 0.26,
-                      letterSpacing: size * 0.08,
-                      color: dark ? Colors.white70 : GenozColors.textSecondary,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
+                      fontSize: size,
+                      height: 1.0,
+                      color: color,
+                      letterSpacing: -0.5,
                     ),
                   ),
+                  if (showSignature) ...[
+                    SizedBox(height: size * 0.18),
+                    Text(
+                      l.brandSignature,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                        fontSize: size * 0.26,
+                        letterSpacing: size * 0.08,
+                        color: dark ? Colors.white70 : GenozColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -99,10 +104,7 @@ class BrandHeader extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-      decoration: BoxDecoration(
-        gradient: GenozColors.headerGradient,
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: BoxDecoration(gradient: GenozColors.headerGradient, borderRadius: BorderRadius.circular(20)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -110,7 +112,12 @@ class BrandHeader extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             l.brandSlogan,
-            style: const TextStyle(fontFamily: 'Poppins', fontSize: 17, color: Colors.white, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 17,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           const SizedBox(height: 12),
           const PrivacyChip(onDark: true),
@@ -140,7 +147,10 @@ class GenozDrawer extends StatelessWidget {
           child: ListTile(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             leading: Icon(icon, color: Colors.white),
-            title: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
+            title: Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+            ),
             selected: active,
             onTap: () {
               // O contexto do menu some ao fechá-lo; o do Navigator continua ativo.
@@ -168,6 +178,7 @@ class GenozDrawer extends StatelessWidget {
             item(Icons.folder_outlined, l.menuProjects, '/'),
             item(Icons.info_outline, l.menuAbout, '/sobre'),
             item(Icons.verified_user_outlined, l.privacyCheckTitle, '/privacidade'),
+            item(Icons.settings_outlined, l.settingsTitle, '/ajustes'),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.all(24),
@@ -198,7 +209,11 @@ class EmptyState extends StatelessWidget {
           const SizedBox(height: 16),
           Text(title, style: t.titleLarge, textAlign: TextAlign.center),
           const SizedBox(height: 8),
-          Text(body, style: t.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant), textAlign: TextAlign.center),
+          Text(
+            body,
+            style: t.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );

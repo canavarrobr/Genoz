@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Única permissão do app: biometria opcional para desbloquear. Sem INTERNET, sem armazenamento
+         (o seletor do sistema dá acesso só ao arquivo escolhido). -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
     <application
         android:label="Genoz"
         android:allowBackup="false"

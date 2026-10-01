@@ -11,3 +11,4 @@ As decisões tomadas durante o desenvolvimento ficam registradas aqui, uma por a
 | [ADR-010](ADR-010-ausencia-nao-e-referencia.md) | Ausência de registro não é genótipo de referência | 2 |
 | [ADR-011](ADR-011-fontes-e-marca.md) | Fontes embutidas e marca gerada por script | 5 |
 | [ADR-012](ADR-012-web-isolamento-por-service-worker.md) | Web: isolamento de origem por service worker, arquivos no OPFS | 6 |
+| [ADR-013](ADR-013-bloqueio-do-app.md) | Bloqueio do app por PIN/biometria (não é criptografia) | 7 |

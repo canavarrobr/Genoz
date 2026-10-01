@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -9,6 +10,7 @@ import 'package:genoz/core/genoz_core.dart';
 import 'package:genoz/persistence/app_storage.dart';
 import 'package:genoz/persistence/database.dart';
 import 'package:genoz/persistence/project_repository.dart';
+import 'package:genoz/platform/blob_store.dart';
 import 'package:genoz/platform/blob_store_io.dart';
 
 String fixture(String name) => File('test/fixtures/$name').readAsStringSync();
@@ -194,4 +196,44 @@ class TestEnv {
     await db.close();
     await dir.delete(recursive: true);
   }
+}
+
+/// Armazenamento em memória (testes de widget sem E/S real).
+class MemoryBlobStore implements BlobStore {
+  final files = <String, Uint8List>{};
+
+  @override
+  Future<int> writeStream(String relative, Stream<List<int>> bytes, {void Function(int written)? onProgress}) async {
+    final b = BytesBuilder();
+    await for (final chunk in bytes) {
+      b.add(chunk);
+      onProgress?.call(b.length);
+    }
+    files[relative] = b.takeBytes();
+    return files[relative]!.length;
+  }
+
+  @override
+  Future<void> writeBytes(String relative, Uint8List bytes) async => files[relative] = bytes;
+
+  @override
+  Future<Uint8List> readBytes(String relative) async => files[relative] ?? (throw StateError('não existe: $relative'));
+
+  @override
+  Future<String> readString(String relative) async => utf8.decode(await readBytes(relative));
+
+  @override
+  Future<bool> exists(String relative) async => files.containsKey(relative);
+
+  @override
+  Future<int?> size(String relative) async => files[relative]?.length;
+
+  @override
+  Future<void> deleteFile(String relative) async => files.remove(relative);
+
+  @override
+  Future<void> deleteDir(String relative) async => files.removeWhere((k, _) => k.startsWith('$relative/'));
+
+  @override
+  String? nativePath(String relative) => null;
 }

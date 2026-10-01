@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/genoz_core.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../platform/picker_cache.dart';
 import '../../persistence/analysis_repository.dart';
 import '../../persistence/database.dart';
 import '../../persistence/project_repository.dart';
@@ -96,15 +97,21 @@ class ProjectScreen extends ConsumerWidget {
     final file = await FilePicker.pickFile(type: FileType.any);
     if (file == null) return;
     // No navegador (e no Android com `content://`) não há caminho: lemos como fluxo de bytes.
-    await ref.read(importControllerProvider.notifier).importFile(
-          projectId: projectId,
-          source: SourceFile(
-            name: file.name,
-            path: kIsWeb ? null : file.path,
-            open: file.readAsByteStream,
-            size: await file.length(),
-          ),
-        );
+    try {
+      await ref
+          .read(importControllerProvider.notifier)
+          .importFile(
+            projectId: projectId,
+            source: SourceFile(
+              name: file.name,
+              path: kIsWeb ? null : file.path,
+              open: file.readAsByteStream,
+              size: await file.length(),
+            ),
+          );
+    } finally {
+      await clearPickerCache();
+    }
   }
 
   void _showOutcome(BuildContext context, WidgetRef ref, ImportState state) {
@@ -138,14 +145,14 @@ class ProjectScreen extends ConsumerWidget {
   }
 
   void _alert(BuildContext context, String title, String body) => showDialog<void>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          icon: const Icon(Icons.error_outline),
-          title: Text(title),
-          content: SingleChildScrollView(child: Text(body)),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocalizations.of(ctx).ok))],
-        ),
-      );
+    context: context,
+    builder: (ctx) => AlertDialog(
+      icon: const Icon(Icons.error_outline),
+      title: Text(title),
+      content: SingleChildScrollView(child: Text(body)),
+      actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppLocalizations.of(ctx).ok))],
+    ),
+  );
 }
 
 class _ImportProgressBar extends ConsumerWidget {
@@ -180,10 +187,7 @@ class _ImportProgressBar extends ConsumerWidget {
                   ],
                 ),
               ),
-              TextButton(
-                onPressed: () => ref.read(importControllerProvider.notifier).cancel(),
-                child: Text(l.cancel),
-              ),
+              TextButton(onPressed: () => ref.read(importControllerProvider.notifier).cancel(), child: Text(l.cancel)),
             ],
           ),
         ),
@@ -204,27 +208,27 @@ class _FileTile extends ConsumerWidget {
       child: ListTile(
         leading: Icon(verdictIcon(v), color: verdictColor(v, context)),
         title: Text(file.displayName, maxLines: 1, overflow: TextOverflow.ellipsis),
-        subtitle: Text([
-          l.verdict(v),
-          l.buildName(file.build),
-          l.samplesCount(file.sampleNames.length),
-          l.variantsCount(file.recordsOk),
-          formatBytes(file.bytes),
-        ].join(' · ')),
+        subtitle: Text(
+          [
+            l.verdict(v),
+            l.buildName(file.build),
+            l.samplesCount(file.sampleNames.length),
+            l.variantsCount(file.recordsOk),
+            formatBytes(file.bytes),
+          ].join(' · '),
+        ),
         isThreeLine: true,
         onTap: () => context.push('/projeto/${file.projectId}/arquivo/${file.id}'),
         trailing: IconButton(
           tooltip: l.delete,
           icon: const Icon(Icons.delete_outline),
           onPressed: () async {
-            final ok = await confirmDelete(
-              context,
-              title: l.deleteFileTitle,
-              body: l.deleteFileBody(file.displayName),
-            );
+            final ok = await confirmDelete(context, title: l.deleteFileTitle, body: l.deleteFileBody(file.displayName));
             if (!ok) return;
             await ref.read(projectRepositoryProvider).deleteFile(file);
-            await ref.read(analysisRepositoryProvider).log(file.projectId, 'delete_file', l.logDeleteFile(file.displayName));
+            await ref
+                .read(analysisRepositoryProvider)
+                .log(file.projectId, 'delete_file', l.logDeleteFile(file.displayName));
           },
         ),
       ),
