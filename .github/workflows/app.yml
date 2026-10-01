@@ -25,7 +25,7 @@ jobs:
           flutter gen-l10n
           git diff --exit-code -- lib
       - run: flutter analyze
-      - run: flutter test
+      - run: flutter test --reporter github
 
   ponte-rust:
     name: ponte Rust compila
