@@ -248,7 +248,7 @@ mod tests {
 
     #[test]
     fn rejects_unknown_chrom() {
-        let p = SynthParams { chroms: vec!["17".into()], ..Default::default() };
+        let p = SynthParams { chroms: vec!["99".into()], ..Default::default() };
         assert!(write_synthetic_vcf(&p, Vec::new()).is_err());
     }
 }

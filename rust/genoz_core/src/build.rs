@@ -54,16 +54,35 @@ pub struct BuildGuess {
     pub evidence: Vec<String>,
 }
 
-/// (cromossomo canônico, comprimento GRCh37, comprimento GRCh38)
+/// (cromossomo canônico, comprimento GRCh37, comprimento GRCh38) — Genome
+/// Reference Consortium (assembly reports de GRCh37.p13 e GRCh38.p14).
+/// MT (rCRS) tem o mesmo comprimento nos dois e por isso não serve de evidência.
 pub const CONTIG_LENGTHS: &[(&str, u64, u64)] = &[
     ("1", 249_250_621, 248_956_422),
     ("2", 243_199_373, 242_193_529),
     ("3", 198_022_430, 198_295_559),
+    ("4", 191_154_276, 190_214_555),
+    ("5", 180_915_260, 181_538_259),
+    ("6", 171_115_067, 170_805_979),
+    ("7", 159_138_663, 159_345_973),
+    ("8", 146_364_022, 145_138_636),
+    ("9", 141_213_431, 138_394_717),
+    ("10", 135_534_747, 133_797_422),
+    ("11", 135_006_516, 135_086_622),
+    ("12", 133_851_895, 133_275_309),
+    ("13", 115_169_878, 114_364_328),
+    ("14", 107_349_540, 107_043_718),
+    ("15", 102_531_392, 101_991_189),
+    ("16", 90_354_753, 90_338_345),
+    ("17", 81_195_210, 83_257_441),
+    ("18", 78_077_248, 80_373_285),
+    ("19", 59_128_983, 58_617_616),
     ("20", 63_025_520, 64_444_167),
     ("21", 48_129_895, 46_709_983),
     ("22", 51_304_566, 50_818_468),
     ("X", 155_270_560, 156_040_895),
     ("Y", 59_373_566, 57_227_415),
+    ("MT", 16_569, 16_569),
 ];
 
 pub fn contig_length(chrom: &str, build: GenomeBuild) -> Option<u64> {
@@ -82,6 +101,9 @@ pub fn guess_build(contigs: &[Contig], reference: Option<&str>) -> BuildGuess {
         let Some((_, l37, l38)) = CONTIG_LENGTHS.iter().find(|(c, _, _)| *c == contig.canonical) else {
             continue;
         };
+        if l37 == l38 {
+            continue; // mesmo comprimento nos dois builds (MT): não diz nada
+        }
         if len == *l37 {
             hits37 += 1;
             evidence.push(format!("contig {} com comprimento {} = GRCh37", contig.id, len));
@@ -130,6 +152,24 @@ mod tests {
 
     fn contig(id: &str, len: u64) -> Contig {
         Contig { id: id.into(), canonical: crate::chrom::canonical_chrom(id), length: Some(len), assembly: None }
+    }
+
+    #[test]
+    fn todos_os_cromossomos_tem_comprimento_nos_dois_builds() {
+        for c in (1..=22).map(|n| n.to_string()).chain(["X", "Y", "MT"].map(String::from)) {
+            assert!(contig_length(&c, GenomeBuild::Grch37).is_some(), "{c}");
+            assert!(contig_length(&c, GenomeBuild::Grch38).is_some(), "{c}");
+        }
+        let total38: u64 = CONTIG_LENGTHS.iter().map(|(_, _, l)| l).sum();
+        assert_eq!(total38, 3_088_286_401, "soma de 1-22, X, Y e MT no GRCh38");
+    }
+
+    #[test]
+    fn mt_nao_e_evidencia() {
+        let g = guess_build(&[contig("MT", 16_569)], None);
+        assert_eq!(g.build, GenomeBuild::Unknown);
+        let g = guess_build(&[contig("chrM", 16_569), contig("chr7", 159_345_973)], None);
+        assert_eq!((g.build, g.confidence), (GenomeBuild::Grch38, Confidence::High));
     }
 
     #[test]
