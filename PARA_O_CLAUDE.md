@@ -22,6 +22,7 @@ grandes ainda passam pela memória do Dart (streaming).
 - Conteúdo em `app/assets/aprender/` (trilhas.json, glossario.json, dados/). Perguntas novas: `compute` em
   `lib/features/learn/grading.dart` (respostas são CALCULADAS do resultado, ADR-014).
 - O dataset sintético foi gerado com `genoz-cli synth --seed 2026 --samples 2 --variants-per-chrom 120 --chroms autossomos`.
+- O `.gitignore` barra `*.vcf`/`*.vcf.gz` (dados reais nunca vão para o git); dados FICTÍCIOS novos para o app precisam de exceção explícita (como `!app/assets/aprender/dados/**`) — senão o CI não acha os assets.
 - Ao mexer em textos, confira os glifos (ver "Ambiente"): caractere fora de Inter/Poppins vira quadrado no navegador.
 
 ### Ambiente (Windows) — lembretes
