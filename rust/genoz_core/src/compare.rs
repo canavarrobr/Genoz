@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use crate::build::{guess_build, BuildGuess, Confidence, GenomeBuild};
 use crate::call::{Call, CallStream, FilterState, SampleSelector, StreamItem};
 use crate::chrom::{canonical_chrom, chrom_sort_key};
+use crate::fasta::SequenceSource;
 use crate::filter::CallFilter;
 use crate::io::open_reader;
 use crate::reader::VcfReader;
@@ -191,6 +192,10 @@ pub struct CompareOptions {
     pub allow_build_mismatch: bool,
     /// Força o modo em memória (testes).
     pub force_in_memory: bool,
+    /// Indels alinhados à esquerda com um FASTA local antes de comparar.
+    /// Só aparece no JSON quando ligado (análises antigas mantêm o mesmo ID).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub normalize_with_reference: bool,
 }
 
 /// Uma das entradas da comparação. `open` é chamado mais de uma vez
@@ -269,6 +274,9 @@ pub struct CompareSummary {
     pub benchmark: Option<BenchmarkMetrics>,
     pub options: CompareOptions,
     pub warnings: Vec<String>,
+    /// Só na comparação chip × sequenciamento ([`crate::chip_compare`]).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub chip: Option<crate::chip_compare::ChipCompareInfo>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -506,6 +514,11 @@ fn load_sorted(stream: &mut CallStream) -> Result<Vec<StreamItem>> {
     while let Some(i) = stream.next_item()? {
         v.push(i);
     }
+    sort_items(&mut v);
+    Ok(v)
+}
+
+fn sort_items(v: &mut [StreamItem]) {
     v.sort_by(|x, y| {
         let kx = (chrom_sort_key(x.chrom()), x.pos(), matches!(x, StreamItem::Call(_)));
         let ky = (chrom_sort_key(y.chrom()), y.pos(), matches!(y, StreamItem::Call(_)));
@@ -514,7 +527,6 @@ fn load_sorted(stream: &mut CallStream) -> Result<Vec<StreamItem>> {
             _ => std::cmp::Ordering::Equal,
         })
     });
-    Ok(v)
 }
 
 /// Executa a comparação. Cada linha é entregue a `sink` em ordem genômica.
@@ -524,7 +536,52 @@ pub fn compare(
     opts: &CompareOptions,
     sink: &mut dyn FnMut(&ComparisonRow) -> Result<()>,
 ) -> Result<CompareOutcome> {
+    compare_with_reference(a, b, opts, None, sink)
+}
+
+/// Normalização completa dos dois lados com o FASTA: confere o REF e alinha os
+/// indels à esquerda. Devolve (normalizados, REF diferentes do FASTA, sem o cromossomo no FASTA).
+fn normalize_items(items: &mut [StreamItem], seq: &mut dyn SequenceSource) -> Result<(u64, u64, u64)> {
+    let (mut moved, mut mismatched, mut missing_chrom) = (0u64, 0u64, 0u64);
+    for item in items.iter_mut() {
+        let StreamItem::Call(c) = item else { continue };
+        let len = c.reference.len() as u64;
+        if c.reference.bytes().all(|b| b.is_ascii_alphabetic()) && len > 0 {
+            match seq.fetch(&c.chrom, c.pos, c.pos + len - 1)? {
+                None => {
+                    missing_chrom += 1;
+                    continue;
+                }
+                Some(r) if !r.eq_ignore_ascii_case(c.reference.as_bytes()) => mismatched += 1,
+                _ => {}
+            }
+        }
+        if c.kind.is_indel() {
+            let n = crate::fasta::left_align(seq, &c.chrom, c.pos, &c.reference, &c.alt)?;
+            if n.pos != c.pos || n.reference != c.reference || n.alt != c.alt {
+                moved += 1;
+                c.pos = n.pos;
+                c.reference = n.reference;
+                c.alt = n.alt;
+            }
+        }
+    }
+    sort_items(items);
+    Ok((moved, mismatched, missing_chrom))
+}
+
+/// Como [`compare`], com normalização completa por FASTA quando `reference` vier.
+/// A normalização pode mudar posições, então usa o modo em memória (reordena).
+pub fn compare_with_reference(
+    a: &mut CompareInput,
+    b: &mut CompareInput,
+    opts: &CompareOptions,
+    mut reference: Option<&mut dyn SequenceSource>,
+    sink: &mut dyn FnMut(&ComparisonRow) -> Result<()>,
+) -> Result<CompareOutcome> {
     let mut warnings = Vec::new();
+    let mut options = opts.clone();
+    options.normalize_with_reference = reference.is_some();
 
     let header_a = VcfReader::new((a.open)()?)?.header().clone();
     let header_b = VcfReader::new((b.open)()?)?.header().clone();
@@ -552,13 +609,13 @@ pub fn compare(
 
     let order_a = scan_order((a.open)()?)?;
     let order_b = scan_order((b.open)()?)?;
-    let rank_map = if opts.force_in_memory || !order_a.sorted || !order_b.sorted {
+    let rank_map = if reference.is_some() || opts.force_in_memory || !order_a.sorted || !order_b.sorted {
         None
     } else {
         merged_rank(&order_a.chroms, &order_b.chroms)
     };
     let mode = if rank_map.is_some() { CompareMode::Streaming } else { CompareMode::InMemory };
-    if mode == CompareMode::InMemory && !opts.force_in_memory {
+    if mode == CompareMode::InMemory && !opts.force_in_memory && reference.is_none() {
         warnings
             .push("arquivos fora de ordem ou com ordens de cromossomos diferentes: comparação feita em memória".into());
     }
@@ -575,8 +632,24 @@ pub fn compare(
             Box::new(move |c: &str| map.get(c).copied().unwrap_or(f64::MAX)),
         ),
         None => {
-            let va = load_sorted(&mut stream_a)?;
-            let vb = load_sorted(&mut stream_b)?;
+            let mut va = load_sorted(&mut stream_a)?;
+            let mut vb = load_sorted(&mut stream_b)?;
+            if let Some(seq) = reference.take() {
+                let (ma, xa, ca) = normalize_items(&mut va, seq)?;
+                let (mb, xb, cb) = normalize_items(&mut vb, seq)?;
+                warnings
+                    .push(format!("normalização com o FASTA: {} indels de A e {} de B alinhados à esquerda", ma, mb));
+                if xa + xb > 0 {
+                    warnings.push(format!(
+                        "atenção: {} registros com REF diferente do FASTA (A: {xa}, B: {xb}); confira se o FASTA é do mesmo build",
+                        xa + xb
+                    ));
+                }
+                if ca + cb > 0 {
+                    warnings
+                        .push(format!("{} registros em cromossomos que o FASTA não tem (não normalizados)", ca + cb));
+                }
+            }
             // Classificação natural convertida em número (mesma ordem de chrom_sort_key).
             let mut all: Vec<String> = va.iter().chain(&vb).map(|i| i.chrom().to_string()).collect();
             all.sort_by_key(|c| chrom_sort_key(c));
@@ -773,8 +846,9 @@ pub fn compare(
         jaccard: (union > 0).then(|| both as f64 / union as f64),
         counts,
         benchmark: bench,
-        options: opts.clone(),
+        options,
         warnings,
+        chip: None,
     };
     Ok(CompareOutcome { summary, stats_a: side_a.stats, stats_b: side_b.stats })
 }
@@ -815,4 +889,62 @@ pub fn to_json_bytes<T: Serialize>(value: &T) -> Vec<u8> {
     let mut v = serde_json::to_vec_pretty(value).expect("tipos serializáveis");
     v.push(b'\n');
     v
+}
+
+#[cfg(test)]
+mod normalization_tests {
+    use std::collections::HashMap;
+
+    use super::*;
+    use crate::fasta::MemorySequence;
+
+    fn vcf(pos: u64, r: &str, a: &str) -> String {
+        format!(
+            "##fileformat=VCFv4.3\n##contig=<ID=1,length=13>\n##FORMAT=<ID=GT,Number=1,Type=String,Description=\"g\">\n\
+             #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tS\n1\t{pos}\t.\t{r}\t{a}\t50\tPASS\t.\tGT\t0/1\n"
+        )
+    }
+
+    fn input(text: String) -> CompareInput<'static> {
+        CompareInput {
+            label: "x".into(),
+            open: Box::new(move || Ok(Box::new(std::io::Cursor::new(text.clone().into_bytes())) as Box<dyn Read>)),
+            sample: SampleSelector::First,
+            callable: None,
+        }
+    }
+
+    #[test]
+    fn mesma_delecao_escrita_de_dois_jeitos_so_casa_com_fasta() {
+        //                    1234567890123
+        let reference = b"GATTTTTTACGCA".to_vec();
+        let run = |with_fasta: bool| {
+            let mut a = input(vcf(7, "TT", "T"));
+            let mut b = input(vcf(4, "TTT", "TT"));
+            let mut seq = MemorySequence(HashMap::from([("1".to_string(), reference.clone())]));
+            let mut rows = Vec::new();
+            let out = compare_with_reference(
+                &mut a,
+                &mut b,
+                &CompareOptions::default(),
+                if with_fasta { Some(&mut seq) } else { None },
+                &mut |r| {
+                    rows.push(r.clone());
+                    Ok(())
+                },
+            )
+            .unwrap();
+            (rows, out.summary)
+        };
+        let (rows, s) = run(false);
+        assert_eq!(rows.len(), 2, "sem FASTA: duas variantes diferentes");
+        assert!(!s.options.normalize_with_reference);
+        let (rows, s) = run(true);
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].category, Category::Shared);
+        assert_eq!((rows[0].pos, rows[0].reference.as_str(), rows[0].alt.as_str()), (2, "AT", "A"));
+        assert!(s.options.normalize_with_reference);
+        assert!(serde_json::to_string(&s.options).unwrap().contains("normalize_with_reference"));
+        assert!(!serde_json::to_string(&CompareOptions::default()).unwrap().contains("normalize"));
+    }
 }

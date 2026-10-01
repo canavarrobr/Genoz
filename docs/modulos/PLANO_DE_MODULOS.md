@@ -407,3 +407,23 @@ Limitações: o bloqueio não criptografa os arquivos (Módulo 11); a assinatura
 Achados corrigidos no caminho: tabela de comprimentos do núcleo só tinha 8 cromossomos (completada; MT não conta como evidência de build); régua do visualizador com rótulos sobrepostos e marcadores cortados nas pontas; textos do diagrama apertados dentro dos círculos (viraram legenda); dicas dos campos de resposta pareciam respostas ("0", "83.3"); aula importada sem instruções não tinha botão para abrir a comparação; o "▾" da legenda não existe nas fontes embutidas (no navegador virava um quadrado); `rootBundle.loadString` com cache prendia o carregamento entre testes.
 92 testes Dart + Rust (densidade, ponte memória = arquivo). Decisões em [ADR-014](../adr/ADR-014-modo-estudante-e-pacote-de-aula.md).
 Limitações: perguntas de múltipla escolha levam a alternativa certa no pacote (visível para quem abrir o ZIP); o professor escolhe entre perguntas prontas (calculadas) — perguntas livres ficam para depois.
+
+---
+
+## Contrato do Módulo 9 — Arquivos de consumidor e multiamostra (antes de implementar)
+
+**Entradas:** arquivos brutos de testes de consumidor (23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA); VCFs com várias amostras; opcionalmente um FASTA de referência local.
+
+**Saídas — núcleo (`genoz_core`), CLI e ponte:**
+- `consumer`: detecção do formato pelo conteúdo (não pela extensão) e leitura linha a linha → chamadas de chip (`rsid`, cromossomo canônico, posição, alelos em letras; sem chamada = `--`/`0`; inserções/deleções `I`/`D` contadas e ignoradas); cromossomos 23/24/25/26 da AncestryDNA = X/Y/X(PAR)/MT; relatório de inspeção próprio (fornecedor, build declarado ou presumido, sítios, chamados, sem chamada, het/hom/haploides, por cromossomo, problemas com número da linha, veredito);
+- `chip_compare`: **comparação chip × sequenciamento restrita aos sítios do chip** (A = chip, B = VCF de uma amostra escolhida). Para cada sítio do chip: genótipos comparados como **conjunto de letras** (ordem e fase não importam; multialélicos divididos são recombinados); VCF sem registro só vira "referência" se houver bloco de referência (gVCF) ou região avaliada (BED) — senão o sítio fica "só no chip" (se o chip mostra variante) ou fora da conta (ADR-010). Sem FASTA a base de referência de um sítio sem registro no VCF é desconhecida: homozigotos do chip nesses sítios não são julgados (contados à parte). Possível troca de fita (alelos complementares, não palindrômicos) é sinalizada. Variantes do VCF fora do chip não viram linhas (só contagem). Mesmo formato de resultado (`rows.bgz`, resumo, manifesto), então tabela, mapa, exportação e aulas funcionam;
+- `fasta`: leitura de FASTA de referência local com índice `.fai` (lido ou criado), busca de trechos; **normalização completa** (alinhamento à esquerda + aparo) de indels; conferência do REF do VCF contra o FASTA (REF diferente = build errado → aviso). Na comparação, opção "normalizar com FASTA" (o SHA-256 do FASTA entra no manifesto) e, no chip × VCF, o FASTA permite julgar os homozigotos sem registro no VCF;
+- **multiamostra:** escolher a amostra de A e de B (já existe) também no chip × VCF; relatório mostra contagens por amostra.
+
+**App:** importar arquivos de consumidor pelo mesmo botão (o app reconhece sozinho); relatório próprio; "Comparar chip × sequenciamento" com escolha da amostra do VCF; FASTA importável como "referência" do projeto (aviso de tamanho; no navegador vale o limite de 400 MB, então só FASTA por cromossomo).
+
+**Invariantes:** nada de imputação nem de "adivinhar" referência; build do chip presumido GRCh37 só com aviso (os quatro fornecedores publicam em GRCh37) e comparação com VCF GRCh38 recusada (sem liftover local); todos os números do resumo vêm das linhas; dados de consumidor tratados como dados genômicos (nunca saem do aparelho); nada é diagnóstico.
+
+**Erros:** arquivo de consumidor truncado ou com colunas trocadas (problemas por linha, veredito parcial/inválido); build GRCh36 (recusado com explicação); FASTA sem o cromossomo pedido; FASTA que não confere com o VCF.
+
+**Testes:** fixtures fictícias dos quatro formatos (detecção, cromossomos 23–26, sem chamada, indels, haploides, build); chip × VCF com casos de cada categoria (incluindo multialélico, fase, troca de fita, bloco gVCF, sem registro); FASTA (índice criado = `samtools faidx`, busca, alinhamento à esquerda com casos de repetição); ponte por caminho = por memória; app: importação e relatório do chip, tela de comparação chip × VCF.

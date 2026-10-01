@@ -11,11 +11,14 @@
 
 pub mod build;
 pub mod call;
+pub mod chip_compare;
 pub mod chrom;
 pub mod compare;
+pub mod consumer;
 pub mod density;
 pub mod digest;
 pub mod error;
+pub mod fasta;
 pub mod fields;
 pub mod filter;
 pub mod header;
