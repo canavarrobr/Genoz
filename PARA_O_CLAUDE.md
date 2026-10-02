@@ -1,20 +1,38 @@
 # Recado do Claude para o próximo Claude
 
-**Atualizado em:** 01/10/2026, ao concluir o **Módulo 9 — Arquivos de consumidor e multiamostra** (commit `0269396`).
-**Uso de tokens ao escrever:** ~110 mil de 15 milhões neste trecho (bem abaixo de 90%), então:
+**Atualizado em:** 01/10/2026, ao concluir o **Módulo 10 — Anotação local**.
+**Uso de tokens ao escrever:** ~290 mil de 15 milhões neste trecho (bem abaixo de 90%), então:
 
-## ✅ Pode começar o Módulo 10 — Anotação local
+## ✅ Pode começar o Módulo 11 — Relatórios, reprodutibilidade e criptografia
 
 Regra do usuário: ao fim de cada módulo, atualizar este recado dizendo que o próximo pode começar, **somente se o uso de tokens estiver abaixo de 90%**.
 
 ### Pendências que dependem do usuário (ações públicas ou de conta)
 - **Site no GitHub Pages** (Módulo 6): Settings → Pages → Source: GitHub Actions; e variável de repositório `GENOZ_PAGES` = `1`.
-- **Release do APK** (Módulo 7): criar a tag da versão atual, ex.: `v0.9.0` (o workflow "APK Android e iOS" anexa os APKs a um pre-release). Só com o "sim" do usuário.
+- **Release do APK** (Módulo 7): criar a tag da versão atual, ex.: `v0.10.0` (o workflow "APK Android e iOS" anexa os APKs a um pre-release). Só com o "sim" do usuário.
 - **Chave de assinatura** do APK: sem os secrets `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` o APK sai com chave de depuração (cada runner tem uma diferente → atualizar pode exigir desinstalar). Gerar a chave com `keytool` e o usuário colar os 4 secrets (ou deixar para o Módulo 13).
 
-### O que fazer no Módulo 10
-Seção "Módulo 10" de `docs/modulos/PLANO_DE_MODULOS.md` (escrever o contrato antes de implementar).
-Pendência antiga que pode entrar aqui ou depois: exportações grandes ainda passam pela memória do Dart (streaming).
+### O que fazer no Módulo 11
+Seção "Módulo 11" de `docs/modulos/PLANO_DE_MODULOS.md` (escrever o contrato antes de implementar).
+Pendências que podem entrar aqui: verificar a anotação no site (Edge headless: instalar um BED/TSV próprio e ver a
+coluna de genes; ClinVar de 190 MB na memória do wasm pode ser pesado — medir); exportações grandes ainda passam
+pela memória do Dart (streaming).
+
+### Como a anotação funciona (Módulo 10, ADR-016)
+- Núcleo: `rust/genoz_core/src/annotation.rs` (pacote = manifest.json + records.bgz + records.idx; tipos `sites` e
+  `intervals`; construtores GTF/ClinVar/BED-TSV). CLI: `genoz-cli anot build|info|query|gene`.
+- Ponte: `app/rust/src/api/annotation.rs`. **Tipos auxiliares ficam em `app/rust/src/annot_open.rs`, fora de `api`:**
+  o gerador do flutter_rust_bridge expõe traits e structs privados que encontra em `api` (e `frb(ignore)` não vale
+  para trait) — o resultado não compila.
+- Genes embutidos em `app/assets/anotacao/gencode_v50_grch3{7,8}/`, gerados com
+  `genoz-cli anot build --from gtf <GTF do GENCODE> ...` (comandos no status do Módulo 10 / ADR-016). Os arquivos
+  brutos ficam em `dados_brutos/` (no .gitignore; nunca commitar).
+- Catálogo: `app/assets/anotacao/catalogo.json` (URL, bytes, SHA-256, metadados). O app não tem INTERNET: o navegador
+  baixa, o app confere o SHA-256. Para atualizar o ClinVar: baixar o VCF novo, calcular SHA-256/tamanho, trocar o catálogo.
+- Licença/aviso das fontes conhecidas são traduzidos no app (`sourceLicense`/`sourceDisclaimer` em
+  `sources_section.dart`); o manifesto guarda o texto em português.
+- Testes de widget com os genes embutidos: carregar `installedPackagesProvider` dentro de `tester.runAsync` antes de
+  montar a tela (a cópia dos assets é E/S real e trava o `pumpAndSettle`).
 
 ### Como chip × sequenciamento funciona (Módulo 9, ADR-015)
 - Núcleo: `consumer.rs` (formatos), `chip_compare.rs` (comparação por letras, só sítios do chip), `fasta.rs`
