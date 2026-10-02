@@ -25,7 +25,9 @@ Os dados genômicos são processados no próprio dispositivo; nada é enviado a 
 | 7 — Android completo (APK de prévia) | concluído |
 | 8 — Visualização e modo estudante | concluído |
 | 9 — Arquivos de consumidor e multiamostra | concluído |
-| 10 — Anotação local | próximo |
+| 10 — Anotação local | concluído |
+| 11 — Relatórios, reprodutibilidade e criptografia | concluído |
+| 12 — Família e populações | próximo |
 
 ## Preparar o computador (Windows)
 
@@ -133,6 +135,9 @@ flutter build apk --release --split-per-abi
 ```
 
 O arquivo `build\app\outputs\flutter-apk\app-arm64-v8a-release.apk` serve para a maioria dos celulares.
+Os APKs publicados no GitHub são assinados com a chave do Genoz; confira com
+`apksigner verify --print-certs genoz-*.apk` — o certificado (SHA-256) tem que ser
+`ca196046beec1037e3b7810dfece15cfb3b1791f7a3409b4c679d4d15f6f1367`.
 O app **não pede permissão de internet** nem de acesso aos arquivos: o seletor do sistema entrega só o arquivo
 escolhido. Em **Ajustes** (menu ☰): tema, idioma, bloqueio por PIN/digital, proteção de tela e "Apagar todos os dados".
 

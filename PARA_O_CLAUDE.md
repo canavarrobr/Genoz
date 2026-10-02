@@ -8,9 +8,13 @@
 Regra do usuário: ao fim de cada módulo, atualizar este recado dizendo que o próximo pode começar, **somente se o uso de tokens estiver abaixo de 90%**.
 
 ### Pendências que dependem do usuário (ações públicas ou de conta)
-- **Site no GitHub Pages** (Módulo 6): Settings → Pages → Source: GitHub Actions; e variável de repositório `GENOZ_PAGES` = `1`.
-- **Release do APK** (Módulo 7): criar a tag da versão atual, ex.: `v0.11.0` (o workflow "APK Android e iOS" anexa os APKs a um pre-release). Só com o "sim" do usuário.
-- **Chave de assinatura** do APK: sem os secrets `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` o APK sai com chave de depuração (cada runner tem uma diferente → atualizar pode exigir desinstalar). Gerar a chave com `keytool` e o usuário colar os 4 secrets (ou deixar para o Módulo 13).
+- **Site no GitHub Pages**: o usuário disse NÃO, por enquanto (02/10/2026). Não oferecer de novo antes do Módulo 13.
+- **Chave de assinatura**: GERADA em 02/10/2026 em `Documentos\Genoz - chave de assinatura (NAO APAGUE)\`
+  (jks, base64 e LEIA-ME com os 4 valores; certificado SHA-256 `ca196046…f1367`, também no README). Testada
+  (APK local assinado e conferido com `apksigner`). FALTA o usuário colar os 4 secrets no GitHub (o Claude não tem
+  login no GitHub). Nunca imprimir a senha; apagar qualquer `app/android/key.properties` local depois de usar.
+- **Release do APK**: AUTORIZADA pelo usuário. Criar a tag da versão atual (ex.: `v0.11.0`) **depois** que os secrets
+  existirem — confira no log do job "Chave de assinatura" que não aparece o aviso de chave de depuração.
 
 ### O que fazer no Módulo 12
 Seção "Módulo 12" de `docs/modulos/PLANO_DE_MODULOS.md` (escrever o contrato antes de implementar).
