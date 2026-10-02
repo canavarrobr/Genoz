@@ -1,9 +1,9 @@
 # Recado do Claude para o próximo Claude
 
-**Atualizado em:** 02/10/2026, ao concluir o **Módulo 11 — Relatórios, reprodutibilidade e criptografia**.
-**Uso de tokens ao escrever:** ~60 mil de 15 milhões neste trecho (bem abaixo de 90%), então:
+**Atualizado em:** 02/10/2026, ao concluir o **Módulo 12 — Família e populações**.
+**Uso de tokens ao escrever:** ~200 mil de 15 milhões neste trecho (bem abaixo de 90%), então:
 
-## ✅ Pode começar o Módulo 12 — Família e populações
+## ✅ Pode começar o Módulo 13 — Lançamento 1.0
 
 Regra do usuário: ao fim de cada módulo, atualizar este recado dizendo que o próximo pode começar, **somente se o uso de tokens estiver abaixo de 90%**.
 
@@ -13,13 +13,24 @@ Regra do usuário: ao fim de cada módulo, atualizar este recado dizendo que o p
   (jks, base64 e LEIA-ME com os 4 valores; certificado SHA-256 `ca196046…f1367`, também no README). Testada
   (APK local assinado e conferido com `apksigner`). FALTA o usuário colar os 4 secrets no GitHub (o Claude não tem
   login no GitHub). Nunca imprimir a senha; apagar qualquer `app/android/key.properties` local depois de usar.
-- **Release do APK**: AUTORIZADA pelo usuário. Criar a tag da versão atual (ex.: `v0.11.0`) **depois** que os secrets
+- **Release do APK**: AUTORIZADA pelo usuário. Criar a tag da versão atual (ex.: `v0.12.0`) **depois** que os secrets
   existirem — confira no log do job "Chave de assinatura" que não aparece o aviso de chave de depuração.
 
-### O que fazer no Módulo 12
-Seção "Módulo 12" de `docs/modulos/PLANO_DE_MODULOS.md` (escrever o contrato antes de implementar).
-Pendência antiga: exportações da TABELA (CSV/TSV/JSON/VCF) ainda passam pela memória do Dart — dá para usar
-`saveStoredFile` (lib/platform/file_saver.dart, cópia em fluxo no Android) se o núcleo gravar o arquivo no disco.
+### O que fazer no Módulo 13
+Seção "Módulo 13" de `docs/modulos/PLANO_DE_MODULOS.md` (escrever o contrato antes de implementar). Lembretes:
+GitHub Pages = NÃO por enquanto (usuário, 02/10/2026); release e assinatura autorizadas (ver pendências acima).
+Pendência antiga: exportações da TABELA ainda passam pela memória do Dart.
+
+### Como família e populações funciona (Módulo 12, ADR-018)
+- Núcleo: `rust/genoz_core/src/family.rs` (uma passada: KING-robust, π0, ROH, trio, interseções); família fictícia em
+  `synth::write_family_vcf` (verdade plantada devolvida em `FamilyTruth`). CLI: `family`, `synth --family`, `rerun`
+  aceita `family` (VCF em `--a`).
+- Só VCF multiamostra com chamada conjunta (ausência não é referência). Autossomos + SNVs bialélicos.
+- App: `features/family/` (setup, tela com abas, ações); banco v4 (`family_analyses`, só metadados — o resultado está
+  em `<resultDir>/familia.json`); cofre `.genoz` leva junto; reprodutibilidade genérica em `reproducibility.dart`.
+- Fixtures Dart: `test/fixtures/familia.json` e `familia_manifest.json` (saída real da CLI para `synth --family --seed
+  2026 --variants-per-chrom 4000` com trio FILHO,PAI,MAE). Se o núcleo mudar a saída, gere de novo.
+- Testes de widget com E/S: use `pumpUntil` (support.dart) em vez de esperas fixas (havia um teste instável).
 
 ### Como relatórios, reexecução e cofre funcionam (Módulo 11, ADR-017)
 - Núcleo: `report.rs` (modelo de blocos + HTML), `pdf.rs` (escritor de PDF próprio, WinAnsi), `pack.rs`
