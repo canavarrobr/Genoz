@@ -2,7 +2,7 @@ name: genoz
 description: "Genoz - plataforma genômica local-first para ensino e pesquisa."
 publish_to: 'none'
 
-version: 0.8.0+8
+version: 0.9.0+9
 
 environment:
   sdk: ^3.13.2

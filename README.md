@@ -24,7 +24,8 @@ Os dados genômicos são processados no próprio dispositivo; nada é enviado a 
 | 6 — Web local-first (site de prévia) | concluído |
 | 7 — Android completo (APK de prévia) | concluído |
 | 8 — Visualização e modo estudante | concluído |
-| 9 — Arquivos de consumidor e multiamostra | próximo |
+| 9 — Arquivos de consumidor e multiamostra | concluído |
+| 10 — Anotação local | próximo |
 
 ## Preparar o computador (Windows)
 
@@ -68,6 +69,18 @@ flutter run
 
 Na primeira vez a compilação demora alguns minutos, porque o núcleo Rust é compilado para Android.
 No app: **Novo projeto → Gerar exemplo sintético** (ou **Importar VCF**) → toque no arquivo para ver o relatório.
+
+## Arquivos de testes de consumidor (Módulo 9)
+
+O botão **Importar** também aceita os arquivos brutos da 23andMe, AncestryDNA, MyHeritage e FamilyTreeDNA
+(inclusive o `.zip` que elas enviam) e um FASTA de referência. Com um chip e um VCF da mesma pessoa no projeto,
+**Comparar A × B** faz a comparação chip × sequenciamento, só nos sítios que o chip mede. Pela linha de comando:
+
+```powershell
+genoz-cli compare-chip chip.txt sequenciamento.vcf --out resultado --fasta referencia.fa
+```
+
+Arquivos fictícios para testar ficam em `test_fixtures/consumidor/`.
 
 ## Aprender (Módulo 8)
 

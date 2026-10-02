@@ -21,7 +21,7 @@ Um APK e um site de prévia aparecem já nos Módulos 6 e 7 (depois do módulo d
 | 6 ✅ | Web local-first | **Site de prévia** (GitHub Pages) comparando VCF no navegador sem upload | Web |
 | 7 ✅ | Android completo | **APK de prévia** para instalar no celular; bloqueio do app; privacidade | Android |
 | 8 ✅ | Visualização + modo estudante | Ideograma, densidade, visualizador de região, trilhas guiadas, dados sintéticos | Web + Android |
-| 9 | Arquivos de consumidor + multiamostra | Importa 23andMe/AncestryDNA/MyHeritage; escolhe amostra em VCF multi-amostra | Web + Android |
+| 9 ✅ | Arquivos de consumidor + multiamostra | Importa 23andMe/AncestryDNA/MyHeritage; escolhe amostra em VCF multi-amostra | Web + Android |
 | 10 | Anotação local | Pacotes (genes, rsID, ClinVar, frequências) baixados uma vez; busca por gene | Web + Android |
 | 11 | Relatórios, reprodutibilidade e criptografia | Relatório HTML/PDF, "reexecutar manifesto", exportação `.genoz` cifrada | Web + Android |
 | 12 | Família e populações | Trio, parentesco KING, ROH, comparação de N amostras | Web + Android |
@@ -427,3 +427,13 @@ Limitações: perguntas de múltipla escolha levam a alternativa certa no pacote
 **Erros:** arquivo de consumidor truncado ou com colunas trocadas (problemas por linha, veredito parcial/inválido); build GRCh36 (recusado com explicação); FASTA sem o cromossomo pedido; FASTA que não confere com o VCF.
 
 **Testes:** fixtures fictícias dos quatro formatos (detecção, cromossomos 23–26, sem chamada, indels, haploides, build); chip × VCF com casos de cada categoria (incluindo multialélico, fase, troca de fita, bloco gVCF, sem registro); FASTA (índice criado = `samtools faidx`, busca, alinhamento à esquerda com casos de repetição); ponte por caminho = por memória; app: importação e relatório do chip, tela de comparação chip × VCF.
+
+**Status:** concluído em 01/10/2026. Verificado no emulador Android (API 35, APK de release), com dados fictícios (`test_fixtures/consumidor/`, gerados por `gerar.py`):
+- importar o `.zip` do 23andMe pelo seletor do sistema → o app abre o zip e reconhece "chip 23andMe · GRCh37 · 14 sítios"; o VCF GRCh37 e o FASTA ("FASTA de referência", build desconhecido por ser um trecho) também;
+- tela de comparação: o chip vai sozinho para A, B só oferece VCF, "verdade" some, aparece o seletor de referência;
+- chip × VCF com FASTA: 6 compartilhadas, 3 genótipo diferente, 1 só no chip, 1 incerta, 1 homozigoto de referência sem registro no VCF — os mesmos números do `genoz-cli compare-chip --fasta`; tabela com genótipos em letras dos dois lados.
+- os quatro formatos (23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA) da mesma pessoa dão exatamente as mesmas linhas (teste no núcleo); ponte em memória (Web) dá o mesmo ID de análise da CLI, com e sem FASTA (teste na ponte).
+
+Achados corrigidos no caminho: `ZipDecoder` aceita qualquer lixo como ZIP vazio (agora confere a assinatura PK); fixtures geradas em Windows saíam com CRLF (gerador força LF); `.fai` do FASTA ficava órfão ao apagar o arquivo.
+Núcleo: 73 testes (+ 32 de CLI/integração); ponte: 3; app: 100. Decisões em [ADR-015](../adr/ADR-015-chip-x-sequenciamento-e-fasta.md).
+Limitações: chips de indel ignorados; sem liftover (chip GRCh37 × VCF GRCh38 é recusado); normalização VCF × VCF com FASTA carrega os dois VCFs em memória; exportações grandes ainda passam pela memória do Dart (fica para depois).
