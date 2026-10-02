@@ -1,22 +1,28 @@
 # Recado do Claude para o próximo Claude
 
-**Atualizado em:** 01/10/2026, ao concluir o **Módulo 8 — Visualização e modo estudante** (commit `29c73e7`).
-**Uso de tokens ao escrever:** ~275 mil de 15 milhões neste trecho (bem abaixo de 90%), então:
+**Atualizado em:** 01/10/2026, ao concluir o **Módulo 9 — Arquivos de consumidor e multiamostra** (commit `0269396`).
+**Uso de tokens ao escrever:** ~110 mil de 15 milhões neste trecho (bem abaixo de 90%), então:
 
-## ✅ Pode começar o Módulo 9 — Arquivos de consumidor e multiamostra
+## ✅ Pode começar o Módulo 10 — Anotação local
 
 Regra do usuário: ao fim de cada módulo, atualizar este recado dizendo que o próximo pode começar, **somente se o uso de tokens estiver abaixo de 90%**.
 
 ### Pendências que dependem do usuário (ações públicas ou de conta)
 - **Site no GitHub Pages** (Módulo 6): Settings → Pages → Source: GitHub Actions; e variável de repositório `GENOZ_PAGES` = `1`.
-- **Release do APK** (Módulo 7): criar a tag da versão atual, ex.: `v0.8.0` (o workflow "APK Android e iOS" anexa os APKs a um pre-release). Só com o "sim" do usuário.
+- **Release do APK** (Módulo 7): criar a tag da versão atual, ex.: `v0.9.0` (o workflow "APK Android e iOS" anexa os APKs a um pre-release). Só com o "sim" do usuário.
 - **Chave de assinatura** do APK: sem os secrets `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` o APK sai com chave de depuração (cada runner tem uma diferente → atualizar pode exigir desinstalar). Gerar a chave com `keytool` e o usuário colar os 4 secrets (ou deixar para o Módulo 13).
 
-### O que fazer no Módulo 9
-Seção "Módulo 9" de `docs/modulos/PLANO_DE_MODULOS.md` (escrever o contrato antes de implementar).
-Já existe: seleção de amostra no núcleo (`SampleSelector`) e na tela de comparação; arquivos 23andMe são
-recusados com mensagem (`test_fixtures/vcf/not_vcf_23andme_like.txt`). Pendência que cai aqui: exportações
-grandes ainda passam pela memória do Dart (streaming).
+### O que fazer no Módulo 10
+Seção "Módulo 10" de `docs/modulos/PLANO_DE_MODULOS.md` (escrever o contrato antes de implementar).
+Pendência antiga que pode entrar aqui ou depois: exportações grandes ainda passam pela memória do Dart (streaming).
+
+### Como chip × sequenciamento funciona (Módulo 9, ADR-015)
+- Núcleo: `consumer.rs` (formatos), `chip_compare.rs` (comparação por letras, só sítios do chip), `fasta.rs`
+  (índice `.fai`, alinhamento à esquerda). `consumer::inspect_any` reconhece VCF, chip ou FASTA pelo conteúdo.
+- CLI: `compare-chip`, `compare --fasta`, `faidx`. Fixtures fictícias em `test_fixtures/consumidor/` (gere de novo
+  com `python -X utf8 gerar.py`; se mudar o conteúdo, os IDs esperados no teste da ponte mudam).
+- `CompareOptions.normalize_with_reference` e `CompareSummary.chip` só aparecem no JSON quando usados: NÃO os torne
+  sempre presentes (mudaria o ID de todas as análises antigas e o hash dourado).
 
 ### Como o modo estudante funciona (Módulo 8)
 - Conteúdo em `app/assets/aprender/` (trilhas.json, glossario.json, dados/). Perguntas novas: `compute` em
@@ -43,7 +49,9 @@ grandes ainda passam pela memória do Dart (streaming).
 - **`dart format` reformata arquivos inteiros** (estilo novo): rode só em arquivos NOVOS, nunca em arquivos existentes.
 - Glifos: conferir que todo caractere visível existe em `assets/fonts/Inter-*.ttf` (fontTools, `getBestCmap()`); o site não baixa fontes de reserva.
 - Testes de widget: `rootBundle.loadString` com cache prende Futures entre testes (usar `cache: false`); listas preguiçosas não constroem itens fora da tela (use `ensureVisible`/`scrollUntilVisible` com `scrollable:` explícito).
-- Emulador: tela de bloqueio do aparelho tem PIN 1111 (acordar: `input keyevent 224`, deslizar, digitar 1111).
+- Emulador: tela de bloqueio do aparelho tem PIN 1111 (acordar: `input keyevent 224`, deslizar, digitar 1111). O armazenamento (`/sdcard/Download`) só existe depois de desbloquear — faça `adb push` depois.
+- Nunca `rm` com variável de shell no caminho (o Claude Code bloqueia): use caminho literal ou `"${VAR:?}"`.
+- `sed` com `\\n` no texto de substituição vira quebra de linha de verdade: para editar código, use script Python gravado com a ferramenta Write.
 
 ### Pendências conhecidas
 - Exportações muito grandes passam pela memória do Dart (Módulo 9: streaming); no navegador, limite de 400 MB por arquivo.
