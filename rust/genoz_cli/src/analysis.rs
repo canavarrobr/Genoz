@@ -30,7 +30,7 @@ pub struct QualityArgs {
 }
 
 impl QualityArgs {
-    fn filter(&self) -> CallFilter {
+    pub(crate) fn filter(&self) -> CallFilter {
         CallFilter {
             pass_only: self.pass_only,
             min_qual: self.min_qual,

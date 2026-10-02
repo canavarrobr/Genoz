@@ -40,17 +40,30 @@ Future<void> saveAnalysisReport(BuildContext context, WidgetRef ref, Analysis an
   }
 }
 
-Future<void> verifyReproducibilityFlow(BuildContext context, WidgetRef ref, Analysis analysis) async {
+Future<void> verifyReproducibilityFlow(BuildContext context, WidgetRef ref, Analysis analysis) => runReproFlow(
+      context,
+      ref,
+      projectId: analysis.projectId,
+      run: () => ref.read(reproducibilityProvider)(analysis),
+    );
+
+/// Mostra o progresso, registra no diário e abre o resultado (comparação ou família).
+Future<void> runReproFlow(
+  BuildContext context,
+  WidgetRef ref, {
+  required String projectId,
+  required Future<ReproResult> Function() run,
+}) async {
   final l = AppLocalizations.of(context);
   final ReproResult r;
   try {
-    r = await withProgress(context, l.reproRunning, () => ref.read(reproducibilityProvider)(analysis));
+    r = await withProgress(context, l.reproRunning, run);
   } catch (e) {
     if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.reproFailed('$e'))));
     return;
   }
   final verdict = r.reproduced ? l.reproOk(r.outputs.length) : l.reproPartial(r.identical, r.outputs.length);
-  await ref.read(analysisRepositoryProvider).log(analysis.projectId, 'repro', l.logRepro(verdict));
+  await ref.read(analysisRepositoryProvider).log(projectId, 'repro', l.logRepro(verdict));
   if (context.mounted) await showDialog<void>(context: context, builder: (_) => _ReproDialog(result: r));
 }
 

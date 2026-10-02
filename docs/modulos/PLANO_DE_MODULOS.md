@@ -519,3 +519,38 @@ OPFS (`annot_load`); a verificação manual no site ficou para o Módulo 11 (o C
 
 Testes: 113 Dart, 126 Rust (núcleo e CLI) + 6 da ponte. Decisões em [ADR-017](../adr/ADR-017-relatorios-reexecucao-e-cofre-genoz.md).
 
+
+## Contrato do Módulo 12 — Família e populações (antes de implementar)
+
+**Entrada:** um VCF **multiamostra com chamada conjunta** (2 a 32 amostras escolhidas), o formato de trios e coortes (ex.: 1000 Genomes). Motivo (ADR-010): parentesco, ROH e herança precisam saber quem é homozigoto de referência; em VCFs de uma pessoa só, ausência não é referência — para esses, a comparação A × B continua sendo o caminho, e o app explica por quê. Portão de qualidade igual ao da comparação (chamada reprovada = ausente). Só autossomos e SNVs bialélicos (multialélicos divididos ficam de fora do parentesco e do ROH; X/Y ficam de fora por não sabermos o sexo — explicado).
+
+**Saídas — núcleo e CLI (`genoz-cli family`), numa só passada, memória proporcional a N²:**
+- **Parentesco KING-robust** (Manichaikul et al., 2010, eq. 9) para cada par: φ = (N_Aa,Aa − 2·N_AA,aa) / (N_Aa(i) + N_Aa(j)), só SNPs com genótipo nos dois; IBS0 (N_AA,aa) e sua proporção; concordância de genótipos; M (SNPs usados). Classes pela Tabela 1 do artigo (potências de 2): > 2^-1,5 mesma pessoa/gêmeos idênticos; 2^-2,5 a 2^-1,5 1º grau; 2^-3,5 a 2^-2,5 2º grau; 2^-4,5 a 2^-3,5 3º grau; abaixo, sem parentesco próximo. Pai/mãe–filho × irmãos (dentro do 1º grau): π̂0 pela eq. 2 com as frequências da própria amostra (≥ 3 amostras) — grosseiro com poucas pessoas, mas a diferença é grande (≈ 0 × ≈ 1/4); com 2 amostras, "1º grau" + IBS0 explicado. O IBS0 bruto é sempre mostrado.
+- **Matriz N × N** (parentesco e concordância) e **interseções estilo UpSet** (quais amostras carregam cada variante; as combinações mais frequentes).
+- **Runs of homozygosity** por amostra (algoritmo simplificado inspirado no `plink --homozyg`: ≥ 1000 kb, ≥ 100 SNPs, ≤ 1 heterozigoto e ≤ 5 ausentes por trecho, lacuna ≤ 1000 kb, densidade ≥ 1 SNP/50 kb): trechos, total em Mb e F_ROH. Texto educativo, nunca clínico.
+- **Trio** (filho(a), pai, mãe escolhidos): sítios com os três genotipados; consistência mendeliana; **candidatas a de novo** (filho(a) portador(a), pais 0/0); outros erros mendelianos; alelos atribuíveis ao pai ou à mãe (sítios informativos); lista de eventos com genótipos e QUAL/DP/GQ (limitada, com contagens completas).
+- Resultado em `familia.json` + manifesto (ID pelo conteúdo, reexecutável). Dados fictícios: `synth --family` gera uma família (pai, mãe, dois filhos, uma pessoa sem parentesco e uma duplicata) com de novo e um trecho de ROH plantados — valores esperados conhecidos.
+
+**App:** no projeto, **Família e populações** para um VCF com 2+ amostras: escolher amostras e, opcionalmente, o trio → tela com abas **Parentesco** (pares + matriz), **ROH**, **Trio**, **Interseções**; análises salvas no banco (v4), incluídas no cofre `.genoz`; reprodutibilidade verificável; aviso obrigatório: estimativa estatística, sujeita a erro, **não é teste de paternidade com valor legal** e não é diagnóstico.
+
+**Invariantes:** ausência nunca vira referência; mesmo arquivo + mesmas escolhas = mesmo resultado byte a byte; nada sai do aparelho.
+
+**Erros:** VCF com menos de 2 amostras; mais de 32 amostras escolhidas; trio com amostra repetida; poucos SNPs utilizáveis (aviso: estimativa instável abaixo de ~1000).
+
+**Testes:** fórmula KING em casos calculados à mão; família sintética (φ ≈ 0,25 pai/mãe–filho e irmãos, ≈ 0,5 duplicata, ≈ 0 sem parentesco; de novo plantadas encontradas; ROH plantado encontrado); bordas do ROH; trio com erro mendeliano; determinismo; ponte caminho = memória; app (tela, salvar, cofre, migração v4); emulador e navegador.
+
+**Status:** concluído em 02/10/2026. Verificado no emulador Android (API 35, APK de release) e no Edge (site com isolamento de origem):
+- **Android:**
+  - a atualização migrou o banco v3 → v4 com os projetos protegidos intactos;
+  - "Gerar família fictícia" → 7 amostras, 9.781 variantes;
+  - Família e populações com trio FILHO/PAI/MAE → matriz com duplicata 0,50, pai/mãe–filho e irmãos 0,25, avô–neto 0,12–0,13 e o vizinho ≈ 0;
+  - pares classificados como mesma pessoa, pai/mãe–filho, irmãos, 2º grau e sem parentesco;
+  - ROH: 12,0 Mb no VIZINHO (F_ROH 0,074), nada nos outros;
+  - trio: 9.706 sítios, 3 candidatas a de novo, 1 erro mendeliano, 1.760 alelos do pai e 1.764 da mãe;
+  - "Verificar reprodutibilidade" deu 1 de 1 idêntica.
+- **Navegador:** os mesmos números nas abas Parentesco, Trio e Interseções; reprodutibilidade 1 de 1; 85 requisições, todas para `127.0.0.1` ou `blob:`.
+- **CLI:** `family` e `rerun` de família (1 de 1 idêntica).
+- **Mudança em relação ao contrato:** o π̂0 separa pai/mãe–filho de irmãos já a partir de 3 amostras (ver ADR-018).
+
+Testes: 118 Dart, 134 Rust (núcleo e CLI) + 7 da ponte. Decisões em [ADR-018](../adr/ADR-018-familia-e-populacoes.md).
+

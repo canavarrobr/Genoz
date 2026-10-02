@@ -27,7 +27,8 @@ Os dados genômicos são processados no próprio dispositivo; nada é enviado a 
 | 9 — Arquivos de consumidor e multiamostra | concluído |
 | 10 — Anotação local | concluído |
 | 11 — Relatórios, reprodutibilidade e criptografia | concluído |
-| 12 — Família e populações | próximo |
+| 12 — Família e populações | concluído |
+| 13 — Lançamento 1.0 | próximo |
 
 ## Preparar o computador (Windows)
 
@@ -71,6 +72,20 @@ flutter run
 
 Na primeira vez a compilação demora alguns minutos, porque o núcleo Rust é compilado para Android.
 No app: **Novo projeto → Gerar exemplo sintético** (ou **Importar VCF**) → toque no arquivo para ver o relatório.
+
+## Família e populações (Módulo 12)
+
+Com um VCF de várias pessoas chamadas juntas (chamada conjunta), o botão **Família e populações** do projeto mostra
+o **parentesco** de cada par (método KING-robust: mesma pessoa, pai/mãe–filho, irmãos, 2º e 3º grau), a **matriz**
+de parentesco, os **trechos longos de homozigose** (ROH) de cada pessoa, as **interseções** de variantes e, com um
+trio indicado, a **herança**: candidatas a de novo, erros mendelianos e alelos vindos do pai ou da mãe. É uma
+estimativa estatística — não é teste de paternidade com valor legal nem diagnóstico. Para experimentar: **Gerar
+família fictícia**. Pela linha de comando:
+
+```powershell
+genoz-cli synth --family --out familia.vcf
+genoz-cli family familia.vcf --out resultado --trio FILHO,PAI,MAE
+```
 
 ## Relatórios, reprodutibilidade e projetos cifrados (Módulo 11)
 

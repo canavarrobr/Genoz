@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:genoz/core/annotation_models.dart';
 import 'package:genoz/core/compare_models.dart';
 import 'package:genoz/core/genoz_core.dart';
@@ -224,6 +225,27 @@ class FakeGenozCore implements GenozCore {
   @override
   void forgetAnnotation(String package) => forgotten.add(package);
 
+  // ---- Módulo 12: família (resultado real gravado pela CLI em fixtures/familia.json) ----
+  String? lastFamilyOptions;
+
+  @override
+  Future<({String result, String manifest})> analyzeFamily({
+    required CompareInputFile input,
+    required String optionsJson,
+    required String outDirRelative,
+    required String createdAt,
+  }) async {
+    lastFamilyOptions = optionsJson;
+    final result = fixture('familia.json');
+    final manifest = fixture('familia_manifest.json');
+    await storage.blobs.writeBytes('$outDirRelative/familia.json', Uint8List.fromList(utf8.encode(result)));
+    await storage.blobs.writeBytes('$outDirRelative/manifest.json', Uint8List.fromList(utf8.encode(manifest)));
+    return (result: result, manifest: manifest);
+  }
+
+  @override
+  Future<Uint8List> syntheticFamily(int seed) async => Uint8List.fromList(utf8.encode('##fileformat=VCFv4.3\n'));
+
   // ---- Módulo 11: relatório e cofre (formato falso: JSON com a senha, só para testes) ----
   final reports = <({String project, String lang, bool pdf})>[];
   Map<String, String> sha256ByName = {};
@@ -392,4 +414,15 @@ Future<(String, ProjectFile, ProjectFile)> projectWithTwoFiles(TestEnv env) asyn
     );
   }
   return (p.id, (await env.repo.getFile('fa'))!, (await env.repo.getFile('fb'))!);
+}
+
+/// Espera (em tempo real) até `finder` achar algo — para telas que dependem de E/S
+/// ou de streams do banco. Falha clara se não aparecer.
+Future<void> pumpUntil(WidgetTester tester, Finder finder, {int tries = 200}) async {
+  for (var i = 0; i < tries; i++) {
+    if (finder.evaluate().isNotEmpty) return;
+    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 25)));
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+  throw TestFailure('não apareceu: $finder');
 }

@@ -16,3 +16,4 @@ As decisões tomadas durante o desenvolvimento ficam registradas aqui, uma por a
 | [ADR-015](ADR-015-chip-x-sequenciamento-e-fasta.md) | Chip × sequenciamento por letras; FASTA local para normalizar | 9 |
 | [ADR-016](ADR-016-anotacao-local-e-online-controlado.md) | Anotação local em pacotes próprios; "online controlado" sem internet | 10 |
 | [ADR-017](ADR-017-relatorios-reexecucao-e-cofre-genoz.md) | Relatórios pelo núcleo, reexecução pelo manifesto e cofre `.genoz` com senha | 11 |
+| [ADR-018](ADR-018-familia-e-populacoes.md) | Família e populações a partir de VCF com chamada conjunta | 12 |

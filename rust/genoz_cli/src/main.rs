@@ -12,6 +12,7 @@
 
 mod analysis;
 mod anot;
+mod family_cmd;
 mod repro;
 
 use std::fs::File;
@@ -71,6 +72,9 @@ enum Command {
         /// Cromossomos, separados por vírgula (ex.: `1,2,X`), ou `autossomos` (1–22).
         #[arg(long, default_value = "20,21,22")]
         chroms: String,
+        /// Família fictícia (avô, pai, mãe, dois filhos, vizinho, duplicata) em vez de amostras independentes
+        #[arg(long)]
+        family: bool,
     },
     /// Divide multialélicos e apara bases redundantes; grava novo VCF.
     Split {
@@ -92,6 +96,8 @@ enum Command {
     CompareChip(analysis::ChipCompareArgs),
     /// Cria o índice .fai de um FASTA (igual ao `samtools faidx`).
     Faidx { fasta: PathBuf },
+    /// Família e populações: parentesco, ROH, trio (VCF multiamostra com chamada conjunta)
+    Family(family_cmd::FamilyArgs),
     /// Relatório HTML autocontido ou PDF de uma comparação
     Report(repro::ReportArgs),
     /// Confere os SHA-256 das saídas de um resultado contra o manifesto
@@ -160,7 +166,17 @@ fn run(cli: Cli) -> Result<ExitCode, GenozError> {
             println!("{}  {}", d.sha256, file.display());
             Ok(ExitCode::SUCCESS)
         }
-        Command::Synth { out, seed, samples, variants_per_chrom, build, no_chr, phased, chroms } => {
+        Command::Synth { out, seed, build, variants_per_chrom, family: true, .. } => {
+            let build = match build {
+                Build::Grch37 => GenomeBuild::Grch37,
+                Build::Grch38 => GenomeBuild::Grch38,
+            };
+            let w = std::io::BufWriter::new(File::create(&out)?);
+            let truth = genoz_core::synth::write_family_vcf(seed, build, variants_per_chrom, w)?;
+            println!("família fictícia gravada em {} (de novo plantadas: {})", out.display(), truth.de_novo.len());
+            Ok(ExitCode::SUCCESS)
+        }
+        Command::Synth { out, seed, samples, variants_per_chrom, build, no_chr, phased, chroms, family: false } => {
             let chroms: Vec<String> = if chroms == "autossomos" {
                 (1..=22).map(|n| n.to_string()).collect()
             } else {
@@ -212,6 +228,7 @@ fn run(cli: Cli) -> Result<ExitCode, GenozError> {
         Command::Export(args) => analysis::export_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::Density(args) => analysis::density_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::CompareChip(args) => analysis::chip_compare_cmd(args).map(|()| ExitCode::SUCCESS),
+        Command::Family(args) => family_cmd::family_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::Report(args) => repro::report_cmd(args),
         Command::Verify { result } => repro::verify_cmd(&result),
         Command::Rerun(args) => repro::rerun_cmd(args),

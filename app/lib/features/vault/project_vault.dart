@@ -27,7 +27,15 @@ const archiveSchema = 1;
 const minPasswordLength = 8;
 
 /// Arquivos de uma pasta de resultado que vão no pacote.
-const analysisFiles = ['rows.bgz', 'rows.idx', 'summary.json', 'stats_a.json', 'stats_b.json', 'manifest.json'];
+const analysisFiles = [
+  'rows.bgz',
+  'rows.idx',
+  'summary.json',
+  'stats_a.json',
+  'stats_b.json',
+  'manifest.json',
+  'familia.json',
+];
 
 String vaultRelative(String projectId) => '$vaultDir/$projectId.$vaultExtension';
 
@@ -45,6 +53,7 @@ class ProjectVault {
     final project = await (_db.select(_db.projects)..where((t) => t.id.equals(projectId))).getSingle();
     final files = await (_db.select(_db.projectFiles)..where((t) => t.projectId.equals(projectId))).get();
     final analyses = await (_db.select(_db.analyses)..where((t) => t.projectId.equals(projectId))).get();
+    final families = await (_db.select(_db.familyAnalyses)..where((t) => t.projectId.equals(projectId))).get();
     final filters = await (_db.select(_db.savedFilters)..where((t) => t.projectId.equals(projectId))).get();
     final notes = await (_db.select(_db.variantNotes)..where((t) => t.projectId.equals(projectId))).get();
     final journal = await (_db.select(_db.journalEntries)..where((t) => t.projectId.equals(projectId))).get();
@@ -54,10 +63,10 @@ class ProjectVault {
       if (await _storage.blobs.exists(f.storedPath)) entries['arquivos/${f.id}'] = f.storedPath;
       if (await _storage.blobs.exists('${f.storedPath}.fai')) entries['arquivos/${f.id}.fai'] = '${f.storedPath}.fai';
     }
-    for (final a in analyses) {
+    for (final (id, dir) in [for (final a in analyses) (a.id, a.resultDir), for (final f in families) (f.id, f.resultDir)]) {
       for (final name in analysisFiles) {
-        final rel = '${a.resultDir}/$name';
-        if (await _storage.blobs.exists(rel)) entries['analises/${a.id}/$name'] = rel;
+        final rel = '$dir/$name';
+        if (await _storage.blobs.exists(rel)) entries['analises/$id/$name'] = rel;
       }
     }
     final json = {
@@ -67,6 +76,7 @@ class ProjectVault {
       'project': project.toJson(),
       'files': [for (final f in files) f.toJson()],
       'analyses': [for (final a in analyses) a.toJson()],
+      'family_analyses': [for (final f in families) f.toJson()],
       'saved_filters': [for (final f in filters) f.toJson()],
       'notes': [for (final n in notes) n.toJson()],
       'journal': [for (final j in journal) j.toJson()],
@@ -149,6 +159,7 @@ class ProjectVault {
     await (_db.delete(_db.variantNotes)..where((t) => t.projectId.equals(projectId))).go();
     await (_db.delete(_db.savedFilters)..where((t) => t.projectId.equals(projectId))).go();
     await (_db.delete(_db.analyses)..where((t) => t.projectId.equals(projectId))).go();
+    await (_db.delete(_db.familyAnalyses)..where((t) => t.projectId.equals(projectId))).go();
     await (_db.delete(_db.projectFiles)..where((t) => t.projectId.equals(projectId))).go();
   }
 
@@ -195,6 +206,18 @@ class ProjectVault {
       ));
     }
 
+    final families = <FamilyAnalysis>[];
+    for (final f in list('family_analyses').map(FamilyAnalysis.fromJson)) {
+      final id = keep ? f.id : newId();
+      analysisIds[f.id] = id;
+      families.add(f.copyWith(
+        id: id,
+        projectId: pid,
+        fileId: fileIds[f.fileId] ?? f.fileId,
+        resultDir: _storage.analysisRelative(pid, id),
+      ));
+    }
+
     // Arquivos primeiro; se algo falhar, a pasta do projeto novo é apagada.
     try {
       for (final f in files) {
@@ -203,11 +226,11 @@ class ProjectVault {
         if (await _storage.blobs.exists(src)) await _storage.blobs.move(src, f.storedPath);
         if (await _storage.blobs.exists('$src.fai')) await _storage.blobs.move('$src.fai', '${f.storedPath}.fai');
       }
-      for (final a in analyses) {
-        final oldId = analysisIds.entries.firstWhere((e) => e.value == a.id).key;
+      for (final (id, dir) in [for (final a in analyses) (a.id, a.resultDir), for (final f in families) (f.id, f.resultDir)]) {
+        final oldId = analysisIds.entries.firstWhere((e) => e.value == id).key;
         for (final name in analysisFiles) {
           final src = '$staging/analises/$oldId/$name';
-          if (await _storage.blobs.exists(src)) await _storage.blobs.move(src, '${a.resultDir}/$name');
+          if (await _storage.blobs.exists(src)) await _storage.blobs.move(src, '$dir/$name');
         }
       }
       await _db.transaction(() async {
@@ -223,6 +246,9 @@ class ProjectVault {
         }
         for (final a in analyses) {
           await _db.into(_db.analyses).insert(a);
+        }
+        for (final f in families) {
+          await _db.into(_db.familyAnalyses).insert(f);
         }
         for (final f in list('saved_filters').map(SavedFilter.fromJson)) {
           await _db.into(_db.savedFilters).insert(f.copyWith(id: keep ? f.id : newId(), projectId: pid));

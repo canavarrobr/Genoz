@@ -56,12 +56,18 @@ SourceFile storedSource(AppStorage storage, ProjectFile f) {
   );
 }
 
-Future<ReproResult> verifyReproducibility(Ref ref, Analysis analysis) async {
+/// Núcleo comum: confere entradas, reexecuta com `rerun` numa pasta temporária e
+/// compara saída por saída. `rerun` devolve o JSON do manifesto novo.
+Future<ReproResult> _verify(
+  Ref ref, {
+  required String projectId,
+  required String resultDir,
+  required Future<String> Function(Map<String, ProjectFile> byRole, String outDir) rerun,
+}) async {
   final storage = ref.read(appStorageProvider);
   final core = ref.read(genozCoreProvider);
   final repo = ref.read(projectRepositoryProvider);
-  final manifest =
-      jsonDecode(await storage.blobs.readString('${analysis.resultDir}/manifest.json')) as Map<String, dynamic>;
+  final manifest = jsonDecode(await storage.blobs.readString('$resultDir/manifest.json')) as Map<String, dynamic>;
   final expected = [
     for (final o in manifest['outputs'] as List)
       (name: (o as Map<String, dynamic>)['name'] as String, sha: o['sha256'] as String),
@@ -78,7 +84,7 @@ Future<ReproResult> verifyReproducibility(Ref ref, Analysis analysis) async {
       inputs.add(InputCheck(role: role, name: name, ok: false, problem: 'nao_suportado'));
       continue;
     }
-    final file = await repo.findBySha(analysis.projectId, sha);
+    final file = await repo.findBySha(projectId, sha);
     if (file == null) {
       inputs.add(InputCheck(role: role, name: name, ok: false, problem: 'ausente'));
       continue;
@@ -93,39 +99,10 @@ Future<ReproResult> verifyReproducibility(Ref ref, Analysis analysis) async {
 
   // 2. Reexecuta numa pasta temporária, com os mesmos parâmetros.
   final out = '$tempDir/reexecucao_${newId()}';
-  CompareInputFile side(ProjectFile f, String? sample) => CompareInputFile(
-        relativePath: f.storedPath,
-        displayName: f.displayName,
-        sha256: f.sha256,
-        bytes: f.bytes,
-        sample: sample,
-      );
-  final a = byRole['a']!;
-  final b = byRole['b']!;
   String? newManifest;
   String? error;
   try {
-    await for (final e in core.compare(
-      a: side(a, analysis.sampleA),
-      b: side(b, analysis.sampleB),
-      options: CompareOptions.parse(analysis.optionsJson),
-      outDirRelative: out,
-      createdAt: DateTime.now().toUtc().toIso8601String(),
-      jobId: 'reexecucao_${analysis.id}',
-      chip: a.isChip,
-      reference: byRole['reference'] == null ? null : side(byRole['reference']!, null),
-    )) {
-      switch (e) {
-        case CompareDone(:final manifestJson):
-          newManifest = manifestJson;
-        case CompareFailed(:final message):
-          error = message;
-        case CompareCancelled():
-          error = 'cancelada';
-        case CompareProgress():
-          break;
-      }
-    }
+    newManifest = await rerun(byRole, out);
   } catch (e) {
     error = '$e';
   } finally {
@@ -144,6 +121,64 @@ Future<ReproResult> verifyReproducibility(Ref ref, Analysis analysis) async {
   );
 }
 
+CompareInputFile _side(ProjectFile f, String? sample) => CompareInputFile(
+      relativePath: f.storedPath,
+      displayName: f.displayName,
+      sha256: f.sha256,
+      bytes: f.bytes,
+      sample: sample,
+    );
+
+Future<ReproResult> verifyReproducibility(Ref ref, Analysis analysis) => _verify(
+      ref,
+      projectId: analysis.projectId,
+      resultDir: analysis.resultDir,
+      rerun: (byRole, out) async {
+        final a = byRole['a']!;
+        final b = byRole['b']!;
+        await for (final e in ref.read(genozCoreProvider).compare(
+          a: _side(a, analysis.sampleA),
+          b: _side(b, analysis.sampleB),
+          options: CompareOptions.parse(analysis.optionsJson),
+          outDirRelative: out,
+          createdAt: DateTime.now().toUtc().toIso8601String(),
+          jobId: 'reexecucao_${analysis.id}',
+          chip: a.isChip,
+          reference: byRole['reference'] == null ? null : _side(byRole['reference']!, null),
+        )) {
+          switch (e) {
+            case CompareDone(:final manifestJson):
+              return manifestJson;
+            case CompareFailed(:final message):
+              throw StateError(message);
+            case CompareCancelled():
+              throw StateError('cancelada');
+            case CompareProgress():
+              break;
+          }
+        }
+        throw StateError('sem resultado');
+      },
+    );
+
+/// Família e populações (Módulo 12): mesmo VCF, mesmas opções.
+Future<ReproResult> verifyFamilyReproducibility(Ref ref, FamilyAnalysis analysis) => _verify(
+      ref,
+      projectId: analysis.projectId,
+      resultDir: analysis.resultDir,
+      rerun: (byRole, out) async => (await ref.read(genozCoreProvider).analyzeFamily(
+            input: _side(byRole['a']!, null),
+            optionsJson: analysis.optionsJson,
+            outDirRelative: out,
+            createdAt: DateTime.now().toUtc().toIso8601String(),
+          ))
+              .manifest,
+    );
+
 final reproducibilityProvider = Provider<Future<ReproResult> Function(Analysis)>(
   (ref) => (a) => verifyReproducibility(ref, a),
+);
+
+final familyReproducibilityProvider = Provider<Future<ReproResult> Function(FamilyAnalysis)>(
+  (ref) => (a) => verifyFamilyReproducibility(ref, a),
 );

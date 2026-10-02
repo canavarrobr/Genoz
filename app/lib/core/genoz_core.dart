@@ -17,6 +17,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../persistence/app_storage.dart';
 import '../src/rust/api/analysis.dart' as rust_analysis;
 import '../src/rust/api/annotation.dart' as rust_annot;
+import '../src/rust/api/family.dart' as rust_family;
 import '../src/rust/api/genoz.dart' as rust;
 import '../src/rust/api/memory.dart' as rust_memory;
 import '../src/rust/api/vault.dart' as rust_vault;
@@ -271,6 +272,20 @@ abstract interface class GenozCore {
 
   void forgetAnnotation(String package);
 
+  // ---- Família e populações (Módulo 12) ----
+
+  /// Analisa um VCF multiamostra e grava `familia.json` e `manifest.json` em `outDirRelative`.
+  /// Devolve o JSON do resultado e o do manifesto.
+  Future<({String result, String manifest})> analyzeFamily({
+    required CompareInputFile input,
+    required String optionsJson,
+    required String outDirRelative,
+    required String createdAt,
+  });
+
+  /// VCF (BGZF) de uma família fictícia.
+  Future<Uint8List> syntheticFamily(int seed);
+
   // ---- Relatório e cofre .genoz (Módulo 11) ----
 
   /// Relatório HTML autocontido ou PDF de uma análise salva.
@@ -498,6 +513,28 @@ class NativeGenozCore implements GenozCore {
 
   @override
   void forgetAnnotation(String package) => rust_annot.annotForget(key: storage.absolute(package));
+
+  @override
+  Future<({String result, String manifest})> analyzeFamily({
+    required CompareInputFile input,
+    required String optionsJson,
+    required String outDirRelative,
+    required String createdAt,
+  }) async {
+    final r = await rust_family.familyAnalyzeFile(
+      path: storage.absolute(input.relativePath),
+      inputName: input.displayName,
+      inputSha256: input.sha256,
+      inputBytes: BigInt.from(input.bytes),
+      optionsJson: optionsJson,
+      outDir: storage.absolute(outDirRelative),
+      createdAt: createdAt,
+    );
+    return (result: r.resultJson, manifest: r.manifestJson);
+  }
+
+  @override
+  Future<Uint8List> syntheticFamily(int seed) => rust_family.syntheticFamilyBytes(seed: BigInt.from(seed));
 
   @override
   Future<Uint8List> analysisReport({
@@ -798,6 +835,29 @@ class WebGenozCore implements GenozCore {
 
   @override
   void forgetAnnotation(String package) => rust_annot.annotForget(key: package);
+
+  @override
+  Future<({String result, String manifest})> analyzeFamily({
+    required CompareInputFile input,
+    required String optionsJson,
+    required String outDirRelative,
+    required String createdAt,
+  }) async {
+    if (input.bytes > webMaxFileBytes) throw StateError(webTooLarge(input.bytes));
+    final r = await rust_family.familyAnalyzeBytes(
+      data: await storage.blobs.readBytes(input.relativePath),
+      inputName: input.displayName,
+      inputSha256: input.sha256,
+      optionsJson: optionsJson,
+      createdAt: createdAt,
+    );
+    await storage.blobs.writeBytes('$outDirRelative/familia.json', Uint8List.fromList(utf8.encode(r.resultJson)));
+    await storage.blobs.writeBytes('$outDirRelative/manifest.json', Uint8List.fromList(utf8.encode(r.manifestJson)));
+    return (result: r.resultJson, manifest: r.manifestJson);
+  }
+
+  @override
+  Future<Uint8List> syntheticFamily(int seed) => rust_family.syntheticFamilyBytes(seed: BigInt.from(seed));
 
   @override
   Future<Uint8List> analysisReport({

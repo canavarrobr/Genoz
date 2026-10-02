@@ -155,6 +155,7 @@ void main() {
       ),
     );
     await settle(tester);
+    await pumpUntil(tester, find.textContaining('A é um arquivo de chip'));
 
     expect(find.textContaining('A é um arquivo de chip'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Referência (FASTA)'), 200, scrollable: find.byType(Scrollable).first);

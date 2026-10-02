@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "analysis_id": "15cd6732-77c1-8fe4-b3ac-c992e2f03382",
+  "analysis_type": "family",
+  "app_version": null,
+  "core_version": "0.1.0",
+  "platform": "cli-windows-x86_64",
+  "created_at": "2026-10-02T18:56:20Z",
+  "inputs": [
+    {
+      "role": "a",
+      "name": "familia.vcf",
+      "sha256": "915ae6c04c6f2a64fe01f82841a3744dcfcad01c4d5ae7dc82549147c1fcae05",
+      "bytes": 1102942
+    }
+  ],
+  "parameters": {
+    "call_filter": {
+      "conditions": [],
+      "min_dp": null,
+      "min_gq": null,
+      "min_qual": null,
+      "pass_only": false
+    },
+    "roh": {
+      "max_gap_kb": 1000,
+      "max_het": 1,
+      "max_kb_per_snp": 50,
+      "max_missing": 5,
+      "min_kb": 1000,
+      "min_snps": 100
+    },
+    "samples": [],
+    "trio": {
+      "child": "FILHO",
+      "father": "PAI",
+      "mother": "MAE"
+    }
+  },
+  "annotation_sources": [],
+  "outputs": [
+    {
+      "name": "familia.json",
+      "sha256": "02422250069df1edb15c217becca86a28a9fb0ad67580896337b3ea99bcb75c0",
+      "bytes": 12235
+    }
+  ],
+  "status": "completed",
+  "disclaimer": "Uso educacional e de pesquisa. Não é diagnóstico."
+}

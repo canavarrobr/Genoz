@@ -1,0 +1,665 @@
+{
+  "core_version": "0.1.0",
+  "samples": [
+    "AVO",
+    "PAI",
+    "MAE",
+    "FILHO",
+    "FILHA",
+    "VIZINHO",
+    "FILHO_REPETIDO"
+  ],
+  "options": {
+    "call_filter": {
+      "pass_only": false,
+      "min_qual": null,
+      "min_dp": null,
+      "min_gq": null,
+      "conditions": []
+    },
+    "samples": [],
+    "trio": {
+      "child": "FILHO",
+      "father": "PAI",
+      "mother": "MAE"
+    },
+    "roh": {
+      "min_kb": 1000,
+      "min_snps": 100,
+      "max_het": 1,
+      "max_missing": 5,
+      "max_gap_kb": 1000,
+      "max_kb_per_snp": 50
+    }
+  },
+  "sites": {
+    "records": 9781,
+    "used": 9781,
+    "skipped_multiallelic": 0,
+    "skipped_not_snv": 0,
+    "skipped_not_autosomal": 0,
+    "rejected_lines": 0
+  },
+  "pairs": [
+    {
+      "a": 0,
+      "b": 1,
+      "sites": 9728,
+      "het_a": 4357,
+      "het_b": 4340,
+      "het_het": 2181,
+      "ibs0": 0,
+      "identical": 5393,
+      "concordance": 0.5543791118421053,
+      "kinship": 0.2507761296998965,
+      "pi0": 0.0,
+      "relation": "parent_offspring"
+    },
+    {
+      "a": 0,
+      "b": 2,
+      "sites": 9721,
+      "het_a": 4356,
+      "het_b": 4325,
+      "het_het": 1779,
+      "ibs0": 881,
+      "identical": 3717,
+      "concordance": 0.3823680691286905,
+      "kinship": 0.001958299735053565,
+      "pi0": 1.247886133800258,
+      "relation": "unrelated"
+    },
+    {
+      "a": 0,
+      "b": 3,
+      "sites": 9732,
+      "het_a": 4357,
+      "het_b": 4420,
+      "het_het": 2012,
+      "ibs0": 435,
+      "identical": 4544,
+      "concordance": 0.4669132757912043,
+      "kinship": 0.13011279480460294,
+      "pi0": 0.6152488060452609,
+      "relation": "second_degree"
+    },
+    {
+      "a": 0,
+      "b": 4,
+      "sites": 9725,
+      "het_a": 4354,
+      "het_b": 4264,
+      "het_het": 1913,
+      "ibs0": 434,
+      "identical": 4499,
+      "concordance": 0.46262210796915165,
+      "kinship": 0.12125783244372244,
+      "pi0": 0.6147582768977073,
+      "relation": "second_degree"
+    },
+    {
+      "a": 0,
+      "b": 5,
+      "sites": 9720,
+      "het_a": 4354,
+      "het_b": 3943,
+      "het_het": 1622,
+      "ibs0": 999,
+      "identical": 3668,
+      "concordance": 0.37736625514403294,
+      "kinship": -0.04531758466915753,
+      "pi0": 1.4161899483803628,
+      "relation": "unrelated"
+    },
+    {
+      "a": 0,
+      "b": 6,
+      "sites": 9728,
+      "het_a": 4351,
+      "het_b": 4419,
+      "het_het": 2008,
+      "ibs0": 435,
+      "identical": 4539,
+      "concordance": 0.46659128289473684,
+      "kinship": 0.12976054732041048,
+      "pi0": 0.6159776774729431,
+      "relation": "second_degree"
+    },
+    {
+      "a": 1,
+      "b": 2,
+      "sites": 9726,
+      "het_a": 4344,
+      "het_b": 4329,
+      "het_het": 1738,
+      "ibs0": 892,
+      "identical": 3637,
+      "concordance": 0.373946123791898,
+      "kinship": -0.00530381644183097,
+      "pi0": 1.2628645354391903,
+      "relation": "unrelated"
+    },
+    {
+      "a": 1,
+      "b": 3,
+      "sites": 9737,
+      "het_a": 4352,
+      "het_b": 4418,
+      "het_het": 2220,
+      "ibs0": 1,
+      "identical": 5406,
+      "concordance": 0.5552018075382561,
+      "kinship": 0.25290763968072977,
+      "pi0": 0.0014136916367189438,
+      "relation": "parent_offspring"
+    },
+    {
+      "a": 1,
+      "b": 4,
+      "sites": 9730,
+      "het_a": 4341,
+      "het_b": 4263,
+      "het_het": 2120,
+      "ibs0": 0,
+      "identical": 5366,
+      "concordance": 0.5514902363823228,
+      "kinship": 0.24639702463970248,
+      "pi0": 0.0,
+      "relation": "parent_offspring"
+    },
+    {
+      "a": 1,
+      "b": 5,
+      "sites": 9725,
+      "het_a": 4341,
+      "het_b": 3948,
+      "het_het": 1639,
+      "ibs0": 1024,
+      "identical": 3690,
+      "concordance": 0.3794344473007712,
+      "kinship": -0.049342502111231756,
+      "pi0": 1.4509373754756232,
+      "relation": "unrelated"
+    },
+    {
+      "a": 1,
+      "b": 6,
+      "sites": 9733,
+      "het_a": 4350,
+      "het_b": 4417,
+      "het_het": 2219,
+      "ibs0": 2,
+      "identical": 5402,
+      "concordance": 0.5550190075002569,
+      "kinship": 0.25265199041861525,
+      "pi0": 0.002830731214098425,
+      "relation": "parent_offspring"
+    },
+    {
+      "a": 2,
+      "b": 3,
+      "sites": 9730,
+      "het_a": 4329,
+      "het_b": 4420,
+      "het_het": 2183,
+      "ibs0": 1,
+      "identical": 5346,
+      "concordance": 0.5494347379239466,
+      "kinship": 0.24928563264373071,
+      "pi0": 0.0014140784168200277,
+      "relation": "parent_offspring"
+    },
+    {
+      "a": 2,
+      "b": 4,
+      "sites": 9723,
+      "het_a": 4329,
+      "het_b": 4263,
+      "het_het": 2092,
+      "ibs0": 0,
+      "identical": 5315,
+      "concordance": 0.5466419829270801,
+      "kinship": 0.24348230912476723,
+      "pi0": 0.0,
+      "relation": "parent_offspring"
+    },
+    {
+      "a": 2,
+      "b": 5,
+      "sites": 9718,
+      "het_a": 4326,
+      "het_b": 3948,
+      "het_het": 1545,
+      "ibs0": 985,
+      "identical": 3549,
+      "concordance": 0.3651986005350895,
+      "kinship": -0.05136572395455644,
+      "pi0": 1.3960597918974516,
+      "relation": "unrelated"
+    },
+    {
+      "a": 2,
+      "b": 6,
+      "sites": 9726,
+      "het_a": 4328,
+      "het_b": 4419,
+      "het_het": 2183,
+      "ibs0": 1,
+      "identical": 5344,
+      "concordance": 0.5494550688875179,
+      "kinship": 0.2493426317594604,
+      "pi0": 0.0014157533038007307,
+      "relation": "parent_offspring"
+    },
+    {
+      "a": 3,
+      "b": 4,
+      "sites": 9734,
+      "het_a": 4417,
+      "het_b": 4269,
+      "het_het": 2603,
+      "ibs0": 226,
+      "identical": 6028,
+      "concordance": 0.619272652558044,
+      "kinship": 0.2476398802670965,
+      "pi0": 0.31959318608485215,
+      "relation": "full_siblings"
+    },
+    {
+      "a": 3,
+      "b": 5,
+      "sites": 9729,
+      "het_a": 4414,
+      "het_b": 3954,
+      "het_het": 1635,
+      "ibs0": 1000,
+      "identical": 3631,
+      "concordance": 0.37321410216877376,
+      "kinship": -0.043618546845124284,
+      "pi0": 1.4152392552983568,
+      "relation": "unrelated"
+    },
+    {
+      "a": 3,
+      "b": 6,
+      "sites": 9737,
+      "het_a": 4420,
+      "het_b": 4423,
+      "het_het": 4417,
+      "ibs0": 0,
+      "identical": 9728,
+      "concordance": 0.9990756906644757,
+      "kinship": 0.49949112292208525,
+      "pi0": 0.0,
+      "relation": "duplicate"
+    },
+    {
+      "a": 4,
+      "b": 5,
+      "sites": 9722,
+      "het_a": 4259,
+      "het_b": 3946,
+      "het_het": 1554,
+      "ibs0": 994,
+      "identical": 3631,
+      "concordance": 0.3734828224645135,
+      "kinship": -0.052894576477757464,
+      "pi0": 1.4088663203712526,
+      "relation": "unrelated"
+    },
+    {
+      "a": 4,
+      "b": 6,
+      "sites": 9730,
+      "het_a": 4267,
+      "het_b": 4416,
+      "het_het": 2600,
+      "ibs0": 225,
+      "identical": 6022,
+      "concordance": 0.6189105858170606,
+      "kinship": 0.24761027294713808,
+      "pi0": 0.31855593356637657,
+      "relation": "full_siblings"
+    },
+    {
+      "a": 5,
+      "b": 6,
+      "sites": 9725,
+      "het_a": 3947,
+      "het_b": 4413,
+      "het_het": 1632,
+      "ibs0": 999,
+      "identical": 3630,
+      "concordance": 0.37326478149100256,
+      "kinship": -0.04377990430622009,
+      "pi0": 1.4154999780244464,
+      "relation": "unrelated"
+    }
+  ],
+  "carriers": [
+    5462,
+    5487,
+    5454,
+    5558,
+    5431,
+    5253,
+    5557
+  ],
+  "intersections": [
+    {
+      "samples": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "count": 1018
+    },
+    {
+      "samples": [
+        5
+      ],
+      "count": 997
+    },
+    {
+      "samples": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "count": 677
+    },
+    {
+      "samples": [
+        0
+      ],
+      "count": 436
+    },
+    {
+      "samples": [
+        0,
+        1,
+        3,
+        4,
+        6
+      ],
+      "count": 412
+    },
+    {
+      "samples": [
+        2,
+        3,
+        4,
+        6
+      ],
+      "count": 381
+    },
+    {
+      "samples": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6
+      ],
+      "count": 372
+    },
+    {
+      "samples": [
+        0,
+        5
+      ],
+      "count": 312
+    },
+    {
+      "samples": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "count": 290
+    },
+    {
+      "samples": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "count": 255
+    },
+    {
+      "samples": [
+        2,
+        3,
+        6
+      ],
+      "count": 243
+    },
+    {
+      "samples": [
+        2
+      ],
+      "count": 240
+    },
+    {
+      "samples": [
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "count": 211
+    },
+    {
+      "samples": [
+        2,
+        4
+      ],
+      "count": 203
+    },
+    {
+      "samples": [
+        0,
+        1
+      ],
+      "count": 179
+    },
+    {
+      "samples": [
+        0,
+        1,
+        3,
+        6
+      ],
+      "count": 178
+    },
+    {
+      "samples": [
+        0,
+        1,
+        3,
+        5,
+        6
+      ],
+      "count": 173
+    },
+    {
+      "samples": [
+        0,
+        1,
+        4
+      ],
+      "count": 167
+    },
+    {
+      "samples": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "count": 156
+    },
+    {
+      "samples": [
+        2,
+        3,
+        5,
+        6
+      ],
+      "count": 147
+    }
+  ],
+  "roh": [
+    {
+      "sample": 0,
+      "genotyped": 9752,
+      "heterozygous": 4368,
+      "runs": [],
+      "total_kb": 0,
+      "froh": 0.0
+    },
+    {
+      "sample": 1,
+      "genotyped": 9757,
+      "heterozygous": 4357,
+      "runs": [],
+      "total_kb": 0,
+      "froh": 0.0
+    },
+    {
+      "sample": 2,
+      "genotyped": 9750,
+      "heterozygous": 4339,
+      "runs": [],
+      "total_kb": 0,
+      "froh": 0.0
+    },
+    {
+      "sample": 3,
+      "genotyped": 9761,
+      "heterozygous": 4432,
+      "runs": [],
+      "total_kb": 0,
+      "froh": 0.0
+    },
+    {
+      "sample": 4,
+      "genotyped": 9754,
+      "heterozygous": 4277,
+      "runs": [],
+      "total_kb": 0,
+      "froh": 0.0
+    },
+    {
+      "sample": 5,
+      "genotyped": 9749,
+      "heterozygous": 3958,
+      "runs": [
+        {
+          "chrom": "21",
+          "start": 19979466,
+          "end": 32004488,
+          "snps": 818,
+          "hets": 1,
+          "missing": 2
+        }
+      ],
+      "total_kb": 12025,
+      "froh": 0.07444431203734612
+    },
+    {
+      "sample": 6,
+      "genotyped": 9757,
+      "heterozygous": 4431,
+      "runs": [],
+      "total_kb": 0,
+      "froh": 0.0
+    }
+  ],
+  "roh_available": true,
+  "trio": {
+    "child": 3,
+    "father": 1,
+    "mother": 2,
+    "sites": 9706,
+    "consistent": 9702,
+    "de_novo_candidates": 3,
+    "other_errors": 1,
+    "paternal": 1760,
+    "maternal": 1764,
+    "ambiguous": 879,
+    "error_rate": 0.00041211621677313,
+    "events": [
+      {
+        "chrom": "22",
+        "pos": 2421785,
+        "reference": "A",
+        "alt": "C",
+        "kind": "de_novo",
+        "child": "0/1",
+        "father": "0/0",
+        "mother": "0/0",
+        "child_qual": 634.9,
+        "child_dp": 18,
+        "child_gq": 40
+      },
+      {
+        "chrom": "22",
+        "pos": 3669921,
+        "reference": "A",
+        "alt": "C",
+        "kind": "de_novo",
+        "child": "0/1",
+        "father": "0/0",
+        "mother": "0/0",
+        "child_qual": 331.3,
+        "child_dp": 21,
+        "child_gq": 61
+      },
+      {
+        "chrom": "22",
+        "pos": 4895323,
+        "reference": "T",
+        "alt": "C",
+        "kind": "de_novo",
+        "child": "0/1",
+        "father": "0/0",
+        "mother": "0/0",
+        "child_qual": 643.9,
+        "child_dp": 33,
+        "child_gq": 31
+      },
+      {
+        "chrom": "22",
+        "pos": 19172744,
+        "reference": "C",
+        "alt": "T",
+        "kind": "mendelian_error",
+        "child": "1/1",
+        "father": "0/0",
+        "mother": "0/0",
+        "child_qual": 895.0,
+        "child_dp": 40,
+        "child_gq": 46
+      }
+    ],
+    "events_truncated": false
+  },
+  "warnings": []
+}

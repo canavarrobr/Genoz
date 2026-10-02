@@ -221,6 +221,128 @@ pub fn write_synthetic_vcf<W: Write>(p: &SynthParams, mut w: W) -> Result<()> {
     Ok(())
 }
 
+/// Amostras da família fictícia: avô paterno, pai (filho do avô), mãe, dois filhos,
+/// uma pessoa sem parentesco (com um trecho longo de homozigose) e uma duplicata do filho.
+pub const FAMILY_SAMPLES: [&str; 7] = ["AVO", "PAI", "MAE", "FILHO", "FILHA", "VIZINHO", "FILHO_REPETIDO"];
+
+/// O que foi plantado na família fictícia (para testes e aulas).
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct FamilyTruth {
+    /// Variantes novas no FILHO (pai e mãe 0/0).
+    pub de_novo: Vec<(String, u64)>,
+    /// FILHO 1/1 com o PAI 0/0.
+    pub mendelian_error: Option<(String, u64)>,
+    /// Trecho homozigoto do VIZINHO: cromossomo, início, fim.
+    pub roh: (String, u64, u64),
+}
+
+/// VCF multiamostra (chamada conjunta) de uma família FICTÍCIA, determinístico.
+/// SNVs bialélicos com frequência entre 5% e 50%; transmissão mendeliana sítio a sítio.
+pub fn write_family_vcf<W: Write>(
+    seed: u64,
+    build: GenomeBuild,
+    sites_per_chrom: u32,
+    mut w: W,
+) -> Result<FamilyTruth> {
+    if build == GenomeBuild::Unknown {
+        return Err(GenozError::InvalidParam("escolha GRCh37 ou GRCh38".into()));
+    }
+    let build_name = if build == GenomeBuild::Grch37 { "GRCh37" } else { "GRCh38" };
+    let chroms = ["20", "21", "22"];
+    writeln!(w, "##fileformat=VCFv4.3")?;
+    writeln!(w, "##source=genoz-synth family seed={seed} (dados fictícios)")?;
+    writeln!(w, "##reference={build_name}")?;
+    for c in chroms {
+        let len = contig_length(c, build).expect("comprimento conhecido");
+        writeln!(w, "##contig=<ID=chr{c},length={len},assembly={build_name}>")?;
+    }
+    writeln!(w, "##FILTER=<ID=PASS,Description=\"All filters passed\">")?;
+    writeln!(w, "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genótipo\">")?;
+    writeln!(w, "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Profundidade\">")?;
+    writeln!(w, "##FORMAT=<ID=GQ,Number=1,Type=Integer,Description=\"Qualidade do genótipo\">")?;
+    write!(w, "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT")?;
+    for s in FAMILY_SAMPLES {
+        write!(w, "\t{s}")?;
+    }
+    writeln!(w)?;
+
+    let mut rng = SplitMix64::new(seed);
+    let mut truth = FamilyTruth::default();
+    let roh_chrom = "21";
+    let (roh_start, roh_end) = (20_000_000u64, 32_000_000u64);
+    let mut first_roh = None;
+    let mut last_roh = 0;
+    for c in chroms {
+        let len = contig_length(c, build).expect("comprimento conhecido");
+        let usable = len.saturating_sub(20_000);
+        let step = (usable / u64::from(sites_per_chrom.max(1))).max(10);
+        let mut pos = 10_000u64;
+        let mut k = 0u32;
+        while k < sites_per_chrom {
+            k += 1;
+            pos += rng.range(step / 2, step * 3 / 2).max(10);
+            if pos >= usable {
+                break;
+            }
+            let q = 0.05 + rng.next_f64() * 0.45;
+            let allele = |rng: &mut SplitMix64| u8::from(rng.chance(q));
+            let pick = |rng: &mut SplitMix64, g: [u8; 2]| g[usize::from(rng.chance(0.5))];
+            let avo = [allele(&mut rng), allele(&mut rng)];
+            let avo_parceira = [allele(&mut rng), allele(&mut rng)];
+            let pai = [pick(&mut rng, avo), pick(&mut rng, avo_parceira)];
+            let mae = [allele(&mut rng), allele(&mut rng)];
+            let mut filho = [pick(&mut rng, pai), pick(&mut rng, mae)];
+            let filha = [pick(&mut rng, pai), pick(&mut rng, mae)];
+            let mut vizinho = [allele(&mut rng), allele(&mut rng)];
+            let in_roh = c == roh_chrom && (roh_start..=roh_end).contains(&pos);
+            if in_roh {
+                vizinho[1] = vizinho[0];
+            }
+            // Plantados no cromossomo 22: três de novo e um erro mendeliano.
+            let mut planted = false;
+            if c == "22" && pai == [0, 0] && mae == [0, 0] && truth.de_novo.len() < 3 && k % 97 == 0 {
+                filho = [0, 1];
+                truth.de_novo.push((format!("chr{c}"), pos));
+                planted = true;
+            } else if c == "22" && truth.mendelian_error.is_none() && pai == [0, 0] && k > 1500 {
+                filho = [1, 1];
+                truth.mendelian_error = Some((format!("chr{c}"), pos));
+                planted = true;
+            }
+            let mut repetido = filho;
+            if !planted && rng.chance(0.001) {
+                repetido[0] ^= 1;
+            }
+            let genos = [avo, pai, mae, filho, filha, vizinho, repetido];
+            if genos.iter().all(|g| g == &[0, 0]) {
+                continue; // sítio sem variante: não entra num VCF conjunto
+            }
+            if in_roh {
+                first_roh.get_or_insert(pos);
+                last_roh = pos;
+            }
+            let anchor = BASES[rng.range(0, 3) as usize];
+            let alt = other_base(&mut rng, anchor);
+            let qual = rng.range(300, 9_999) as f64 / 10.0;
+            write!(w, "chr{c}\t{pos}\t.\t{}\t{}\t{qual:.1}\tPASS\t.\tGT:DP:GQ", anchor as char, alt as char)?;
+            for g in genos {
+                let dp = rng.range(15, 60);
+                let gq = rng.range(30, 99);
+                if !planted && rng.chance(0.003) {
+                    write!(w, "\t./.:{dp}:.")?;
+                } else {
+                    let (a, b) = (g[0].min(g[1]), g[0].max(g[1]));
+                    write!(w, "\t{a}/{b}:{dp}:{gq}")?;
+                }
+            }
+            writeln!(w)?;
+        }
+    }
+    truth.roh = (format!("chr{roh_chrom}"), first_roh.unwrap_or(roh_start), last_roh);
+    w.flush()?;
+    Ok(truth)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -3214,6 +3214,582 @@ class JournalEntriesCompanion extends UpdateCompanion<JournalEntry> {
   }
 }
 
+class $FamilyAnalysesTable extends FamilyAnalyses
+    with TableInfo<$FamilyAnalysesTable, FamilyAnalysis> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FamilyAnalysesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _fileIdMeta = const VerificationMeta('fileId');
+  @override
+  late final GeneratedColumn<String> fileId = GeneratedColumn<String>(
+    'file_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _optionsJsonMeta = const VerificationMeta(
+    'optionsJson',
+  );
+  @override
+  late final GeneratedColumn<String> optionsJson = GeneratedColumn<String>(
+    'options_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _resultDirMeta = const VerificationMeta(
+    'resultDir',
+  );
+  @override
+  late final GeneratedColumn<String> resultDir = GeneratedColumn<String>(
+    'result_dir',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sampleCountMeta = const VerificationMeta(
+    'sampleCount',
+  );
+  @override
+  late final GeneratedColumn<int> sampleCount = GeneratedColumn<int>(
+    'sample_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hasTrioMeta = const VerificationMeta(
+    'hasTrio',
+  );
+  @override
+  late final GeneratedColumn<bool> hasTrio = GeneratedColumn<bool>(
+    'has_trio',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("has_trio" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _contentIdMeta = const VerificationMeta(
+    'contentId',
+  );
+  @override
+  late final GeneratedColumn<String> contentId = GeneratedColumn<String>(
+    'content_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    projectId,
+    fileId,
+    optionsJson,
+    resultDir,
+    sampleCount,
+    hasTrio,
+    contentId,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'family_analyses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FamilyAnalysis> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('file_id')) {
+      context.handle(
+        _fileIdMeta,
+        fileId.isAcceptableOrUnknown(data['file_id']!, _fileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fileIdMeta);
+    }
+    if (data.containsKey('options_json')) {
+      context.handle(
+        _optionsJsonMeta,
+        optionsJson.isAcceptableOrUnknown(
+          data['options_json']!,
+          _optionsJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_optionsJsonMeta);
+    }
+    if (data.containsKey('result_dir')) {
+      context.handle(
+        _resultDirMeta,
+        resultDir.isAcceptableOrUnknown(data['result_dir']!, _resultDirMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_resultDirMeta);
+    }
+    if (data.containsKey('sample_count')) {
+      context.handle(
+        _sampleCountMeta,
+        sampleCount.isAcceptableOrUnknown(
+          data['sample_count']!,
+          _sampleCountMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sampleCountMeta);
+    }
+    if (data.containsKey('has_trio')) {
+      context.handle(
+        _hasTrioMeta,
+        hasTrio.isAcceptableOrUnknown(data['has_trio']!, _hasTrioMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_hasTrioMeta);
+    }
+    if (data.containsKey('content_id')) {
+      context.handle(
+        _contentIdMeta,
+        contentId.isAcceptableOrUnknown(data['content_id']!, _contentIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FamilyAnalysis map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FamilyAnalysis(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      projectId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}project_id'],
+      )!,
+      fileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}file_id'],
+      )!,
+      optionsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}options_json'],
+      )!,
+      resultDir: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}result_dir'],
+      )!,
+      sampleCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sample_count'],
+      )!,
+      hasTrio: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}has_trio'],
+      )!,
+      contentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FamilyAnalysesTable createAlias(String alias) {
+    return $FamilyAnalysesTable(attachedDatabase, alias);
+  }
+}
+
+class FamilyAnalysis extends DataClass implements Insertable<FamilyAnalysis> {
+  final String id;
+  final String projectId;
+  final String fileId;
+
+  /// `FamilyOptions` do núcleo, em JSON.
+  final String optionsJson;
+  final String resultDir;
+  final int sampleCount;
+  final bool hasTrio;
+  final String contentId;
+  final DateTime createdAt;
+  const FamilyAnalysis({
+    required this.id,
+    required this.projectId,
+    required this.fileId,
+    required this.optionsJson,
+    required this.resultDir,
+    required this.sampleCount,
+    required this.hasTrio,
+    required this.contentId,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['project_id'] = Variable<String>(projectId);
+    map['file_id'] = Variable<String>(fileId);
+    map['options_json'] = Variable<String>(optionsJson);
+    map['result_dir'] = Variable<String>(resultDir);
+    map['sample_count'] = Variable<int>(sampleCount);
+    map['has_trio'] = Variable<bool>(hasTrio);
+    map['content_id'] = Variable<String>(contentId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  FamilyAnalysesCompanion toCompanion(bool nullToAbsent) {
+    return FamilyAnalysesCompanion(
+      id: Value(id),
+      projectId: Value(projectId),
+      fileId: Value(fileId),
+      optionsJson: Value(optionsJson),
+      resultDir: Value(resultDir),
+      sampleCount: Value(sampleCount),
+      hasTrio: Value(hasTrio),
+      contentId: Value(contentId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory FamilyAnalysis.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FamilyAnalysis(
+      id: serializer.fromJson<String>(json['id']),
+      projectId: serializer.fromJson<String>(json['projectId']),
+      fileId: serializer.fromJson<String>(json['fileId']),
+      optionsJson: serializer.fromJson<String>(json['optionsJson']),
+      resultDir: serializer.fromJson<String>(json['resultDir']),
+      sampleCount: serializer.fromJson<int>(json['sampleCount']),
+      hasTrio: serializer.fromJson<bool>(json['hasTrio']),
+      contentId: serializer.fromJson<String>(json['contentId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'projectId': serializer.toJson<String>(projectId),
+      'fileId': serializer.toJson<String>(fileId),
+      'optionsJson': serializer.toJson<String>(optionsJson),
+      'resultDir': serializer.toJson<String>(resultDir),
+      'sampleCount': serializer.toJson<int>(sampleCount),
+      'hasTrio': serializer.toJson<bool>(hasTrio),
+      'contentId': serializer.toJson<String>(contentId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  FamilyAnalysis copyWith({
+    String? id,
+    String? projectId,
+    String? fileId,
+    String? optionsJson,
+    String? resultDir,
+    int? sampleCount,
+    bool? hasTrio,
+    String? contentId,
+    DateTime? createdAt,
+  }) => FamilyAnalysis(
+    id: id ?? this.id,
+    projectId: projectId ?? this.projectId,
+    fileId: fileId ?? this.fileId,
+    optionsJson: optionsJson ?? this.optionsJson,
+    resultDir: resultDir ?? this.resultDir,
+    sampleCount: sampleCount ?? this.sampleCount,
+    hasTrio: hasTrio ?? this.hasTrio,
+    contentId: contentId ?? this.contentId,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  FamilyAnalysis copyWithCompanion(FamilyAnalysesCompanion data) {
+    return FamilyAnalysis(
+      id: data.id.present ? data.id.value : this.id,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      fileId: data.fileId.present ? data.fileId.value : this.fileId,
+      optionsJson: data.optionsJson.present
+          ? data.optionsJson.value
+          : this.optionsJson,
+      resultDir: data.resultDir.present ? data.resultDir.value : this.resultDir,
+      sampleCount: data.sampleCount.present
+          ? data.sampleCount.value
+          : this.sampleCount,
+      hasTrio: data.hasTrio.present ? data.hasTrio.value : this.hasTrio,
+      contentId: data.contentId.present ? data.contentId.value : this.contentId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FamilyAnalysis(')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('fileId: $fileId, ')
+          ..write('optionsJson: $optionsJson, ')
+          ..write('resultDir: $resultDir, ')
+          ..write('sampleCount: $sampleCount, ')
+          ..write('hasTrio: $hasTrio, ')
+          ..write('contentId: $contentId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    projectId,
+    fileId,
+    optionsJson,
+    resultDir,
+    sampleCount,
+    hasTrio,
+    contentId,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FamilyAnalysis &&
+          other.id == this.id &&
+          other.projectId == this.projectId &&
+          other.fileId == this.fileId &&
+          other.optionsJson == this.optionsJson &&
+          other.resultDir == this.resultDir &&
+          other.sampleCount == this.sampleCount &&
+          other.hasTrio == this.hasTrio &&
+          other.contentId == this.contentId &&
+          other.createdAt == this.createdAt);
+}
+
+class FamilyAnalysesCompanion extends UpdateCompanion<FamilyAnalysis> {
+  final Value<String> id;
+  final Value<String> projectId;
+  final Value<String> fileId;
+  final Value<String> optionsJson;
+  final Value<String> resultDir;
+  final Value<int> sampleCount;
+  final Value<bool> hasTrio;
+  final Value<String> contentId;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const FamilyAnalysesCompanion({
+    this.id = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.fileId = const Value.absent(),
+    this.optionsJson = const Value.absent(),
+    this.resultDir = const Value.absent(),
+    this.sampleCount = const Value.absent(),
+    this.hasTrio = const Value.absent(),
+    this.contentId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FamilyAnalysesCompanion.insert({
+    required String id,
+    required String projectId,
+    required String fileId,
+    required String optionsJson,
+    required String resultDir,
+    required int sampleCount,
+    required bool hasTrio,
+    required String contentId,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       projectId = Value(projectId),
+       fileId = Value(fileId),
+       optionsJson = Value(optionsJson),
+       resultDir = Value(resultDir),
+       sampleCount = Value(sampleCount),
+       hasTrio = Value(hasTrio),
+       contentId = Value(contentId),
+       createdAt = Value(createdAt);
+  static Insertable<FamilyAnalysis> custom({
+    Expression<String>? id,
+    Expression<String>? projectId,
+    Expression<String>? fileId,
+    Expression<String>? optionsJson,
+    Expression<String>? resultDir,
+    Expression<int>? sampleCount,
+    Expression<bool>? hasTrio,
+    Expression<String>? contentId,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (projectId != null) 'project_id': projectId,
+      if (fileId != null) 'file_id': fileId,
+      if (optionsJson != null) 'options_json': optionsJson,
+      if (resultDir != null) 'result_dir': resultDir,
+      if (sampleCount != null) 'sample_count': sampleCount,
+      if (hasTrio != null) 'has_trio': hasTrio,
+      if (contentId != null) 'content_id': contentId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FamilyAnalysesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? projectId,
+    Value<String>? fileId,
+    Value<String>? optionsJson,
+    Value<String>? resultDir,
+    Value<int>? sampleCount,
+    Value<bool>? hasTrio,
+    Value<String>? contentId,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return FamilyAnalysesCompanion(
+      id: id ?? this.id,
+      projectId: projectId ?? this.projectId,
+      fileId: fileId ?? this.fileId,
+      optionsJson: optionsJson ?? this.optionsJson,
+      resultDir: resultDir ?? this.resultDir,
+      sampleCount: sampleCount ?? this.sampleCount,
+      hasTrio: hasTrio ?? this.hasTrio,
+      contentId: contentId ?? this.contentId,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (fileId.present) {
+      map['file_id'] = Variable<String>(fileId.value);
+    }
+    if (optionsJson.present) {
+      map['options_json'] = Variable<String>(optionsJson.value);
+    }
+    if (resultDir.present) {
+      map['result_dir'] = Variable<String>(resultDir.value);
+    }
+    if (sampleCount.present) {
+      map['sample_count'] = Variable<int>(sampleCount.value);
+    }
+    if (hasTrio.present) {
+      map['has_trio'] = Variable<bool>(hasTrio.value);
+    }
+    if (contentId.present) {
+      map['content_id'] = Variable<String>(contentId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FamilyAnalysesCompanion(')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('fileId: $fileId, ')
+          ..write('optionsJson: $optionsJson, ')
+          ..write('resultDir: $resultDir, ')
+          ..write('sampleCount: $sampleCount, ')
+          ..write('hasTrio: $hasTrio, ')
+          ..write('contentId: $contentId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$GenozDatabase extends GeneratedDatabase {
   _$GenozDatabase(QueryExecutor e) : super(e);
   $GenozDatabaseManager get managers => $GenozDatabaseManager(this);
@@ -3223,6 +3799,7 @@ abstract class _$GenozDatabase extends GeneratedDatabase {
   late final $SavedFiltersTable savedFilters = $SavedFiltersTable(this);
   late final $VariantNotesTable variantNotes = $VariantNotesTable(this);
   late final $JournalEntriesTable journalEntries = $JournalEntriesTable(this);
+  late final $FamilyAnalysesTable familyAnalyses = $FamilyAnalysesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3234,6 +3811,7 @@ abstract class _$GenozDatabase extends GeneratedDatabase {
     savedFilters,
     variantNotes,
     journalEntries,
+    familyAnalyses,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -3271,6 +3849,13 @@ abstract class _$GenozDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('journal_entries', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'projects',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('family_analyses', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -3384,6 +3969,24 @@ final class $$ProjectsTableReferences
     ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_journalEntriesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FamilyAnalysesTable, List<FamilyAnalysis>>
+  _familyAnalysesRefsTable(_$GenozDatabase db) => MultiTypedResultKey.fromTable(
+    db.familyAnalyses,
+    aliasName: 'projects__id__family_analyses__project_id',
+  );
+
+  $$FamilyAnalysesTableProcessedTableManager get familyAnalysesRefs {
+    final manager = $$FamilyAnalysesTableTableManager(
+      $_db,
+      $_db.familyAnalyses,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_familyAnalysesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3545,6 +4148,31 @@ class $$ProjectsTableFilterComposer
           }) => $$JournalEntriesTableFilterComposer(
             $db: $db,
             $table: $db.journalEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> familyAnalysesRefs(
+    Expression<bool> Function($$FamilyAnalysesTableFilterComposer f) f,
+  ) {
+    final $$FamilyAnalysesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.familyAnalyses,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FamilyAnalysesTableFilterComposer(
+            $db: $db,
+            $table: $db.familyAnalyses,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3748,6 +4376,31 @@ class $$ProjectsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> familyAnalysesRefs<T extends Object>(
+    Expression<T> Function($$FamilyAnalysesTableAnnotationComposer a) f,
+  ) {
+    final $$FamilyAnalysesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.familyAnalyses,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FamilyAnalysesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.familyAnalyses,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProjectsTableTableManager
@@ -3769,6 +4422,7 @@ class $$ProjectsTableTableManager
             bool savedFiltersRefs,
             bool variantNotesRefs,
             bool journalEntriesRefs,
+            bool familyAnalysesRefs,
           })
         > {
   $$ProjectsTableTableManager(_$GenozDatabase db, $ProjectsTable table)
@@ -3833,6 +4487,7 @@ class $$ProjectsTableTableManager
                 savedFiltersRefs = false,
                 variantNotesRefs = false,
                 journalEntriesRefs = false,
+                familyAnalysesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -3842,6 +4497,7 @@ class $$ProjectsTableTableManager
                     if (savedFiltersRefs) db.savedFilters,
                     if (variantNotesRefs) db.variantNotes,
                     if (journalEntriesRefs) db.journalEntries,
+                    if (familyAnalysesRefs) db.familyAnalyses,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -3951,6 +4607,27 @@ class $$ProjectsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (familyAnalysesRefs)
+                        await $_getPrefetchedData<
+                          Project,
+                          $ProjectsTable,
+                          FamilyAnalysis
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProjectsTableReferences
+                              ._familyAnalysesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).familyAnalysesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.projectId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -3977,6 +4654,7 @@ typedef $$ProjectsTableProcessedTableManager =
         bool savedFiltersRefs,
         bool variantNotesRefs,
         bool journalEntriesRefs,
+        bool familyAnalysesRefs,
       })
     >;
 typedef $$ProjectFilesTableCreateCompanionBuilder =
@@ -5938,6 +6616,408 @@ typedef $$JournalEntriesTableProcessedTableManager =
       JournalEntry,
       PrefetchHooks Function({bool projectId})
     >;
+typedef $$FamilyAnalysesTableCreateCompanionBuilder =
+    FamilyAnalysesCompanion Function({
+      required String id,
+      required String projectId,
+      required String fileId,
+      required String optionsJson,
+      required String resultDir,
+      required int sampleCount,
+      required bool hasTrio,
+      required String contentId,
+      required DateTime createdAt,
+      Value<int> rowid,
+    });
+typedef $$FamilyAnalysesTableUpdateCompanionBuilder =
+    FamilyAnalysesCompanion Function({
+      Value<String> id,
+      Value<String> projectId,
+      Value<String> fileId,
+      Value<String> optionsJson,
+      Value<String> resultDir,
+      Value<int> sampleCount,
+      Value<bool> hasTrio,
+      Value<String> contentId,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+final class $$FamilyAnalysesTableReferences
+    extends
+        BaseReferences<_$GenozDatabase, $FamilyAnalysesTable, FamilyAnalysis> {
+  $$FamilyAnalysesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectsTable _projectIdTable(_$GenozDatabase db) =>
+      db.projects.createAlias('family_analyses__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FamilyAnalysesTableFilterComposer
+    extends Composer<_$GenozDatabase, $FamilyAnalysesTable> {
+  $$FamilyAnalysesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fileId => $composableBuilder(
+    column: $table.fileId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get optionsJson => $composableBuilder(
+    column: $table.optionsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get resultDir => $composableBuilder(
+    column: $table.resultDir,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sampleCount => $composableBuilder(
+    column: $table.sampleCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get hasTrio => $composableBuilder(
+    column: $table.hasTrio,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contentId => $composableBuilder(
+    column: $table.contentId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FamilyAnalysesTableOrderingComposer
+    extends Composer<_$GenozDatabase, $FamilyAnalysesTable> {
+  $$FamilyAnalysesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fileId => $composableBuilder(
+    column: $table.fileId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get optionsJson => $composableBuilder(
+    column: $table.optionsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get resultDir => $composableBuilder(
+    column: $table.resultDir,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sampleCount => $composableBuilder(
+    column: $table.sampleCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get hasTrio => $composableBuilder(
+    column: $table.hasTrio,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contentId => $composableBuilder(
+    column: $table.contentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FamilyAnalysesTableAnnotationComposer
+    extends Composer<_$GenozDatabase, $FamilyAnalysesTable> {
+  $$FamilyAnalysesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get fileId =>
+      $composableBuilder(column: $table.fileId, builder: (column) => column);
+
+  GeneratedColumn<String> get optionsJson => $composableBuilder(
+    column: $table.optionsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get resultDir =>
+      $composableBuilder(column: $table.resultDir, builder: (column) => column);
+
+  GeneratedColumn<int> get sampleCount => $composableBuilder(
+    column: $table.sampleCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get hasTrio =>
+      $composableBuilder(column: $table.hasTrio, builder: (column) => column);
+
+  GeneratedColumn<String> get contentId =>
+      $composableBuilder(column: $table.contentId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FamilyAnalysesTableTableManager
+    extends
+        RootTableManager<
+          _$GenozDatabase,
+          $FamilyAnalysesTable,
+          FamilyAnalysis,
+          $$FamilyAnalysesTableFilterComposer,
+          $$FamilyAnalysesTableOrderingComposer,
+          $$FamilyAnalysesTableAnnotationComposer,
+          $$FamilyAnalysesTableCreateCompanionBuilder,
+          $$FamilyAnalysesTableUpdateCompanionBuilder,
+          (FamilyAnalysis, $$FamilyAnalysesTableReferences),
+          FamilyAnalysis,
+          PrefetchHooks Function({bool projectId})
+        > {
+  $$FamilyAnalysesTableTableManager(
+    _$GenozDatabase db,
+    $FamilyAnalysesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FamilyAnalysesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FamilyAnalysesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FamilyAnalysesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> projectId = const Value.absent(),
+                Value<String> fileId = const Value.absent(),
+                Value<String> optionsJson = const Value.absent(),
+                Value<String> resultDir = const Value.absent(),
+                Value<int> sampleCount = const Value.absent(),
+                Value<bool> hasTrio = const Value.absent(),
+                Value<String> contentId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FamilyAnalysesCompanion(
+                id: id,
+                projectId: projectId,
+                fileId: fileId,
+                optionsJson: optionsJson,
+                resultDir: resultDir,
+                sampleCount: sampleCount,
+                hasTrio: hasTrio,
+                contentId: contentId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String projectId,
+                required String fileId,
+                required String optionsJson,
+                required String resultDir,
+                required int sampleCount,
+                required bool hasTrio,
+                required String contentId,
+                required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => FamilyAnalysesCompanion.insert(
+                id: id,
+                projectId: projectId,
+                fileId: fileId,
+                optionsJson: optionsJson,
+                resultDir: resultDir,
+                sampleCount: sampleCount,
+                hasTrio: hasTrio,
+                contentId: contentId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$FamilyAnalysesTable, FamilyAnalysis>(table),
+                  $$FamilyAnalysesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({projectId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (projectId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.projectId,
+                        referencedTable: $$FamilyAnalysesTableReferences
+                            ._projectIdTable(db),
+                        referencedColumn: $$FamilyAnalysesTableReferences
+                            ._projectIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FamilyAnalysesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$GenozDatabase,
+      $FamilyAnalysesTable,
+      FamilyAnalysis,
+      $$FamilyAnalysesTableFilterComposer,
+      $$FamilyAnalysesTableOrderingComposer,
+      $$FamilyAnalysesTableAnnotationComposer,
+      $$FamilyAnalysesTableCreateCompanionBuilder,
+      $$FamilyAnalysesTableUpdateCompanionBuilder,
+      (FamilyAnalysis, $$FamilyAnalysesTableReferences),
+      FamilyAnalysis,
+      PrefetchHooks Function({bool projectId})
+    >;
 
 class $GenozDatabaseManager {
   final _$GenozDatabase _db;
@@ -5954,4 +7034,6 @@ class $GenozDatabaseManager {
       $$VariantNotesTableTableManager(_db, _db.variantNotes);
   $$JournalEntriesTableTableManager get journalEntries =>
       $$JournalEntriesTableTableManager(_db, _db.journalEntries);
+  $$FamilyAnalysesTableTableManager get familyAnalyses =>
+      $$FamilyAnalysesTableTableManager(_db, _db.familyAnalyses);
 }

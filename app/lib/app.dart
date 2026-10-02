@@ -3,6 +3,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'features/family/family_screen.dart';
+import 'features/family/family_setup_screen.dart';
 import 'features/about/about_screen.dart';
 import 'features/analysis/analysis_screen.dart';
 import 'features/annotation/annotations_screen.dart';
@@ -45,6 +47,14 @@ GoRouter buildRouter() => GoRouter(
             GoRoute(
               path: 'analise/:analysisId',
               builder: (_, s) => AnalysisScreen(analysisId: s.pathParameters['analysisId']!),
+            ),
+            GoRoute(
+              path: 'familia',
+              builder: (_, s) => FamilySetupScreen(projectId: s.pathParameters['id']!),
+            ),
+            GoRoute(
+              path: 'familia/:familyId',
+              builder: (_, s) => FamilyScreen(familyId: s.pathParameters['familyId']!),
             ),
             GoRoute(
               path: 'diario',

@@ -5,6 +5,7 @@
 
 import 'api/analysis.dart';
 import 'api/annotation.dart';
+import 'api/family.dart';
 import 'api/genoz.dart';
 import 'api/memory.dart';
 import 'api/vault.dart';
@@ -67,6 +68,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ExportedBytes dco_decode_exported_bytes(dynamic raw);
+
+  @protected
+  FamilyRun dco_decode_family_run(dynamic raw);
 
   @protected
   int dco_decode_i_32(dynamic raw);
@@ -167,6 +171,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ExportedBytes sse_decode_exported_bytes(SseDeserializer deserializer);
+
+  @protected
+  FamilyRun sse_decode_family_run(SseDeserializer deserializer);
 
   @protected
   int sse_decode_i_32(SseDeserializer deserializer);
@@ -285,6 +292,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_exported_bytes(ExportedBytes self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_family_run(FamilyRun self, SseSerializer serializer);
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer);

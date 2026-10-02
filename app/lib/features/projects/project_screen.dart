@@ -18,6 +18,7 @@ import '../../ui/labels.dart';
 import '../../ui/privacy_chip.dart';
 import '../analysis/analysis_screen.dart' show analysisTitle;
 import '../import/import_controller.dart';
+import '../family/family_actions.dart';
 import '../vault/vault_ui.dart';
 import 'project_dialogs.dart';
 
@@ -99,6 +100,15 @@ class ProjectScreen extends ConsumerWidget {
                   label: Text(l.compareTitle),
                 ),
               ),
+            if (list.any(isMultiSampleVcf))
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: FilledButton.tonalIcon(
+                  onPressed: () => context.push('/projeto/$projectId/familia'),
+                  icon: const Icon(Icons.family_restroom),
+                  label: Text(l.familyTitle),
+                ),
+              ),
             _AnalysesSection(projectId: projectId),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -113,6 +123,20 @@ class ProjectScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(l.generateExampleHint, style: Theme.of(context).textTheme.bodySmall),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: OutlinedButton.icon(
+                onPressed: importState is ImportRunning
+                    ? null
+                    : () => ref.read(familyActionsProvider).importSynthetic(projectId),
+                icon: const Icon(Icons.family_restroom),
+                label: Text(l.familySynthetic),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text(l.familySyntheticHint, style: Theme.of(context).textTheme.bodySmall),
             ),
           ],
         ),
@@ -295,7 +319,8 @@ class _AnalysesSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final analyses = ref.watch(analysesProvider(projectId)).value ?? const <Analysis>[];
-    if (analyses.isEmpty) return const SizedBox.shrink();
+    final families = ref.watch(familyAnalysesProvider(projectId)).value ?? const <FamilyAnalysis>[];
+    if (analyses.isEmpty && families.isEmpty) return const SizedBox.shrink();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -320,6 +345,26 @@ class _AnalysesSection extends ConsumerWidget {
                   ref.read(genozCoreProvider).forgetResult(a.resultDir);
                   await repo.deleteAnalysis(a);
                   await repo.log(projectId, 'delete_analysis', l.logDeleteAnalysis(analysisTitle(l, a)));
+                },
+              ),
+            ),
+          ),
+        for (final f in families)
+          Card(
+            child: ListTile(
+              leading: const CircleAvatar(child: Icon(Icons.family_restroom)),
+              title: Text(l.familyListTitle(f.sampleCount)),
+              subtitle: Text([l.familyTitle, if (f.hasTrio) l.familyListTrio].join(' · ')),
+              onTap: () => context.push('/projeto/$projectId/familia/${f.id}'),
+              trailing: IconButton(
+                tooltip: l.delete,
+                icon: const Icon(Icons.delete_outline),
+                onPressed: () async {
+                  final ok = await confirmDelete(context, title: l.deleteAnalysisTitle, body: l.deleteAnalysisBody);
+                  if (!ok) return;
+                  final repo = ref.read(analysisRepositoryProvider);
+                  await repo.deleteFamilyAnalysis(f);
+                  await repo.log(projectId, 'delete_analysis', l.logDeleteAnalysis(l.familyListTitle(f.sampleCount)));
                 },
               ),
             ),

@@ -2876,6 +2876,396 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Reprodutibilidade verificada: {result}'**
   String logRepro(String result);
+
+  /// No description provided for @familyTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Família e populações'**
+  String get familyTitle;
+
+  /// No description provided for @familyIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Parentesco, trechos de homozigose e herança num trio, a partir de um VCF com várias pessoas chamadas juntas (chamada conjunta).'**
+  String get familyIntro;
+
+  /// No description provided for @familyNeedsJoint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para VCFs de uma pessoa só, use Comparar A × B: neles, ausência não é referência, e o parentesco sairia errado.'**
+  String get familyNeedsJoint;
+
+  /// No description provided for @familyNoMultiSample.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum VCF deste projeto tem 2 ou mais amostras.'**
+  String get familyNoMultiSample;
+
+  /// No description provided for @familyFile.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arquivo'**
+  String get familyFile;
+
+  /// No description provided for @familySamples.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amostras ({count} de no máximo {max})'**
+  String familySamples(int count, int max);
+
+  /// No description provided for @familyTooMany.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha de 2 a {max} amostras.'**
+  String familyTooMany(int max);
+
+  /// No description provided for @familyTrioOptional.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trio (opcional)'**
+  String get familyTrioOptional;
+
+  /// No description provided for @familyChild.
+  ///
+  /// In pt, this message translates to:
+  /// **'Filho(a)'**
+  String get familyChild;
+
+  /// No description provided for @familyFather.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pai'**
+  String get familyFather;
+
+  /// No description provided for @familyMother.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mãe'**
+  String get familyMother;
+
+  /// No description provided for @familyTrioDistinct.
+  ///
+  /// In pt, this message translates to:
+  /// **'Filho(a), pai e mãe precisam ser pessoas diferentes.'**
+  String get familyTrioDistinct;
+
+  /// No description provided for @familyRun.
+  ///
+  /// In pt, this message translates to:
+  /// **'Analisar'**
+  String get familyRun;
+
+  /// No description provided for @familyRunning.
+  ///
+  /// In pt, this message translates to:
+  /// **'Analisando a família…'**
+  String get familyRunning;
+
+  /// No description provided for @familyDisclaimer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Estimativa estatística, sujeita a erro. Não é teste de paternidade com valor legal nem diagnóstico.'**
+  String get familyDisclaimer;
+
+  /// No description provided for @familyTabKinship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Parentesco'**
+  String get familyTabKinship;
+
+  /// No description provided for @familyTabRoh.
+  ///
+  /// In pt, this message translates to:
+  /// **'ROH'**
+  String get familyTabRoh;
+
+  /// No description provided for @familyTabTrio.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trio'**
+  String get familyTabTrio;
+
+  /// No description provided for @familyTabShared.
+  ///
+  /// In pt, this message translates to:
+  /// **'Interseções'**
+  String get familyTabShared;
+
+  /// No description provided for @familySitesUsed.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} SNVs autossômicos usados'**
+  String familySitesUsed(String count);
+
+  /// No description provided for @relDuplicate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mesma pessoa ou gêmeos idênticos'**
+  String get relDuplicate;
+
+  /// No description provided for @relParentOffspring.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pai/mãe e filho(a)'**
+  String get relParentOffspring;
+
+  /// No description provided for @relFullSiblings.
+  ///
+  /// In pt, this message translates to:
+  /// **'Irmãos'**
+  String get relFullSiblings;
+
+  /// No description provided for @relFirstDegree.
+  ///
+  /// In pt, this message translates to:
+  /// **'1º grau (pai/mãe–filho ou irmãos)'**
+  String get relFirstDegree;
+
+  /// No description provided for @relSecondDegree.
+  ///
+  /// In pt, this message translates to:
+  /// **'2º grau (avós, tios, meio-irmãos)'**
+  String get relSecondDegree;
+
+  /// No description provided for @relThirdDegree.
+  ///
+  /// In pt, this message translates to:
+  /// **'3º grau (ex.: primos de 1º grau)'**
+  String get relThirdDegree;
+
+  /// No description provided for @relUnrelated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem parentesco próximo'**
+  String get relUnrelated;
+
+  /// No description provided for @relInsufficient.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dados insuficientes'**
+  String get relInsufficient;
+
+  /// No description provided for @kinshipLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'φ (parentesco)'**
+  String get kinshipLabel;
+
+  /// No description provided for @ibs0Label.
+  ///
+  /// In pt, this message translates to:
+  /// **'IBS0'**
+  String get ibs0Label;
+
+  /// No description provided for @pairSites.
+  ///
+  /// In pt, this message translates to:
+  /// **'SNPs comparados'**
+  String get pairSites;
+
+  /// No description provided for @concordanceLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Concordância de genótipos'**
+  String get concordanceLabel;
+
+  /// No description provided for @kinshipExplain.
+  ///
+  /// In pt, this message translates to:
+  /// **'φ é a chance de um alelo sorteado de cada pessoa ser idêntico por descendência: ≈ 0,5 mesma pessoa; ≈ 0,25 pai/mãe–filho e irmãos; ≈ 0,125 2º grau; ≈ 0,0625 3º grau; ≈ 0 sem parentesco (valores negativos aparecem com consanguinidade ou populações diferentes). IBS0 conta os SNPs em que as duas pessoas são homozigotas opostas: perto de zero em pai/mãe–filho. Método KING-robust (Manichaikul et al., 2010).'**
+  String get kinshipExplain;
+
+  /// No description provided for @familyMatrix.
+  ///
+  /// In pt, this message translates to:
+  /// **'Matriz de parentesco'**
+  String get familyMatrix;
+
+  /// No description provided for @familyPairs.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pares'**
+  String get familyPairs;
+
+  /// No description provided for @rohIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Runs of homozygosity (ROH) são trechos longos em que as duas cópias do genoma são iguais. Aparecem quando os pais têm ancestrais em comum, próximos ou distantes, e ajudam a estudar a história das populações. Conteúdo educativo, não clínico.'**
+  String get rohIntro;
+
+  /// No description provided for @rohSummary.
+  ///
+  /// In pt, this message translates to:
+  /// **'{runs} trechos · {mb} Mb · F_ROH {froh}'**
+  String rohSummary(int runs, String mb, String froh);
+
+  /// No description provided for @rohNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum trecho longo de homozigose.'**
+  String get rohNone;
+
+  /// No description provided for @rohUnavailable.
+  ///
+  /// In pt, this message translates to:
+  /// **'O VCF não está ordenado por posição: ROH não foi calculado.'**
+  String get rohUnavailable;
+
+  /// No description provided for @rohMethod.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trechos de ≥ 1000 kb com ≥ 100 SNPs, até 1 heterozigoto e 5 ausentes (inspirado no plink --homozyg). Com poucas pessoas no VCF há menos SNPs por trecho.'**
+  String get rohMethod;
+
+  /// No description provided for @trioRoles.
+  ///
+  /// In pt, this message translates to:
+  /// **'Filho(a): {child} · Pai: {father} · Mãe: {mother}'**
+  String trioRoles(String child, String father, String mother);
+
+  /// No description provided for @trioSites.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} sítios com os três genotipados'**
+  String trioSites(String count);
+
+  /// No description provided for @trioConsistent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Consistentes com herança mendeliana'**
+  String get trioConsistent;
+
+  /// No description provided for @trioDeNovo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Candidatas a de novo'**
+  String get trioDeNovo;
+
+  /// No description provided for @trioOtherErrors.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outros erros mendelianos'**
+  String get trioOtherErrors;
+
+  /// No description provided for @trioErrorRate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Taxa de inconsistência'**
+  String get trioErrorRate;
+
+  /// No description provided for @trioInherited.
+  ///
+  /// In pt, this message translates to:
+  /// **'Alelo alternativo do(a) filho(a) heterozigoto(a), quando dá para saber de quem veio'**
+  String get trioInherited;
+
+  /// No description provided for @trioPaternal.
+  ///
+  /// In pt, this message translates to:
+  /// **'do pai'**
+  String get trioPaternal;
+
+  /// No description provided for @trioMaternal.
+  ///
+  /// In pt, this message translates to:
+  /// **'da mãe'**
+  String get trioMaternal;
+
+  /// No description provided for @trioDeNovoExplain.
+  ///
+  /// In pt, this message translates to:
+  /// **'Candidata a de novo: o(a) filho(a) tem uma variante que nenhum dos pais tem. Em dados reais, a maioria é erro de chamada ou de cobertura — confira QUAL, DP e GQ antes de qualquer conclusão. Uma taxa alta de inconsistência pode indicar troca de amostra ou pais biológicos diferentes dos indicados; só um teste oficial confirma.'**
+  String get trioDeNovoExplain;
+
+  /// No description provided for @trioEvents.
+  ///
+  /// In pt, this message translates to:
+  /// **'Eventos'**
+  String get trioEvents;
+
+  /// No description provided for @trioTruncated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostrando os primeiros {max} eventos (as contagens acima são completas).'**
+  String trioTruncated(int max);
+
+  /// No description provided for @trioNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum trio foi indicado nesta análise.'**
+  String get trioNone;
+
+  /// No description provided for @trioGenotypes.
+  ///
+  /// In pt, this message translates to:
+  /// **'filho(a) {child} · pai {father} · mãe {mother}'**
+  String trioGenotypes(String child, String father, String mother);
+
+  /// No description provided for @sharedIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quais amostras carregam o alelo alternativo de cada variante: as combinações mais frequentes (estilo UpSet).'**
+  String get sharedIntro;
+
+  /// No description provided for @sharedCarriers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Variantes por amostra'**
+  String get sharedCarriers;
+
+  /// No description provided for @sharedCombos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Combinações mais frequentes'**
+  String get sharedCombos;
+
+  /// No description provided for @familyListTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Família: {count} amostras'**
+  String familyListTitle(int count);
+
+  /// No description provided for @familyListTrio.
+  ///
+  /// In pt, this message translates to:
+  /// **'com trio'**
+  String get familyListTrio;
+
+  /// No description provided for @familySynthetic.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gerar família fictícia'**
+  String get familySynthetic;
+
+  /// No description provided for @familySyntheticHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'VCF com 7 pessoas fictícias (avô, pai, mãe, dois filhos, uma pessoa sem parentesco e uma duplicata) para experimentar Família e populações.'**
+  String get familySyntheticHint;
+
+  /// No description provided for @logFamily.
+  ///
+  /// In pt, this message translates to:
+  /// **'Família e populações: {count} amostras'**
+  String logFamily(int count);
+
+  /// No description provided for @familyQuality.
+  ///
+  /// In pt, this message translates to:
+  /// **'Portão de qualidade (chamada reprovada = ausente)'**
+  String get familyQuality;
+
+  /// No description provided for @trioEventDeNovo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Candidata a de novo'**
+  String get trioEventDeNovo;
+
+  /// No description provided for @trioEventError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro mendeliano'**
+  String get trioEventError;
 }
 
 class _AppLocalizationsDelegate

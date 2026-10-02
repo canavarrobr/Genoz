@@ -65,6 +65,46 @@ class AnalysisRepository {
         ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
       .watch();
 
+  // ---- Família e populações (Módulo 12) ----
+
+  Future<FamilyAnalysis> addFamilyAnalysis({
+    required String id,
+    required String projectId,
+    required String fileId,
+    required String optionsJson,
+    required String resultDir,
+    required int sampleCount,
+    required bool hasTrio,
+    required String manifestJson,
+  }) async {
+    final row = FamilyAnalysis(
+      id: id,
+      projectId: projectId,
+      fileId: fileId,
+      optionsJson: optionsJson,
+      resultDir: resultDir,
+      sampleCount: sampleCount,
+      hasTrio: hasTrio,
+      contentId: (jsonDecode(manifestJson) as Map<String, dynamic>)['analysis_id'] as String,
+      createdAt: DateTime.now(),
+    );
+    await _db.into(_db.familyAnalyses).insert(row);
+    return row;
+  }
+
+  Stream<List<FamilyAnalysis>> watchFamilyAnalyses(String projectId) => (_db.select(_db.familyAnalyses)
+        ..where((t) => t.projectId.equals(projectId))
+        ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+      .watch();
+
+  Future<FamilyAnalysis?> getFamilyAnalysis(String id) =>
+      (_db.select(_db.familyAnalyses)..where((t) => t.id.equals(id))).getSingleOrNull();
+
+  Future<void> deleteFamilyAnalysis(FamilyAnalysis a) async {
+    await (_db.delete(_db.familyAnalyses)..where((t) => t.id.equals(a.id))).go();
+    await _storage.deleteDir(a.resultDir);
+  }
+
   Future<Analysis?> getAnalysis(String id) =>
       (_db.select(_db.analyses)..where((t) => t.id.equals(id))).getSingleOrNull();
 
@@ -135,6 +175,14 @@ final analysisRepositoryProvider = Provider<AnalysisRepository>(
 
 final analysesProvider = StreamProvider.family<List<Analysis>, String>(
   (ref, projectId) => ref.watch(analysisRepositoryProvider).watchAnalyses(projectId),
+);
+
+final familyAnalysesProvider = StreamProvider.family<List<FamilyAnalysis>, String>(
+  (ref, projectId) => ref.watch(analysisRepositoryProvider).watchFamilyAnalyses(projectId),
+);
+
+final familyAnalysisProvider = FutureProvider.family<FamilyAnalysis?, String>(
+  (ref, id) => ref.watch(analysisRepositoryProvider).getFamilyAnalysis(id),
 );
 
 final analysisProvider = FutureProvider.family<Analysis?, String>(

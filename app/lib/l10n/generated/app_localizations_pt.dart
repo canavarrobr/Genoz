@@ -1643,4 +1643,233 @@ class AppLocalizationsPt extends AppLocalizations {
   String logRepro(String result) {
     return 'Reprodutibilidade verificada: $result';
   }
+
+  @override
+  String get familyTitle => 'Família e populações';
+
+  @override
+  String get familyIntro =>
+      'Parentesco, trechos de homozigose e herança num trio, a partir de um VCF com várias pessoas chamadas juntas (chamada conjunta).';
+
+  @override
+  String get familyNeedsJoint =>
+      'Para VCFs de uma pessoa só, use Comparar A × B: neles, ausência não é referência, e o parentesco sairia errado.';
+
+  @override
+  String get familyNoMultiSample =>
+      'Nenhum VCF deste projeto tem 2 ou mais amostras.';
+
+  @override
+  String get familyFile => 'Arquivo';
+
+  @override
+  String familySamples(int count, int max) {
+    return 'Amostras ($count de no máximo $max)';
+  }
+
+  @override
+  String familyTooMany(int max) {
+    return 'Escolha de 2 a $max amostras.';
+  }
+
+  @override
+  String get familyTrioOptional => 'Trio (opcional)';
+
+  @override
+  String get familyChild => 'Filho(a)';
+
+  @override
+  String get familyFather => 'Pai';
+
+  @override
+  String get familyMother => 'Mãe';
+
+  @override
+  String get familyTrioDistinct =>
+      'Filho(a), pai e mãe precisam ser pessoas diferentes.';
+
+  @override
+  String get familyRun => 'Analisar';
+
+  @override
+  String get familyRunning => 'Analisando a família…';
+
+  @override
+  String get familyDisclaimer =>
+      'Estimativa estatística, sujeita a erro. Não é teste de paternidade com valor legal nem diagnóstico.';
+
+  @override
+  String get familyTabKinship => 'Parentesco';
+
+  @override
+  String get familyTabRoh => 'ROH';
+
+  @override
+  String get familyTabTrio => 'Trio';
+
+  @override
+  String get familyTabShared => 'Interseções';
+
+  @override
+  String familySitesUsed(String count) {
+    return '$count SNVs autossômicos usados';
+  }
+
+  @override
+  String get relDuplicate => 'Mesma pessoa ou gêmeos idênticos';
+
+  @override
+  String get relParentOffspring => 'Pai/mãe e filho(a)';
+
+  @override
+  String get relFullSiblings => 'Irmãos';
+
+  @override
+  String get relFirstDegree => '1º grau (pai/mãe–filho ou irmãos)';
+
+  @override
+  String get relSecondDegree => '2º grau (avós, tios, meio-irmãos)';
+
+  @override
+  String get relThirdDegree => '3º grau (ex.: primos de 1º grau)';
+
+  @override
+  String get relUnrelated => 'Sem parentesco próximo';
+
+  @override
+  String get relInsufficient => 'Dados insuficientes';
+
+  @override
+  String get kinshipLabel => 'φ (parentesco)';
+
+  @override
+  String get ibs0Label => 'IBS0';
+
+  @override
+  String get pairSites => 'SNPs comparados';
+
+  @override
+  String get concordanceLabel => 'Concordância de genótipos';
+
+  @override
+  String get kinshipExplain =>
+      'φ é a chance de um alelo sorteado de cada pessoa ser idêntico por descendência: ≈ 0,5 mesma pessoa; ≈ 0,25 pai/mãe–filho e irmãos; ≈ 0,125 2º grau; ≈ 0,0625 3º grau; ≈ 0 sem parentesco (valores negativos aparecem com consanguinidade ou populações diferentes). IBS0 conta os SNPs em que as duas pessoas são homozigotas opostas: perto de zero em pai/mãe–filho. Método KING-robust (Manichaikul et al., 2010).';
+
+  @override
+  String get familyMatrix => 'Matriz de parentesco';
+
+  @override
+  String get familyPairs => 'Pares';
+
+  @override
+  String get rohIntro =>
+      'Runs of homozygosity (ROH) são trechos longos em que as duas cópias do genoma são iguais. Aparecem quando os pais têm ancestrais em comum, próximos ou distantes, e ajudam a estudar a história das populações. Conteúdo educativo, não clínico.';
+
+  @override
+  String rohSummary(int runs, String mb, String froh) {
+    return '$runs trechos · $mb Mb · F_ROH $froh';
+  }
+
+  @override
+  String get rohNone => 'Nenhum trecho longo de homozigose.';
+
+  @override
+  String get rohUnavailable =>
+      'O VCF não está ordenado por posição: ROH não foi calculado.';
+
+  @override
+  String get rohMethod =>
+      'Trechos de ≥ 1000 kb com ≥ 100 SNPs, até 1 heterozigoto e 5 ausentes (inspirado no plink --homozyg). Com poucas pessoas no VCF há menos SNPs por trecho.';
+
+  @override
+  String trioRoles(String child, String father, String mother) {
+    return 'Filho(a): $child · Pai: $father · Mãe: $mother';
+  }
+
+  @override
+  String trioSites(String count) {
+    return '$count sítios com os três genotipados';
+  }
+
+  @override
+  String get trioConsistent => 'Consistentes com herança mendeliana';
+
+  @override
+  String get trioDeNovo => 'Candidatas a de novo';
+
+  @override
+  String get trioOtherErrors => 'Outros erros mendelianos';
+
+  @override
+  String get trioErrorRate => 'Taxa de inconsistência';
+
+  @override
+  String get trioInherited =>
+      'Alelo alternativo do(a) filho(a) heterozigoto(a), quando dá para saber de quem veio';
+
+  @override
+  String get trioPaternal => 'do pai';
+
+  @override
+  String get trioMaternal => 'da mãe';
+
+  @override
+  String get trioDeNovoExplain =>
+      'Candidata a de novo: o(a) filho(a) tem uma variante que nenhum dos pais tem. Em dados reais, a maioria é erro de chamada ou de cobertura — confira QUAL, DP e GQ antes de qualquer conclusão. Uma taxa alta de inconsistência pode indicar troca de amostra ou pais biológicos diferentes dos indicados; só um teste oficial confirma.';
+
+  @override
+  String get trioEvents => 'Eventos';
+
+  @override
+  String trioTruncated(int max) {
+    return 'Mostrando os primeiros $max eventos (as contagens acima são completas).';
+  }
+
+  @override
+  String get trioNone => 'Nenhum trio foi indicado nesta análise.';
+
+  @override
+  String trioGenotypes(String child, String father, String mother) {
+    return 'filho(a) $child · pai $father · mãe $mother';
+  }
+
+  @override
+  String get sharedIntro =>
+      'Quais amostras carregam o alelo alternativo de cada variante: as combinações mais frequentes (estilo UpSet).';
+
+  @override
+  String get sharedCarriers => 'Variantes por amostra';
+
+  @override
+  String get sharedCombos => 'Combinações mais frequentes';
+
+  @override
+  String familyListTitle(int count) {
+    return 'Família: $count amostras';
+  }
+
+  @override
+  String get familyListTrio => 'com trio';
+
+  @override
+  String get familySynthetic => 'Gerar família fictícia';
+
+  @override
+  String get familySyntheticHint =>
+      'VCF com 7 pessoas fictícias (avô, pai, mãe, dois filhos, uma pessoa sem parentesco e uma duplicata) para experimentar Família e populações.';
+
+  @override
+  String logFamily(int count) {
+    return 'Família e populações: $count amostras';
+  }
+
+  @override
+  String get familyQuality =>
+      'Portão de qualidade (chamada reprovada = ausente)';
+
+  @override
+  String get trioEventDeNovo => 'Candidata a de novo';
+
+  @override
+  String get trioEventError => 'Erro mendeliano';
 }

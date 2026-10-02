@@ -8,7 +8,7 @@ import '../../ui/privacy_chip.dart';
 import '../../ui/theme.dart';
 
 /// Versão do app (a mesma de pubspec.yaml).
-const appVersion = '0.11.0';
+const appVersion = '0.12.0';
 
 class AboutScreen extends ConsumerWidget {
   const AboutScreen({super.key});

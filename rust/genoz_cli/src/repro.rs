@@ -37,10 +37,12 @@ pub struct ReportArgs {
 pub struct RerunArgs {
     /// Pasta do resultado original (com manifest.json)
     pub result: PathBuf,
+    /// Entrada A (na análise de família: o VCF multiamostra)
     #[arg(long)]
     pub a: PathBuf,
+    /// Entrada B (comparações)
     #[arg(long)]
-    pub b: PathBuf,
+    pub b: Option<PathBuf>,
     #[arg(long)]
     pub bed_a: Option<PathBuf>,
     #[arg(long)]
@@ -149,12 +151,12 @@ pub fn verify_cmd(result: &Path) -> Result<ExitCode, GenozError> {
 /// Refaz a análise com os parâmetros do manifesto e compara as saídas.
 pub fn rerun_cmd(args: RerunArgs) -> Result<ExitCode, GenozError> {
     let m = read_manifest(&args.result)?;
-    if !matches!(m.analysis_type.as_str(), "compare" | "compare_chip") {
+    if !matches!(m.analysis_type.as_str(), "compare" | "compare_chip" | "family") {
         return Err(GenozError::InvalidParam(format!("reexecução de '{}' não é suportada", m.analysis_type)));
     }
     let given: Vec<(&str, &PathBuf)> = [
         ("a", Some(&args.a)),
-        ("b", Some(&args.b)),
+        ("b", args.b.as_ref()),
         ("callable_a", args.bed_a.as_ref()),
         ("callable_b", args.bed_b.as_ref()),
         ("reference", args.fasta.as_ref()),
@@ -195,20 +197,15 @@ pub fn rerun_cmd(args: RerunArgs) -> Result<ExitCode, GenozError> {
         println!("As entradas não são as do manifesto: a reexecução não provaria nada.");
         return Ok(ExitCode::from(1));
     }
-    let (opts, sample_a, sample_b) = genoz_core::compare::parameters_from_manifest(&m.parameters)?;
-    let spec = RunSpec {
-        a: args.a,
-        b: args.b,
-        sample_a,
-        sample_b,
-        bed_a: args.bed_a,
-        bed_b: args.bed_b,
-        fasta: args.fasta,
-        opts,
-        chip: m.analysis_type == "compare_chip",
-    };
     let out = args.out.unwrap_or_else(|| std::env::temp_dir().join(format!("genoz_reexecucao_{}", m.analysis_id)));
-    let (again, _) = run_compare(&spec, &out)?;
+    let again = if m.analysis_type == "family" {
+        let opts = genoz_core::family::options_from_manifest(&m.parameters)?;
+        crate::family_cmd::run_family(&args.a, &opts, &out)?.0
+    } else {
+        let (opts, sample_a, sample_b) = genoz_core::compare::parameters_from_manifest(&m.parameters)?;
+        let b = args.b.ok_or_else(|| GenozError::InvalidParam("informe --b".into()))?;
+        rerun_compare(args.a, b, sample_a, sample_b, args.bed_a, args.bed_b, args.fasta, opts, &m, &out)?
+    };
     println!();
     println!("Reexecução em {}", out.display());
     if again.analysis_id != m.analysis_id {
@@ -219,6 +216,23 @@ pub fn rerun_cmd(args: RerunArgs) -> Result<ExitCode, GenozError> {
     let checks = check_outputs(&m.outputs, &again.outputs);
     let ok = print_checks(&checks) && again.analysis_id == m.analysis_id;
     Ok(if ok { ExitCode::SUCCESS } else { ExitCode::from(1) })
+}
+
+#[allow(clippy::too_many_arguments)]
+fn rerun_compare(
+    a: PathBuf,
+    b: PathBuf,
+    sample_a: genoz_core::call::SampleSelector,
+    sample_b: genoz_core::call::SampleSelector,
+    bed_a: Option<PathBuf>,
+    bed_b: Option<PathBuf>,
+    fasta: Option<PathBuf>,
+    opts: genoz_core::compare::CompareOptions,
+    m: &Manifest,
+    out: &Path,
+) -> Result<Manifest, GenozError> {
+    let spec = RunSpec { a, b, sample_a, sample_b, bed_a, bed_b, fasta, opts, chip: m.analysis_type == "compare_chip" };
+    Ok(run_compare(&spec, out)?.0)
 }
 
 fn role_flag(role: &str) -> &'static str {

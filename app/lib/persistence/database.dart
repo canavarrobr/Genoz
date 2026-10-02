@@ -85,6 +85,26 @@ class Analyses extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+/// Análises de família e populações (Módulo 12): um VCF multiamostra.
+/// O resultado fica em `<resultDir>/familia.json` (com o manifesto ao lado).
+@DataClassName('FamilyAnalysis')
+class FamilyAnalyses extends Table {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id, onDelete: KeyAction.cascade)();
+  TextColumn get fileId => text()();
+
+  /// `FamilyOptions` do núcleo, em JSON.
+  TextColumn get optionsJson => text()();
+  TextColumn get resultDir => text()();
+  IntColumn get sampleCount => integer()();
+  BoolColumn get hasTrio => boolean()();
+  TextColumn get contentId => text()();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 /// Filtros de tabela salvos (`RowFilter` do núcleo, em JSON). Valem para o projeto todo.
 class SavedFilters extends Table {
   TextColumn get id => text()();
@@ -123,7 +143,7 @@ class JournalEntries extends Table {
   DateTimeColumn get createdAt => dateTime()();
 }
 
-@DriftDatabase(tables: [Projects, ProjectFiles, Analyses, SavedFilters, VariantNotes, JournalEntries])
+@DriftDatabase(tables: [Projects, ProjectFiles, Analyses, SavedFilters, VariantNotes, JournalEntries, FamilyAnalyses])
 class GenozDatabase extends _$GenozDatabase {
   GenozDatabase(super.executor);
 
@@ -140,7 +160,7 @@ class GenozDatabase extends _$GenozDatabase {
   );
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -166,6 +186,8 @@ class GenozDatabase extends _$GenozDatabase {
         await m.createTable(journalEntries);
       case 2: // v2 → v3 (Módulo 11): projetos protegidos com senha.
         await m.addColumn(projects, projects.locked);
+      case 3: // v3 → v4 (Módulo 12): análises de família e populações.
+        await m.createTable(familyAnalyses);
     }
   }
 }
