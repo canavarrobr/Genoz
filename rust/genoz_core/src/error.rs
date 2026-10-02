@@ -22,6 +22,7 @@ impl GenozError {
     /// Mensagem curta em português para mostrar ao usuário.
     pub fn user_message(&self) -> String {
         match self {
+            GenozError::Io(e) if crate::vault::is_auth_error(e) => e.to_string(),
             GenozError::Io(e) => match e.kind() {
                 std::io::ErrorKind::NotFound => "arquivo não encontrado".into(),
                 std::io::ErrorKind::PermissionDenied => "sem permissão para ler o arquivo".into(),

@@ -103,6 +103,32 @@ impl Manifest {
     }
 }
 
+/// Uma saída conferida contra o manifesto.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct OutputCheck {
+    pub name: String,
+    pub expected_sha256: String,
+    /// `None`: a saída não existe.
+    pub actual_sha256: Option<String>,
+    pub matches: bool,
+}
+
+/// Confere saídas obtidas contra as do manifesto (mesma ordem do manifesto; extras são ignoradas).
+pub fn check_outputs(expected: &[OutputRef], actual: &[OutputRef]) -> Vec<OutputCheck> {
+    expected
+        .iter()
+        .map(|e| {
+            let found = actual.iter().find(|a| a.name == e.name).map(|a| a.sha256.clone());
+            OutputCheck {
+                name: e.name.clone(),
+                expected_sha256: e.sha256.clone(),
+                matches: found.as_deref() == Some(e.sha256.as_str()),
+                actual_sha256: found,
+            }
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -123,5 +149,28 @@ mod tests {
         assert_eq!(a.len(), 36);
         assert_eq!(&a[14..15], "8");
         assert!(matches!(&a[19..20], "8" | "9" | "a" | "b"));
+    }
+
+    #[test]
+    fn output_checks() {
+        let o = |n: &str, h: &str| OutputRef { name: n.into(), sha256: h.into(), bytes: 1 };
+        let checks = check_outputs(
+            &[o("rows.bgz", "aa"), o("summary.json", "bb"), o("x", "cc")],
+            &[o("summary.json", "bX"), o("rows.bgz", "aa")],
+        );
+        assert_eq!(checks.iter().map(|c| c.matches).collect::<Vec<_>>(), [true, false, false]);
+        assert_eq!(checks[1].actual_sha256.as_deref(), Some("bX"));
+        assert_eq!(checks[2].actual_sha256, None);
+    }
+
+    #[test]
+    fn parameters_round_trip() {
+        use crate::call::SampleSelector;
+        use crate::compare::{manifest_parameters, parameters_from_manifest, CompareOptions};
+        let opts = CompareOptions { normalize_with_reference: true, allow_build_mismatch: true, ..Default::default() };
+        let p = manifest_parameters(&opts, &SampleSelector::Name("NA12878".into()), &SampleSelector::First);
+        let (o, a, b) = parameters_from_manifest(&p).unwrap();
+        assert_eq!((o, a, b), (opts, SampleSelector::Name("NA12878".into()), SampleSelector::First));
+        assert!(parameters_from_manifest(&serde_json::json!({"options": {"truth": 7}})).is_err());
     }
 }

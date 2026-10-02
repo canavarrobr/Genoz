@@ -12,6 +12,7 @@
 
 mod analysis;
 mod anot;
+mod repro;
 
 use std::fs::File;
 use std::io::{BufWriter, Write};
@@ -91,6 +92,14 @@ enum Command {
     CompareChip(analysis::ChipCompareArgs),
     /// Cria o índice .fai de um FASTA (igual ao `samtools faidx`).
     Faidx { fasta: PathBuf },
+    /// Relatório HTML autocontido ou PDF de uma comparação
+    Report(repro::ReportArgs),
+    /// Confere os SHA-256 das saídas de um resultado contra o manifesto
+    Verify { result: PathBuf },
+    /// Refaz uma comparação com os parâmetros do manifesto e compara as saídas
+    Rerun(repro::RerunArgs),
+    /// Abre um projeto exportado pelo app (.genoz, cifrado com senha)
+    Unpack(repro::UnpackArgs),
     /// Pacotes de anotação locais: construir, ver, consultar.
     Anot {
         #[command(subcommand)]
@@ -203,6 +212,10 @@ fn run(cli: Cli) -> Result<ExitCode, GenozError> {
         Command::Export(args) => analysis::export_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::Density(args) => analysis::density_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::CompareChip(args) => analysis::chip_compare_cmd(args).map(|()| ExitCode::SUCCESS),
+        Command::Report(args) => repro::report_cmd(args),
+        Command::Verify { result } => repro::verify_cmd(&result),
+        Command::Rerun(args) => repro::rerun_cmd(args),
+        Command::Unpack(args) => repro::unpack_cmd(args),
         Command::Anot { cmd } => anot::run(cmd).map(|()| ExitCode::SUCCESS),
         Command::Faidx { fasta } => {
             let index = genoz_core::fasta::FastaIndex::build(File::open(&fasta)?)?;

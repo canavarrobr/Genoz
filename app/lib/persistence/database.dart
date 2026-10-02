@@ -19,6 +19,9 @@ class Projects extends Table {
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 
+  /// Protegido com senha (Módulo 11): os dados estão só no cofre `cofres/<id>.genoz`.
+  BoolColumn get locked => boolean().withDefault(const Constant(false))();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -137,7 +140,7 @@ class GenozDatabase extends _$GenozDatabase {
   );
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -161,6 +164,8 @@ class GenozDatabase extends _$GenozDatabase {
         await m.createTable(savedFilters);
         await m.createTable(variantNotes);
         await m.createTable(journalEntries);
+      case 2: // v2 → v3 (Módulo 11): projetos protegidos com senha.
+        await m.addColumn(projects, projects.locked);
     }
   }
 }

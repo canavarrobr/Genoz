@@ -68,6 +68,14 @@ class IoBlobStore implements BlobStore {
   }
 
   @override
+  Future<void> move(String from, String to) async {
+    final dest = File(_abs(to));
+    await dest.parent.create(recursive: true);
+    if (await dest.exists()) await dest.delete();
+    await File(_abs(from)).rename(dest.path);
+  }
+
+  @override
   Future<void> deleteDir(String relative) async {
     final d = Directory(_abs(relative));
     if (await d.exists()) await d.delete(recursive: true);

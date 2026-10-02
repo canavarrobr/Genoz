@@ -15,3 +15,4 @@ As decisões tomadas durante o desenvolvimento ficam registradas aqui, uma por a
 | [ADR-014](ADR-014-modo-estudante-e-pacote-de-aula.md) | Modo estudante: respostas calculadas e pacote de aula | 8 |
 | [ADR-015](ADR-015-chip-x-sequenciamento-e-fasta.md) | Chip × sequenciamento por letras; FASTA local para normalizar | 9 |
 | [ADR-016](ADR-016-anotacao-local-e-online-controlado.md) | Anotação local em pacotes próprios; "online controlado" sem internet | 10 |
+| [ADR-017](ADR-017-relatorios-reexecucao-e-cofre-genoz.md) | Relatórios pelo núcleo, reexecução pelo manifesto e cofre `.genoz` com senha | 11 |

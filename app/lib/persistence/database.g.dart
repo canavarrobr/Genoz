@@ -63,6 +63,19 @@ class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _lockedMeta = const VerificationMeta('locked');
+  @override
+  late final GeneratedColumn<bool> locked = GeneratedColumn<bool>(
+    'locked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("locked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -70,6 +83,7 @@ class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
     description,
     createdAt,
     updatedAt,
+    locked,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -121,6 +135,12 @@ class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
+    if (data.containsKey('locked')) {
+      context.handle(
+        _lockedMeta,
+        locked.isAcceptableOrUnknown(data['locked']!, _lockedMeta),
+      );
+    }
     return context;
   }
 
@@ -150,6 +170,10 @@ class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      locked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}locked'],
+      )!,
     );
   }
 
@@ -165,12 +189,16 @@ class Project extends DataClass implements Insertable<Project> {
   final String? description;
   final DateTime createdAt;
   final DateTime updatedAt;
+
+  /// Protegido com senha (Módulo 11): os dados estão só no cofre `cofres/<id>.genoz`.
+  final bool locked;
   const Project({
     required this.id,
     required this.name,
     this.description,
     required this.createdAt,
     required this.updatedAt,
+    required this.locked,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -182,6 +210,7 @@ class Project extends DataClass implements Insertable<Project> {
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['locked'] = Variable<bool>(locked);
     return map;
   }
 
@@ -194,6 +223,7 @@ class Project extends DataClass implements Insertable<Project> {
           : Value(description),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      locked: Value(locked),
     );
   }
 
@@ -208,6 +238,7 @@ class Project extends DataClass implements Insertable<Project> {
       description: serializer.fromJson<String?>(json['description']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      locked: serializer.fromJson<bool>(json['locked']),
     );
   }
   @override
@@ -219,6 +250,7 @@ class Project extends DataClass implements Insertable<Project> {
       'description': serializer.toJson<String?>(description),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'locked': serializer.toJson<bool>(locked),
     };
   }
 
@@ -228,12 +260,14 @@ class Project extends DataClass implements Insertable<Project> {
     Value<String?> description = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? locked,
   }) => Project(
     id: id ?? this.id,
     name: name ?? this.name,
     description: description.present ? description.value : this.description,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    locked: locked ?? this.locked,
   );
   Project copyWithCompanion(ProjectsCompanion data) {
     return Project(
@@ -244,6 +278,7 @@ class Project extends DataClass implements Insertable<Project> {
           : this.description,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      locked: data.locked.present ? data.locked.value : this.locked,
     );
   }
 
@@ -254,13 +289,15 @@ class Project extends DataClass implements Insertable<Project> {
           ..write('name: $name, ')
           ..write('description: $description, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('locked: $locked')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, description, createdAt, updatedAt);
+  int get hashCode =>
+      Object.hash(id, name, description, createdAt, updatedAt, locked);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -269,7 +306,8 @@ class Project extends DataClass implements Insertable<Project> {
           other.name == this.name &&
           other.description == this.description &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.locked == this.locked);
 }
 
 class ProjectsCompanion extends UpdateCompanion<Project> {
@@ -278,6 +316,7 @@ class ProjectsCompanion extends UpdateCompanion<Project> {
   final Value<String?> description;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<bool> locked;
   final Value<int> rowid;
   const ProjectsCompanion({
     this.id = const Value.absent(),
@@ -285,6 +324,7 @@ class ProjectsCompanion extends UpdateCompanion<Project> {
     this.description = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.locked = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ProjectsCompanion.insert({
@@ -293,6 +333,7 @@ class ProjectsCompanion extends UpdateCompanion<Project> {
     this.description = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
+    this.locked = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name),
@@ -304,6 +345,7 @@ class ProjectsCompanion extends UpdateCompanion<Project> {
     Expression<String>? description,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<bool>? locked,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -312,6 +354,7 @@ class ProjectsCompanion extends UpdateCompanion<Project> {
       if (description != null) 'description': description,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (locked != null) 'locked': locked,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -322,6 +365,7 @@ class ProjectsCompanion extends UpdateCompanion<Project> {
     Value<String?>? description,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<bool>? locked,
     Value<int>? rowid,
   }) {
     return ProjectsCompanion(
@@ -330,6 +374,7 @@ class ProjectsCompanion extends UpdateCompanion<Project> {
       description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      locked: locked ?? this.locked,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -352,6 +397,9 @@ class ProjectsCompanion extends UpdateCompanion<Project> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (locked.present) {
+      map['locked'] = Variable<bool>(locked.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -366,6 +414,7 @@ class ProjectsCompanion extends UpdateCompanion<Project> {
           ..write('description: $description, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
+          ..write('locked: $locked, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3232,6 +3281,7 @@ typedef $$ProjectsTableCreateCompanionBuilder = ProjectsCompanion Function({
   Value<String?> description,
   required DateTime createdAt,
   required DateTime updatedAt,
+  Value<bool> locked,
   Value<int> rowid,
 });
 typedef $$ProjectsTableUpdateCompanionBuilder = ProjectsCompanion Function({
@@ -3240,6 +3290,7 @@ typedef $$ProjectsTableUpdateCompanionBuilder = ProjectsCompanion Function({
   Value<String?> description,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
+  Value<bool> locked,
   Value<int> rowid,
 });
 
@@ -3370,6 +3421,11 @@ class $$ProjectsTableFilterComposer
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get locked => $composableBuilder(
+    column: $table.locked,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3532,6 +3588,11 @@ class $$ProjectsTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get locked => $composableBuilder(
+    column: $table.locked,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ProjectsTableAnnotationComposer
@@ -3559,6 +3620,9 @@ class $$ProjectsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get locked =>
+      $composableBuilder(column: $table.locked, builder: (column) => column);
 
   Expression<T> projectFilesRefs<T extends Object>(
     Expression<T> Function($$ProjectFilesTableAnnotationComposer a) f,
@@ -3725,6 +3789,7 @@ class $$ProjectsTableTableManager
                 Value<String?> description = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> locked = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProjectsCompanion(
                 id: id,
@@ -3732,6 +3797,7 @@ class $$ProjectsTableTableManager
                 description: description,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                locked: locked,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3741,6 +3807,7 @@ class $$ProjectsTableTableManager
                 Value<String?> description = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
+                Value<bool> locked = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProjectsCompanion.insert(
                 id: id,
@@ -3748,6 +3815,7 @@ class $$ProjectsTableTableManager
                 description: description,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                locked: locked,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

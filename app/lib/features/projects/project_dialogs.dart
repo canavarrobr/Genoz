@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../persistence/database.dart';
 import '../../persistence/project_repository.dart';
+import '../vault/vault_ui.dart';
 
 typedef ProjectForm = ({String name, String? description});
 
@@ -69,9 +70,9 @@ Future<bool> confirmDelete(BuildContext context, {required String title, require
   return ok ?? false;
 }
 
-enum _Action { rename, delete }
+enum _Action { rename, export, protect, delete }
 
-/// Menu "⋮" de um projeto: renomear e apagar.
+/// Menu "⋮" de um projeto: renomear, exportar (.genoz), proteger com senha e apagar.
 class ProjectMenu extends ConsumerWidget {
   const ProjectMenu({super.key, required this.project, this.popAfterDelete = false});
 
@@ -88,6 +89,12 @@ class ProjectMenu extends ConsumerWidget {
           case _Action.rename:
             final r = await showProjectDialog(context, editing: project);
             if (r != null) await repo.renameProject(project.id, r.name);
+          case _Action.export:
+            await exportProjectFlow(context, ref, project);
+          case _Action.protect:
+            final done = await protectProjectFlow(context, ref, project);
+            // Na tela do projeto: os dados em claro sumiram, volta para a lista.
+            if (done && popAfterDelete && context.mounted) context.pop();
           case _Action.delete:
             final ok = await confirmDelete(
               context,
@@ -101,6 +108,8 @@ class ProjectMenu extends ConsumerWidget {
       },
       itemBuilder: (_) => [
         PopupMenuItem(value: _Action.rename, child: Text(l.rename)),
+        PopupMenuItem(value: _Action.export, child: Text(l.vaultExport)),
+        if (!project.locked) PopupMenuItem(value: _Action.protect, child: Text(l.vaultProtect)),
         PopupMenuItem(value: _Action.delete, child: Text(l.delete)),
       ],
     );

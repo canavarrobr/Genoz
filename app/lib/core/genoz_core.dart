@@ -8,6 +8,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -18,6 +19,7 @@ import '../src/rust/api/analysis.dart' as rust_analysis;
 import '../src/rust/api/annotation.dart' as rust_annot;
 import '../src/rust/api/genoz.dart' as rust;
 import '../src/rust/api/memory.dart' as rust_memory;
+import '../src/rust/api/vault.dart' as rust_vault;
 import 'annotation_models.dart';
 import 'compare_models.dart';
 import 'density.dart';
@@ -147,6 +149,60 @@ class ExportResult {
   final int rows;
 }
 
+// ---- Relatórios e cofre .genoz (Módulo 11) ---------------------------------
+
+/// Erro ao abrir/criar um `.genoz`. `code`: `senha` (senha errada, arquivo alterado ou
+/// incompleto), `formato` (não é .genoz), `versao` (de um Genoz mais novo) ou `outro`.
+class VaultError implements Exception {
+  const VaultError(this.code, [this.detail = '']);
+  final String code;
+  final String detail;
+
+  static VaultError from(Object e) {
+    final s = '$e';
+    return switch (s) {
+      'senha' || 'formato' || 'versao' => VaultError(s),
+      _ => VaultError('outro', s),
+    };
+  }
+
+  @override
+  String toString() => detail.isEmpty ? 'VaultError($code)' : detail;
+}
+
+/// 32 bytes do gerador seguro do sistema (sal + prefixo do nonce do cofre).
+Uint8List secureRandom32() {
+  final r = Random.secure();
+  return Uint8List.fromList(List.generate(32, (_) => r.nextInt(256)));
+}
+
+/// Relatório (HTML ou PDF) de uma análise salva: lê estatísticas e manifesto da pasta.
+Future<Uint8List> buildAnalysisReport(
+  AppStorage storage, {
+  required String resultDirRelative,
+  required String summaryJson,
+  required String project,
+  required String generatedAt,
+  required String lang,
+  required bool pdf,
+}) async {
+  Future<String> optional(String name) async {
+    final rel = '$resultDirRelative/$name';
+    return await storage.blobs.exists(rel) ? storage.blobs.readString(rel) : '';
+  }
+
+  return rust_vault.analysisReport(
+    summaryJson: summaryJson,
+    statsAJson: await optional('stats_a.json'),
+    statsBJson: await optional('stats_b.json'),
+    manifestJson: await optional('manifest.json'),
+    project: project,
+    generatedAt: generatedAt,
+    lang: lang,
+    pdf: pdf,
+  );
+}
+
 abstract interface class GenozCore {
   String get coreVersion;
 
@@ -214,6 +270,31 @@ abstract interface class GenozCore {
   Future<List<AnnotRecord>> findName({required String package, required String name});
 
   void forgetAnnotation(String package);
+
+  // ---- Relatório e cofre .genoz (Módulo 11) ----
+
+  /// Relatório HTML autocontido ou PDF de uma análise salva.
+  Future<Uint8List> analysisReport({
+    required String resultDirRelative,
+    required String summaryJson,
+    required String project,
+    required String generatedAt,
+    required String lang,
+    required bool pdf,
+  });
+
+  /// Cifra com senha um pacote com `inline` (ex.: projeto.json) e arquivos do
+  /// armazenamento (`caminho no pacote → caminho relativo`). Grava em `outRelative`.
+  Future<int> sealVault({
+    required Map<String, Uint8List> inline,
+    required Map<String, String> files,
+    required String outRelative,
+    required String password,
+  });
+
+  /// Abre um `.genoz` e extrai tudo em `stagingRelative/<caminho>` (nada fica se der
+  /// erro). Lança [VaultError]. Devolve os caminhos do pacote.
+  Future<List<String>> openVault({required SourceFile source, required String password, required String stagingRelative});
 
   /// Interpreta `chr7:117.5M-117.6M`, `chr1:1000`, `X`... `null` se não for região.
   Region? parseRegion(String text);
@@ -417,6 +498,64 @@ class NativeGenozCore implements GenozCore {
 
   @override
   void forgetAnnotation(String package) => rust_annot.annotForget(key: storage.absolute(package));
+
+  @override
+  Future<Uint8List> analysisReport({
+    required String resultDirRelative,
+    required String summaryJson,
+    required String project,
+    required String generatedAt,
+    required String lang,
+    required bool pdf,
+  }) =>
+      buildAnalysisReport(
+        storage,
+        resultDirRelative: resultDirRelative,
+        summaryJson: summaryJson,
+        project: project,
+        generatedAt: generatedAt,
+        lang: lang,
+        pdf: pdf,
+      );
+
+  @override
+  Future<int> sealVault({
+    required Map<String, Uint8List> inline,
+    required Map<String, String> files,
+    required String outRelative,
+    required String password,
+  }) async {
+    try {
+      final n = await rust_vault.vaultSealFiles(
+        inline: [for (final e in inline.entries) rust_vault.PackBytes(path: e.key, data: e.value)],
+        files: [for (final e in files.entries) rust_vault.PackFile(path: e.key, sourcePath: storage.absolute(e.value))],
+        outPath: storage.absolute(outRelative),
+        password: password,
+        random: secureRandom32(),
+      );
+      return n.toInt();
+    } on String catch (e) {
+      throw VaultError.from(e);
+    }
+  }
+
+  @override
+  Future<List<String>> openVault({required SourceFile source, required String password, required String stagingRelative}) async {
+    var path = source.path;
+    String? temp;
+    if (path == null) {
+      temp = '$stagingRelative.entrada';
+      await storage.blobs.writeStream(temp, source.open!());
+      path = storage.absolute(temp);
+    }
+    try {
+      return await rust_vault.vaultOpenToDir(inPath: path, password: password, outDir: storage.absolute(stagingRelative));
+    } on String catch (e) {
+      throw VaultError.from(e);
+    } finally {
+      if (temp != null) await storage.blobs.deleteFile(temp);
+    }
+  }
 
   @override
   Region? parseRegion(String text) => _parseRegion(text);
@@ -659,6 +798,60 @@ class WebGenozCore implements GenozCore {
 
   @override
   void forgetAnnotation(String package) => rust_annot.annotForget(key: package);
+
+  @override
+  Future<Uint8List> analysisReport({
+    required String resultDirRelative,
+    required String summaryJson,
+    required String project,
+    required String generatedAt,
+    required String lang,
+    required bool pdf,
+  }) =>
+      buildAnalysisReport(
+        storage,
+        resultDirRelative: resultDirRelative,
+        summaryJson: summaryJson,
+        project: project,
+        generatedAt: generatedAt,
+        lang: lang,
+        pdf: pdf,
+      );
+
+  @override
+  Future<int> sealVault({
+    required Map<String, Uint8List> inline,
+    required Map<String, String> files,
+    required String outRelative,
+    required String password,
+  }) async {
+    final entries = [for (final e in inline.entries) rust_vault.PackBytes(path: e.key, data: e.value)];
+    for (final e in files.entries) {
+      entries.add(rust_vault.PackBytes(path: e.key, data: await storage.blobs.readBytes(e.value)));
+    }
+    try {
+      final sealed = await rust_vault.vaultSealBytes(entries: entries, password: password, random: secureRandom32());
+      await storage.blobs.writeBytes(outRelative, sealed);
+      return sealed.length;
+    } on String catch (e) {
+      throw VaultError.from(e);
+    }
+  }
+
+  @override
+  Future<List<String>> openVault({required SourceFile source, required String password, required String stagingRelative}) async {
+    if ((source.size ?? 0) > webMaxFileBytes) throw StateError(webTooLarge(source.size!));
+    final List<rust_vault.PackBytes> entries;
+    try {
+      entries = await rust_vault.vaultOpenBytes(data: await _allBytes(source), password: password);
+    } on String catch (e) {
+      throw VaultError.from(e);
+    }
+    for (final e in entries) {
+      await storage.blobs.writeBytes('$stagingRelative/${e.path}', e.data);
+    }
+    return [for (final e in entries) e.path];
+  }
 
   @override
   Region? parseRegion(String text) => _parseRegion(text);

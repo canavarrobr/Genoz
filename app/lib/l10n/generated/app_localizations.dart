@@ -2558,6 +2558,324 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Acesso aberto (EMBL-EBI: sem restrições adicionais; atribuição esperada)'**
   String get gencodeLicense;
+
+  /// No description provided for @vaultExport.
+  ///
+  /// In pt, this message translates to:
+  /// **'Exportar projeto (.genoz)'**
+  String get vaultExport;
+
+  /// No description provided for @vaultProtect.
+  ///
+  /// In pt, this message translates to:
+  /// **'Proteger com senha'**
+  String get vaultProtect;
+
+  /// No description provided for @vaultImport.
+  ///
+  /// In pt, this message translates to:
+  /// **'Importar projeto (.genoz)'**
+  String get vaultImport;
+
+  /// No description provided for @vaultLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Protegido com senha'**
+  String get vaultLocked;
+
+  /// No description provided for @vaultOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir com a senha'**
+  String get vaultOpen;
+
+  /// No description provided for @vaultLockedBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os dados deste projeto estão cifrados neste aparelho. Digite a senha para abri-lo.'**
+  String get vaultLockedBody;
+
+  /// No description provided for @vaultNewPasswordTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Criar senha'**
+  String get vaultNewPasswordTitle;
+
+  /// No description provided for @vaultPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha'**
+  String get vaultPassword;
+
+  /// No description provided for @vaultPasswordRepeat.
+  ///
+  /// In pt, this message translates to:
+  /// **'Repita a senha'**
+  String get vaultPasswordRepeat;
+
+  /// No description provided for @vaultPasswordShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Use pelo menos {min} caracteres.'**
+  String vaultPasswordShort(int min);
+
+  /// No description provided for @vaultPasswordMismatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'As senhas não são iguais.'**
+  String get vaultPasswordMismatch;
+
+  /// No description provided for @vaultLossWarning.
+  ///
+  /// In pt, this message translates to:
+  /// **'Se você esquecer a senha, os dados não podem ser recuperados — por ninguém, nem pelo Genoz. Anote-a num lugar seguro.'**
+  String get vaultLossWarning;
+
+  /// No description provided for @vaultLossAccept.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entendi: senha perdida = dados perdidos'**
+  String get vaultLossAccept;
+
+  /// No description provided for @vaultProtectBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'O projeto será cifrado neste aparelho (Argon2id + XChaCha20-Poly1305) e a cópia em claro, apagada. Para usá-lo de novo, abra com a senha.'**
+  String get vaultProtectBody;
+
+  /// No description provided for @vaultExportBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'O arquivo .genoz sai cifrado com esta senha. Leve-o a outro aparelho (cabo, pendrive, Bluetooth...) e importe-o lá com a mesma senha. Nada é enviado para a internet.'**
+  String get vaultExportBody;
+
+  /// No description provided for @vaultExportLockedBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Este projeto já está cifrado: o arquivo .genoz usa a mesma senha dele.'**
+  String get vaultExportLockedBody;
+
+  /// No description provided for @vaultSealing.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cifrando o projeto…'**
+  String get vaultSealing;
+
+  /// No description provided for @vaultOpening.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conferindo a senha e decifrando…'**
+  String get vaultOpening;
+
+  /// No description provided for @vaultWrongPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha incorreta — ou o arquivo foi alterado ou está incompleto.'**
+  String get vaultWrongPassword;
+
+  /// No description provided for @vaultNotGenoz.
+  ///
+  /// In pt, this message translates to:
+  /// **'Este arquivo não é um projeto .genoz do Genoz.'**
+  String get vaultNotGenoz;
+
+  /// No description provided for @vaultNewerVersion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Este arquivo é de uma versão mais nova do Genoz. Atualize o app.'**
+  String get vaultNewerVersion;
+
+  /// No description provided for @vaultExported.
+  ///
+  /// In pt, this message translates to:
+  /// **'Projeto exportado.'**
+  String get vaultExported;
+
+  /// No description provided for @vaultProtected.
+  ///
+  /// In pt, this message translates to:
+  /// **'Projeto protegido com senha.'**
+  String get vaultProtected;
+
+  /// No description provided for @vaultImported.
+  ///
+  /// In pt, this message translates to:
+  /// **'Projeto \"{name}\" importado.'**
+  String vaultImported(String name);
+
+  /// No description provided for @vaultOpened.
+  ///
+  /// In pt, this message translates to:
+  /// **'Projeto aberto. Para cifrar de novo, use \"Proteger com senha\".'**
+  String get vaultOpened;
+
+  /// No description provided for @vaultFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível concluir: {detail}'**
+  String vaultFailed(String detail);
+
+  /// No description provided for @logVaultImported.
+  ///
+  /// In pt, this message translates to:
+  /// **'Projeto importado de um arquivo .genoz'**
+  String get logVaultImported;
+
+  /// No description provided for @logVaultOpened.
+  ///
+  /// In pt, this message translates to:
+  /// **'Projeto aberto com a senha'**
+  String get logVaultOpened;
+
+  /// No description provided for @logVaultExported.
+  ///
+  /// In pt, this message translates to:
+  /// **'Projeto exportado (.genoz, cifrado)'**
+  String get logVaultExported;
+
+  /// No description provided for @reportSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Relatório'**
+  String get reportSection;
+
+  /// No description provided for @reportHtml.
+  ///
+  /// In pt, this message translates to:
+  /// **'Relatório HTML (abre em qualquer navegador)'**
+  String get reportHtml;
+
+  /// No description provided for @reportPdf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Relatório PDF'**
+  String get reportPdf;
+
+  /// No description provided for @reportSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Relatório salvo.'**
+  String get reportSaved;
+
+  /// No description provided for @logReport.
+  ///
+  /// In pt, this message translates to:
+  /// **'Relatório {format} gerado'**
+  String logReport(String format);
+
+  /// No description provided for @reproVerify.
+  ///
+  /// In pt, this message translates to:
+  /// **'Verificar reprodutibilidade'**
+  String get reproVerify;
+
+  /// No description provided for @reproRunning.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conferindo as entradas e refazendo a análise…'**
+  String get reproRunning;
+
+  /// No description provided for @reproTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reprodutibilidade'**
+  String get reproTitle;
+
+  /// No description provided for @reproOk.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reproduzida: mesmo ID e {total} de {total} saídas idênticas (SHA-256).'**
+  String reproOk(int total);
+
+  /// No description provided for @reproPartial.
+  ///
+  /// In pt, this message translates to:
+  /// **'{ok} de {total} saídas idênticas.'**
+  String reproPartial(int ok, int total);
+
+  /// No description provided for @reproInputs.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entradas'**
+  String get reproInputs;
+
+  /// No description provided for @reproOutputs.
+  ///
+  /// In pt, this message translates to:
+  /// **'Saídas'**
+  String get reproOutputs;
+
+  /// No description provided for @reproInputOk.
+  ///
+  /// In pt, this message translates to:
+  /// **'SHA-256 confere'**
+  String get reproInputOk;
+
+  /// No description provided for @reproInputMissing.
+  ///
+  /// In pt, this message translates to:
+  /// **'não está mais no projeto'**
+  String get reproInputMissing;
+
+  /// No description provided for @reproInputChanged.
+  ///
+  /// In pt, this message translates to:
+  /// **'SHA-256 diferente (arquivo alterado)'**
+  String get reproInputChanged;
+
+  /// No description provided for @reproInputUnsupported.
+  ///
+  /// In pt, this message translates to:
+  /// **'regiões avaliadas (BED): reexecute pela linha de comando'**
+  String get reproInputUnsupported;
+
+  /// No description provided for @reproIdDiffers.
+  ///
+  /// In pt, this message translates to:
+  /// **'O ID da reexecução é diferente do original.'**
+  String get reproIdDiffers;
+
+  /// No description provided for @reproNotRun.
+  ///
+  /// In pt, this message translates to:
+  /// **'As entradas não conferem: a reexecução não provaria nada.'**
+  String get reproNotRun;
+
+  /// No description provided for @reproFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'A reexecução falhou: {detail}'**
+  String reproFailed(String detail);
+
+  /// No description provided for @reproIdentical.
+  ///
+  /// In pt, this message translates to:
+  /// **'idêntica'**
+  String get reproIdentical;
+
+  /// No description provided for @reproDifferent.
+  ///
+  /// In pt, this message translates to:
+  /// **'diferente'**
+  String get reproDifferent;
+
+  /// No description provided for @reproMissing.
+  ///
+  /// In pt, this message translates to:
+  /// **'ausente'**
+  String get reproMissing;
+
+  /// No description provided for @reproExplain.
+  ///
+  /// In pt, this message translates to:
+  /// **'A análise foi refeita numa pasta temporária com os mesmos arquivos e parâmetros, e cada saída comparada pelo SHA-256 com o manifesto. A análise salva não muda.'**
+  String get reproExplain;
+
+  /// No description provided for @logRepro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reprodutibilidade verificada: {result}'**
+  String logRepro(String result);
 }
 
 class _AppLocalizationsDelegate

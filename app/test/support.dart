@@ -201,7 +201,7 @@ class FakeGenozCore implements GenozCore {
   }
 
   @override
-  Future<String> sha256Of(SourceFile source) async => sha256Result;
+  Future<String> sha256Of(SourceFile source) async => sha256ByName[source.name] ?? sha256Result;
 
   @override
   Future<List<List<AnnotHit>>> annotate({required List<String> packages, required List<ComparisonRow> rows}) async {
@@ -223,6 +223,58 @@ class FakeGenozCore implements GenozCore {
 
   @override
   void forgetAnnotation(String package) => forgotten.add(package);
+
+  // ---- Módulo 11: relatório e cofre (formato falso: JSON com a senha, só para testes) ----
+  final reports = <({String project, String lang, bool pdf})>[];
+  Map<String, String> sha256ByName = {};
+
+  @override
+  Future<Uint8List> analysisReport({
+    required String resultDirRelative,
+    required String summaryJson,
+    required String project,
+    required String generatedAt,
+    required String lang,
+    required bool pdf,
+  }) async {
+    reports.add((project: project, lang: lang, pdf: pdf));
+    return Uint8List.fromList(utf8.encode(pdf ? '%PDF-1.4 falso' : '<!doctype html>'));
+  }
+
+  @override
+  Future<int> sealVault({
+    required Map<String, Uint8List> inline,
+    required Map<String, String> files,
+    required String outRelative,
+    required String password,
+  }) async {
+    final entries = <String, String>{for (final e in inline.entries) e.key: base64Encode(e.value)};
+    for (final e in files.entries) {
+      entries[e.key] = base64Encode(await storage.blobs.readBytes(e.value));
+    }
+    final bytes = Uint8List.fromList(utf8.encode(jsonEncode({'falso_genoz': password, 'entries': entries})));
+    await storage.blobs.writeBytes(outRelative, bytes);
+    return bytes.length;
+  }
+
+  @override
+  Future<List<String>> openVault({required SourceFile source, required String password, required String stagingRelative}) async {
+    final raw = source.path != null
+        ? await File(source.path!).readAsBytes()
+        : (await source.open!().expand((c) => c).toList());
+    final Map<String, dynamic> j;
+    try {
+      j = jsonDecode(utf8.decode(raw)) as Map<String, dynamic>;
+    } catch (_) {
+      throw const VaultError('formato');
+    }
+    if (j['falso_genoz'] != password) throw const VaultError('senha');
+    final entries = (j['entries'] as Map<String, dynamic>).cast<String, String>();
+    for (final e in entries.entries) {
+      await storage.blobs.writeBytes('$stagingRelative/${e.key}', base64Decode(e.value));
+    }
+    return entries.keys.toList();
+  }
 
   @override
   Region? parseRegion(String text) {
@@ -317,6 +369,9 @@ class MemoryBlobStore implements BlobStore {
 
   @override
   Future<void> deleteDir(String relative) async => files.removeWhere((k, _) => k.startsWith('$relative/'));
+
+  @override
+  Future<void> move(String from, String to) async => files[to] = files.remove(from) ?? (throw StateError('não existe: $from'));
 
   @override
   String? nativePath(String relative) => null;

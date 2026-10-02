@@ -476,3 +476,46 @@ do gene; atualizar o app manteve o ClinVar instalado e acrescentou o pacote GRCh
 conhecidas aparecem no idioma do app. 106 testes Dart, 111 Rust (núcleo e CLI) + 4 da ponte. Decisões em
 [ADR-016](../adr/ADR-016-anotacao-local-e-online-controlado.md). No navegador, o mesmo código roda com os pacotes no
 OPFS (`annot_load`); a verificação manual no site ficou para o Módulo 11 (o CI compila a versão Web).
+
+## Contrato do Módulo 11 — Relatórios, reprodutibilidade e criptografia (antes de implementar)
+
+**Entradas:** resultados de comparação (summary.json, stats_a/b.json, manifest.json, rows); projetos do app (banco + arquivos); senha digitada pelo usuário.
+
+**Saídas — núcleo e CLI:**
+- **Relatório HTML autocontido** (um arquivo, sem script, sem fonte ou imagem externa; abre offline em qualquer navegador): projeto, amostras, contagens por categoria com gráfico (SVG embutido), concordância/Jaccard/benchmark, por cromossomo, QC lado a lado (Ti/Tv, het/hom, missing, histogramas), parâmetros, manifesto (entradas e saídas com SHA-256) e o aviso "uso educacional e de pesquisa — não é diagnóstico". Português ou inglês. Mesma entrada → mesmos bytes (a data de geração vem de quem chama).
+- **Relatório PDF** com o mesmo conteúdo, gerado pelo próprio núcleo (escritor de PDF mínimo, fontes padrão do PDF, sem dependência externa), determinístico.
+- **Verificação de reprodutibilidade:** `verify` confere os SHA-256 das saídas de uma pasta de resultado contra o manifesto; `rerun` confere as entradas (SHA-256), refaz a análise com os parâmetros do manifesto e compara saída por saída.
+- **Cofre `.genoz`** (ADR-017): pacote do projeto (projeto.json + arquivos + resultados) cifrado com senha — Argon2id (64 MiB, 3 passadas) → XChaCha20-Poly1305 em segmentos de 64 KiB (desenho de segmentos do GA4GH crypt4gh, com índice e marca de fim autenticados: reordenar ou truncar é detectado). Leitura e escrita em fluxo (arquivos de vários GB não passam inteiros pela memória no celular/PC). O núcleo não sorteia nada: sal e nonce vêm de quem chama (gerador seguro do sistema).
+- CLI: `report`, `verify`, `rerun`, `unpack` (abre um `.genoz` no PC com a senha).
+
+**App:**
+- análise → **Relatório HTML** e **Relatório PDF** (salvar como / download);
+- análise → **Verificar reprodutibilidade**: confere os SHA-256 das entradas, refaz a análise numa pasta temporária e mostra "N de N saídas idênticas" ou quais diferem;
+- projeto → **Exportar projeto (.genoz)** com senha; Projetos → **Importar .genoz** (vira projeto novo, IDs novos; IDs de análise, que vêm do conteúdo, continuam iguais);
+- projeto → **Proteger com senha**: o projeto vira um cofre `.genoz` no armazenamento do app e os dados em claro são apagados; na lista ele aparece com cadeado (só o nome); **Abrir** pede a senha e restaura; **Trancar de novo** volta a cifrar;
+- aviso claro e repetido: **senha perdida = dados irrecuperáveis** (não há "esqueci a senha");
+- Android: salvar arquivos grandes copiando em fluxo para o destino escolhido (sem carregar tudo na memória) — resolve também a pendência das exportações grandes.
+
+**Invariantes:** nada sai do aparelho; senha nunca é gravada (nem em log); texto em claro nunca é gravado em disco fora da área do app; relatório não muda o resultado nem o ID; reexecução usa pasta temporária e não altera a análise; "Apagar tudo" apaga os cofres; banco migra para v3 sem perder dados.
+
+**Erros:** senha errada ou arquivo corrompido/truncado (mensagem única, nada importado); `.genoz` de versão futura; entrada da reexecução ausente ou com SHA-256 diferente; espaço insuficiente (importação desfeita).
+
+**Testes:** núcleo (relatório determinístico e com os números do resumo; PDF válido com xref correto; cofre ida e volta, senha errada, segmento trocado, truncado, tamanho múltiplo exato de 64 KiB, vazio; pacote; verify/rerun detectam saída alterada); CLI; ponte; app (relatórios, verificação, exportar/importar, proteger/abrir, migração v3); emulador e navegador (incluindo a anotação, pendente do Módulo 10).
+
+**Status:** concluído em 02/10/2026. Verificado no emulador Android (API 35, APK de release, sem INTERNET) e no Edge (site com isolamento de origem):
+- **Android:**
+  - atualizar o app migrou o banco v2 → v3 com os dados;
+  - "Verificar reprodutibilidade" deu mesmo ID e 5 de 5 saídas idênticas;
+  - relatório PDF salvo em Downloads; o mesmo ID (`7091d2bc…`) e os mesmos SHA-256 saem no PC;
+  - exportar `.genoz` com senha (salvo em fluxo); o arquivo abre no PC com `genoz-cli unpack`, e com a senha errada nada é extraído;
+  - proteger o projeto deixa só o cofre; um `grep` no banco achou 0 vestígios do conteúdo depois do `VACUUM` (sem ele, achava 3, falha corrigida);
+  - senha errada é recusada; a certa restaura arquivos e análise;
+  - importar o `.genoz` cria um projeto novo que também se reproduz.
+- **Navegador:**
+  - o `.genoz` feito no Android abre (senha errada recusada);
+  - a análise do Android reexecutada no navegador deu 5 de 5 saídas idênticas;
+  - genes GENCODE e ClinVar (193 MB, 4.467.926 registros, instalado no navegador) aparecem na tabela, o que fecha a pendência do Módulo 10;
+  - 96 requisições, todas para `127.0.0.1` ou `blob:`.
+
+Testes: 113 Dart, 126 Rust (núcleo e CLI) + 6 da ponte. Decisões em [ADR-017](../adr/ADR-017-relatorios-reexecucao-e-cofre-genoz.md).
+

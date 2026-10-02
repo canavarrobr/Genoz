@@ -13,6 +13,7 @@ import '../../ui/theme.dart';
 import '../annotation/annotation_store.dart';
 import '../learn/content.dart';
 import '../learn/progress.dart';
+import '../vault/project_vault.dart';
 import 'settings.dart';
 
 /// Apaga tudo o que o Genoz guardou neste aparelho/navegador.
@@ -35,6 +36,9 @@ Future<void> wipeAll({
   // Linhas apagadas continuam nas páginas livres do arquivo do SQLite até o VACUUM.
   await db.customStatement('VACUUM');
   await storage.deleteDir('projetos');
+  // Projetos protegidos com senha e arquivos temporários (exportação, reexecução).
+  await storage.deleteDir(vaultDir);
+  await storage.deleteDir(tempDir);
   // Modo estudante: progresso e aulas importadas.
   await storage.deleteDir(learnDir);
   // Pacotes de anotação baixados (os embutidos são copiados de novo ao abrir).

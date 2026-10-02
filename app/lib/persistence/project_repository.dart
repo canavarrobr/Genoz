@@ -47,6 +47,7 @@ class ProjectRepository {
       description: (description?.trim().isEmpty ?? true) ? null : description!.trim(),
       createdAt: now,
       updatedAt: now,
+      locked: false,
     );
     await _db.into(_db.projects).insert(project);
     return project;
@@ -61,6 +62,8 @@ class ProjectRepository {
   Future<void> deleteProject(String id) async {
     await (_db.delete(_db.projects)..where((t) => t.id.equals(id))).go();
     await _storage.deleteProjectFiles(id);
+    // Projeto protegido com senha (Módulo 11): o cofre cifrado.
+    await _storage.deleteFile('cofres/$id.genoz');
   }
 
   Stream<List<ProjectFile>> watchFiles(String projectId) => (_db.select(_db.projectFiles)

@@ -27,12 +27,16 @@ pub mod inspect;
 pub mod io;
 pub mod manifest;
 pub mod normalize;
+pub mod pack;
+pub mod pdf;
 pub mod reader;
 pub mod record;
 pub mod regions;
+pub mod report;
 pub mod results;
 pub mod stats;
 pub mod synth;
+pub mod vault;
 pub mod writer;
 
 pub use error::{GenozError, Result};

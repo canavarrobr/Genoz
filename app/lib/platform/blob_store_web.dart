@@ -86,6 +86,13 @@ class OpfsBlobStore implements BlobStore {
   }
 
   @override
+  Future<void> move(String from, String to) async {
+    // O OPFS não tem "renomear" em todos os navegadores: copia e apaga.
+    await writeBytes(to, await readBytes(from));
+    await deleteFile(from);
+  }
+
+  @override
   Future<void> deleteFile(String relative) async {
     final parts = _parts(relative);
     try {

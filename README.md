@@ -70,6 +70,22 @@ flutter run
 Na primeira vez a compilação demora alguns minutos, porque o núcleo Rust é compilado para Android.
 No app: **Novo projeto → Gerar exemplo sintético** (ou **Importar VCF**) → toque no arquivo para ver o relatório.
 
+## Relatórios, reprodutibilidade e projetos cifrados (Módulo 11)
+
+Numa análise, o botão de exportar também gera o **relatório HTML** (um arquivo que abre offline em qualquer
+navegador) e o **relatório PDF**, e oferece **Verificar reprodutibilidade**: o app confere os SHA-256 dos arquivos,
+refaz a análise numa pasta temporária e compara cada saída com o manifesto.
+No menu ⋮ de um projeto: **Exportar projeto (.genoz)** — um arquivo cifrado com senha (Argon2id +
+XChaCha20-Poly1305) para levar a outro aparelho sem nuvem — e **Proteger com senha**, que cifra o projeto no
+próprio aparelho. **Senha perdida = dados perdidos.** Pela linha de comando:
+
+```powershell
+genoz-cli report resultado --out relatorio.pdf --lang pt
+genoz-cli verify resultado
+genoz-cli rerun resultado --a pessoa_a.vcf --b pessoa_b.vcf
+genoz-cli unpack projeto.genoz --out pasta   # senha pedida no terminal ou em GENOZ_SENHA
+```
+
 ## Anotação local (Módulo 10)
 
 Menu ☰ → **Anotações**. Os genes do **GENCODE v50** (GRCh38 e GRCh37) já vêm no app: na tabela de uma análise,

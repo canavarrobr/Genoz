@@ -18,6 +18,7 @@ import '../../ui/labels.dart';
 import '../../ui/privacy_chip.dart';
 import '../analysis/analysis_screen.dart' show analysisTitle;
 import '../import/import_controller.dart';
+import '../vault/vault_ui.dart';
 import 'project_dialogs.dart';
 
 class ProjectScreen extends ConsumerWidget {
@@ -32,6 +33,30 @@ class ProjectScreen extends ConsumerWidget {
     final files = ref.watch(projectFilesProvider(projectId));
     final importState = ref.watch(importControllerProvider);
     ref.listen(importControllerProvider, (_, next) => _showOutcome(context, ref, next));
+    if (project != null && project.locked) {
+      return Scaffold(
+        appBar: AppBar(title: Text(project.name), actions: [ProjectMenu(project: project, popAfterDelete: true)]),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.lock_outline, size: 56),
+                const SizedBox(height: 16),
+                Text(l.vaultLockedBody, textAlign: TextAlign.center),
+                const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: () => unlockProjectFlow(context, ref, project),
+                  icon: const Icon(Icons.lock_open_outlined),
+                  label: Text(l.vaultOpen),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(

@@ -6,6 +6,7 @@ import '../../core/genoz_core.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../persistence/project_repository.dart';
 import '../../ui/brand.dart';
+import '../vault/vault_ui.dart';
 import 'project_dialogs.dart';
 
 class ProjectsScreen extends ConsumerWidget {
@@ -16,7 +17,19 @@ class ProjectsScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final projects = ref.watch(projectsProvider);
     return Scaffold(
-      appBar: AppBar(title: const GenozLogo(size: 22)),
+      appBar: AppBar(
+        title: const GenozLogo(size: 22),
+        actions: [
+          IconButton(
+            tooltip: l.vaultImport,
+            icon: const Icon(Icons.move_to_inbox_outlined),
+            onPressed: () async {
+              final id = await importProjectFlow(context, ref);
+              if (id != null && context.mounted) context.push('/projeto/$id');
+            },
+          ),
+        ],
+      ),
       drawer: const GenozDrawer(current: '/'),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _create(context, ref),
@@ -36,14 +49,20 @@ class ProjectsScreen extends ConsumerWidget {
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                    child: Icon(Icons.folder_outlined, color: Theme.of(context).colorScheme.onPrimaryContainer),
+                    child: Icon(
+                      s.project.locked ? Icons.lock_outline : Icons.folder_outlined,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
                   ),
                   title: Text(s.project.name),
                   subtitle: Text([
                     if (s.project.description != null) s.project.description!,
-                    l.filesCount(s.fileCount),
+                    if (s.project.locked) l.vaultLocked else l.filesCount(s.fileCount),
                   ].join(' · ')),
-                  onTap: () => context.push('/projeto/${s.project.id}'),
+                  onTap: () async {
+                    if (s.project.locked && !await unlockProjectFlow(context, ref, s.project)) return;
+                    if (context.mounted) context.push('/projeto/${s.project.id}');
+                  },
                   trailing: ProjectMenu(project: s.project),
                 ),
               ),

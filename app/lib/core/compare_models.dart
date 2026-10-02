@@ -448,6 +448,19 @@ class CompareOptions {
   /// `a`, `b` ou `null`.
   final String? truth;
 
+  /// Lê o JSON gravado na análise (o mesmo que [toJsonString] produz).
+  factory CompareOptions.parse(String json) {
+    final j = jsonDecode(json) as Map<String, dynamic>;
+    final f = (j['call_filter'] as Map<String, dynamic>?) ?? const {};
+    return CompareOptions(
+      passOnly: f['pass_only'] as bool? ?? false,
+      minQual: (f['min_qual'] as num?)?.toDouble(),
+      minDp: f['min_dp'] as int?,
+      minGq: f['min_gq'] as int?,
+      truth: j['truth'] as String?,
+    );
+  }
+
   String toJsonString() => jsonEncode({
         'call_filter': {
           'pass_only': passOnly,

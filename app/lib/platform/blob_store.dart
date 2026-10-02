@@ -29,6 +29,9 @@ abstract interface class BlobStore {
 
   Future<void> deleteDir(String relative);
 
+  /// Move um arquivo (cria as pastas do destino; substitui o destino se existir).
+  Future<void> move(String from, String to);
+
   /// Caminho real no disco (só no Android/iOS; `null` no navegador).
   String? nativePath(String relative);
 }

@@ -25,7 +25,7 @@ import 'support.dart';
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
-  test('migração v1 → v2 mantém os dados e cria as tabelas novas', () async {
+  test('migração v1 → v3 mantém os dados, cria as tabelas novas e a coluna de proteção', () async {
     final db = GenozDatabase(NativeDatabase.memory(setup: (raw) {
       raw.execute('CREATE TABLE projects (id TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, '
           'description TEXT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)');
@@ -38,7 +38,8 @@ void main() {
           JournalEntriesCompanion.insert(projectId: 'p1', kind: 'import', message: 'x', createdAt: DateTime.now()),
         );
     expect(await db.select(db.journalEntries).get(), hasLength(1));
-    expect(await db.customSelect('PRAGMA user_version').getSingle().then((r) => r.data.values.first), 2);
+    expect(await db.customSelect('PRAGMA user_version').getSingle().then((r) => r.data.values.first), 3);
+    expect(projects.single.locked, isFalse, reason: 'v3: projetos antigos não ficam protegidos');
     await db.close();
   });
 

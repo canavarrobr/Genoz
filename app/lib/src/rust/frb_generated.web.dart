@@ -10,6 +10,7 @@ import 'api/analysis.dart';
 import 'api/annotation.dart';
 import 'api/genoz.dart';
 import 'api/memory.dart';
+import 'api/vault.dart';
 
 import 'dart:async';
 import 'dart:convert';
@@ -82,6 +83,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<String> dco_decode_list_String(dynamic raw);
 
   @protected
+  List<PackBytes> dco_decode_list_pack_bytes(dynamic raw);
+
+  @protected
+  List<PackFile> dco_decode_list_pack_file(dynamic raw);
+
+  @protected
   List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
 
   @protected
@@ -98,6 +105,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MemorySide? dco_decode_opt_box_autoadd_memory_side(dynamic raw);
+
+  @protected
+  PackBytes dco_decode_pack_bytes(dynamic raw);
+
+  @protected
+  PackFile dco_decode_pack_file(dynamic raw);
 
   @protected
   ResultPage dco_decode_result_page(dynamic raw);
@@ -170,6 +183,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<String> sse_decode_list_String(SseDeserializer deserializer);
 
   @protected
+  List<PackBytes> sse_decode_list_pack_bytes(SseDeserializer deserializer);
+
+  @protected
+  List<PackFile> sse_decode_list_pack_file(SseDeserializer deserializer);
+
+  @protected
   List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
 
   @protected
@@ -190,6 +209,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   MemorySide? sse_decode_opt_box_autoadd_memory_side(
     SseDeserializer deserializer,
   );
+
+  @protected
+  PackBytes sse_decode_pack_bytes(SseDeserializer deserializer);
+
+  @protected
+  PackFile sse_decode_pack_file(SseDeserializer deserializer);
 
   @protected
   ResultPage sse_decode_result_page(SseDeserializer deserializer);
@@ -276,6 +301,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_list_String(List<String> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_pack_bytes(
+    List<PackBytes> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_pack_file(List<PackFile> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
 
   @protected
@@ -301,6 +335,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     MemorySide? self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_pack_bytes(PackBytes self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_pack_file(PackFile self, SseSerializer serializer);
 
   @protected
   void sse_encode_result_page(ResultPage self, SseSerializer serializer);

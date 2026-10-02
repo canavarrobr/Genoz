@@ -7,13 +7,14 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../persistence/analysis_repository.dart';
 import '../../persistence/app_storage.dart';
 import '../../persistence/database.dart';
+import 'report_actions.dart';
 import 'table_tab.dart';
 
 /// Exporta as linhas do filtro atual da tabela. O núcleo grava o arquivo e o
 /// manifesto na pasta do projeto; depois o usuário escolhe onde salvar.
 Future<void> showExportSheet(BuildContext context, WidgetRef ref, Analysis analysis) async {
   final l = AppLocalizations.of(context);
-  final format = await showModalBottomSheet<ExportFormat>(
+  final choice = await showModalBottomSheet<Object>(
     context: context,
     showDragHandle: true,
     builder: (ctx) => SafeArea(
@@ -32,11 +33,38 @@ Future<void> showExportSheet(BuildContext context, WidgetRef ref, Analysis analy
             (ExportFormat.vcf, l.exportVcf, Icons.biotech_outlined),
           ])
             ListTile(leading: Icon(icon), title: Text(label), onTap: () => Navigator.pop(ctx, f)),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(l.reportSection, style: Theme.of(ctx).textTheme.titleMedium),
+          ),
+          ListTile(
+            leading: const Icon(Icons.html_outlined),
+            title: Text(l.reportHtml),
+            onTap: () => Navigator.pop(ctx, 'html'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.picture_as_pdf_outlined),
+            title: Text(l.reportPdf),
+            onTap: () => Navigator.pop(ctx, 'pdf'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.verified_outlined),
+            title: Text(l.reproVerify),
+            onTap: () => Navigator.pop(ctx, 'verify'),
+          ),
         ],
       ),
     ),
   );
-  if (format == null || !context.mounted) return;
+  if (choice == null || !context.mounted) return;
+  switch (choice) {
+    case 'html' || 'pdf':
+      return saveAnalysisReport(context, ref, analysis, pdf: choice == 'pdf');
+    case 'verify':
+      return verifyReproducibilityFlow(context, ref, analysis);
+  }
+  final format = choice as ExportFormat;
 
   final storage = ref.read(appStorageProvider);
   final core = ref.read(genozCoreProvider);

@@ -1457,4 +1457,190 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get gencodeLicense =>
       'Acesso aberto (EMBL-EBI: sem restrições adicionais; atribuição esperada)';
+
+  @override
+  String get vaultExport => 'Exportar projeto (.genoz)';
+
+  @override
+  String get vaultProtect => 'Proteger com senha';
+
+  @override
+  String get vaultImport => 'Importar projeto (.genoz)';
+
+  @override
+  String get vaultLocked => 'Protegido com senha';
+
+  @override
+  String get vaultOpen => 'Abrir com a senha';
+
+  @override
+  String get vaultLockedBody =>
+      'Os dados deste projeto estão cifrados neste aparelho. Digite a senha para abri-lo.';
+
+  @override
+  String get vaultNewPasswordTitle => 'Criar senha';
+
+  @override
+  String get vaultPassword => 'Senha';
+
+  @override
+  String get vaultPasswordRepeat => 'Repita a senha';
+
+  @override
+  String vaultPasswordShort(int min) {
+    return 'Use pelo menos $min caracteres.';
+  }
+
+  @override
+  String get vaultPasswordMismatch => 'As senhas não são iguais.';
+
+  @override
+  String get vaultLossWarning =>
+      'Se você esquecer a senha, os dados não podem ser recuperados — por ninguém, nem pelo Genoz. Anote-a num lugar seguro.';
+
+  @override
+  String get vaultLossAccept => 'Entendi: senha perdida = dados perdidos';
+
+  @override
+  String get vaultProtectBody =>
+      'O projeto será cifrado neste aparelho (Argon2id + XChaCha20-Poly1305) e a cópia em claro, apagada. Para usá-lo de novo, abra com a senha.';
+
+  @override
+  String get vaultExportBody =>
+      'O arquivo .genoz sai cifrado com esta senha. Leve-o a outro aparelho (cabo, pendrive, Bluetooth...) e importe-o lá com a mesma senha. Nada é enviado para a internet.';
+
+  @override
+  String get vaultExportLockedBody =>
+      'Este projeto já está cifrado: o arquivo .genoz usa a mesma senha dele.';
+
+  @override
+  String get vaultSealing => 'Cifrando o projeto…';
+
+  @override
+  String get vaultOpening => 'Conferindo a senha e decifrando…';
+
+  @override
+  String get vaultWrongPassword =>
+      'Senha incorreta — ou o arquivo foi alterado ou está incompleto.';
+
+  @override
+  String get vaultNotGenoz => 'Este arquivo não é um projeto .genoz do Genoz.';
+
+  @override
+  String get vaultNewerVersion =>
+      'Este arquivo é de uma versão mais nova do Genoz. Atualize o app.';
+
+  @override
+  String get vaultExported => 'Projeto exportado.';
+
+  @override
+  String get vaultProtected => 'Projeto protegido com senha.';
+
+  @override
+  String vaultImported(String name) {
+    return 'Projeto \"$name\" importado.';
+  }
+
+  @override
+  String get vaultOpened =>
+      'Projeto aberto. Para cifrar de novo, use \"Proteger com senha\".';
+
+  @override
+  String vaultFailed(String detail) {
+    return 'Não foi possível concluir: $detail';
+  }
+
+  @override
+  String get logVaultImported => 'Projeto importado de um arquivo .genoz';
+
+  @override
+  String get logVaultOpened => 'Projeto aberto com a senha';
+
+  @override
+  String get logVaultExported => 'Projeto exportado (.genoz, cifrado)';
+
+  @override
+  String get reportSection => 'Relatório';
+
+  @override
+  String get reportHtml => 'Relatório HTML (abre em qualquer navegador)';
+
+  @override
+  String get reportPdf => 'Relatório PDF';
+
+  @override
+  String get reportSaved => 'Relatório salvo.';
+
+  @override
+  String logReport(String format) {
+    return 'Relatório $format gerado';
+  }
+
+  @override
+  String get reproVerify => 'Verificar reprodutibilidade';
+
+  @override
+  String get reproRunning => 'Conferindo as entradas e refazendo a análise…';
+
+  @override
+  String get reproTitle => 'Reprodutibilidade';
+
+  @override
+  String reproOk(int total) {
+    return 'Reproduzida: mesmo ID e $total de $total saídas idênticas (SHA-256).';
+  }
+
+  @override
+  String reproPartial(int ok, int total) {
+    return '$ok de $total saídas idênticas.';
+  }
+
+  @override
+  String get reproInputs => 'Entradas';
+
+  @override
+  String get reproOutputs => 'Saídas';
+
+  @override
+  String get reproInputOk => 'SHA-256 confere';
+
+  @override
+  String get reproInputMissing => 'não está mais no projeto';
+
+  @override
+  String get reproInputChanged => 'SHA-256 diferente (arquivo alterado)';
+
+  @override
+  String get reproInputUnsupported =>
+      'regiões avaliadas (BED): reexecute pela linha de comando';
+
+  @override
+  String get reproIdDiffers => 'O ID da reexecução é diferente do original.';
+
+  @override
+  String get reproNotRun =>
+      'As entradas não conferem: a reexecução não provaria nada.';
+
+  @override
+  String reproFailed(String detail) {
+    return 'A reexecução falhou: $detail';
+  }
+
+  @override
+  String get reproIdentical => 'idêntica';
+
+  @override
+  String get reproDifferent => 'diferente';
+
+  @override
+  String get reproMissing => 'ausente';
+
+  @override
+  String get reproExplain =>
+      'A análise foi refeita numa pasta temporária com os mesmos arquivos e parâmetros, e cada saída comparada pelo SHA-256 com o manifesto. A análise salva não muda.';
+
+  @override
+  String logRepro(String result) {
+    return 'Reprodutibilidade verificada: $result';
+  }
 }

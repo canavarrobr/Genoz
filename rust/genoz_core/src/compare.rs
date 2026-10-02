@@ -895,6 +895,19 @@ pub fn manifest_parameters(
     serde_json::json!({ "options": opts, "sample_a": sample_a, "sample_b": sample_b })
 }
 
+/// Inverso de [`manifest_parameters`]: opções e amostras gravadas no manifesto (reexecução).
+pub fn parameters_from_manifest(p: &serde_json::Value) -> Result<(CompareOptions, SampleSelector, SampleSelector)> {
+    let bad = |what: &str, e: serde_json::Error| GenozError::InvalidParam(format!("manifesto: {what} inválido ({e})"));
+    let opts = serde_json::from_value(p.get("options").cloned().unwrap_or_default()).map_err(|e| bad("options", e))?;
+    let sel = |k: &str| -> Result<SampleSelector> {
+        match p.get(k) {
+            None => Ok(SampleSelector::First),
+            Some(v) => serde_json::from_value(v.clone()).map_err(|e| bad(k, e)),
+        }
+    };
+    Ok((opts, sel("sample_a")?, sel("sample_b")?))
+}
+
 /// JSON formatado e determinístico (mesma entrada → mesmos bytes).
 pub fn to_json_bytes<T: Serialize>(value: &T) -> Vec<u8> {
     let mut v = serde_json::to_vec_pretty(value).expect("tipos serializáveis");

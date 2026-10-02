@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 
 use clap::{Args, ValueEnum};
 use genoz_core::call::SampleSelector;
-use genoz_core::compare::{to_json_bytes, Category, CompareInput, CompareOptions, Truth};
+use genoz_core::compare::{to_json_bytes, Category, CompareInput, CompareOptions, CompareSummary, Truth};
 use genoz_core::digest::sha256_reader;
 use genoz_core::filter::{parse_region, CallFilter, RowFilter};
 use genoz_core::manifest::{InputRef, Manifest, OutputRef};
@@ -173,7 +173,7 @@ fn output_ref(dir: &Path, name: &str) -> Result<OutputRef, GenozError> {
 }
 
 /// Data/hora UTC em RFC 3339, sem dependências externas.
-fn now_utc() -> String {
+pub(crate) fn now_utc() -> String {
     let secs = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
     let (days, rem) = (secs / 86_400, secs % 86_400);
     // Algoritmo de Howard Hinnant (civil_from_days).
@@ -193,36 +193,52 @@ fn pct(v: Option<f64>) -> String {
     v.map_or_else(|| "—".into(), |x| format!("{:.1}%", x * 100.0))
 }
 
-pub fn compare_cmd(args: CompareArgs) -> Result<(), GenozError> {
-    let mut a = file_input("A", &args.a, selector(&args.sample_a));
-    let mut b = file_input("B", &args.b, selector(&args.sample_b));
-    let mut inputs = vec![input_ref("a", &args.a)?, input_ref("b", &args.b)?];
-    for (side, bed, role) in [(&mut a, &args.bed_a, "callable_a"), (&mut b, &args.bed_b, "callable_b")] {
-        if let Some(path) = bed {
-            let (set, issues) = read_bed(File::open(path)?)?;
-            if let Some(i) = issues.first() {
-                return Err(GenozError::InvalidParam(format!(
-                    "BED {} linha {}: {}",
-                    path.display(),
-                    i.line,
-                    i.message
-                )));
-            }
-            side.callable = Some(set);
-            inputs.push(input_ref(role, path)?);
-        }
+/// Uma comparação pronta para rodar (CLI ou reexecução a partir do manifesto).
+pub(crate) struct RunSpec {
+    pub a: PathBuf,
+    pub b: PathBuf,
+    pub sample_a: SampleSelector,
+    pub sample_b: SampleSelector,
+    pub bed_a: Option<PathBuf>,
+    pub bed_b: Option<PathBuf>,
+    pub fasta: Option<PathBuf>,
+    pub opts: CompareOptions,
+    /// A é um arquivo de chip (comparação restrita aos sítios do chip).
+    pub chip: bool,
+}
+
+fn callable(path: &Path) -> Result<genoz_core::regions::RegionSet, GenozError> {
+    let (set, issues) = read_bed(File::open(path)?)?;
+    if let Some(i) = issues.first() {
+        return Err(GenozError::InvalidParam(format!("BED {} linha {}: {}", path.display(), i.line, i.message)));
     }
-    let opts = CompareOptions {
-        call_filter: args.quality.filter(),
-        truth: args.truth.map(|t| match t {
-            TruthArg::A => Truth::A,
-            TruthArg::B => Truth::B,
-        }),
-        allow_build_mismatch: args.allow_build_mismatch,
-        force_in_memory: false,
-        normalize_with_reference: args.fasta.is_some(),
-    };
-    let mut fasta = match &args.fasta {
+    Ok(set)
+}
+
+/// Roda a comparação, grava as saídas e o manifesto em `out`.
+pub(crate) fn run_compare(spec: &RunSpec, out: &Path) -> Result<(Manifest, CompareSummary), GenozError> {
+    let mut inputs = vec![input_ref("a", &spec.a)?, input_ref("b", &spec.b)?];
+    let mut b = file_input("B", &spec.b, spec.sample_b.clone());
+    if let Some(path) = &spec.bed_b {
+        b.callable = Some(callable(path)?);
+    }
+    let mut a = None;
+    if spec.chip {
+        if spec.bed_a.is_some() {
+            return Err(GenozError::InvalidParam("o chip não aceita BED de regiões avaliadas".into()));
+        }
+    } else {
+        let mut side = file_input("A", &spec.a, spec.sample_a.clone());
+        if let Some(path) = &spec.bed_a {
+            side.callable = Some(callable(path)?);
+            inputs.push(input_ref("callable_a", path)?);
+        }
+        a = Some(side);
+    }
+    if let Some(path) = &spec.bed_b {
+        inputs.push(input_ref("callable_b", path)?);
+    }
+    let mut fasta = match &spec.fasta {
         Some(path) => {
             let (fa, created) = genoz_core::fasta::open_fasta(path)?;
             if created {
@@ -234,33 +250,68 @@ pub fn compare_cmd(args: CompareArgs) -> Result<(), GenozError> {
         None => None,
     };
 
-    std::fs::create_dir_all(&args.out)?;
-    let rows_file = BufWriter::new(File::create(args.out.join("rows.bgz"))?);
-    let stored = genoz_core::compare::compare_to_store_with(
-        &mut a,
-        &mut b,
-        &opts,
-        fasta.as_mut().map(|f| f as &mut dyn genoz_core::fasta::SequenceSource),
-        rows_file,
-    )?;
+    std::fs::create_dir_all(out)?;
+    let rows_file = BufWriter::new(File::create(out.join("rows.bgz"))?);
+    let reference = fasta.as_mut().map(|f| f as &mut dyn genoz_core::fasta::SequenceSource);
+    let stored = match a.as_mut() {
+        Some(a) => genoz_core::compare::compare_to_store_with(a, &mut b, &spec.opts, reference, rows_file)?,
+        None => {
+            let Some((header, calls, rejected)) = genoz_core::consumer::read_chip(File::open(&spec.a)?)? else {
+                return Err(GenozError::InvalidParam(format!(
+                    "{} não é um arquivo de chip reconhecido (23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA)",
+                    spec.a.display()
+                )));
+            };
+            let chip =
+                genoz_core::chip_compare::ChipInput { label: "A".into(), header, calls, rejected_lines: rejected };
+            genoz_core::chip_compare::compare_chip_to_store(chip, &mut b, &spec.opts, reference, rows_file)?
+        }
+    };
     drop(stored.rows_out);
-    let s = &stored.outcome.summary;
+    let s = stored.outcome.summary;
 
-    let mut outputs = vec![output_ref(&args.out, "rows.bgz")?];
-    outputs.push(write_output(&args.out, "rows.idx", &stored.index.to_bytes())?);
-    outputs.push(write_output(&args.out, "summary.json", &to_json_bytes(s))?);
-    outputs.push(write_output(&args.out, "stats_a.json", &to_json_bytes(&stored.outcome.stats_a))?);
-    outputs.push(write_output(&args.out, "stats_b.json", &to_json_bytes(&stored.outcome.stats_b))?);
+    let mut outputs = vec![output_ref(out, "rows.bgz")?];
+    outputs.push(write_output(out, "rows.idx", &stored.index.to_bytes())?);
+    outputs.push(write_output(out, "summary.json", &to_json_bytes(&s))?);
+    outputs.push(write_output(out, "stats_a.json", &to_json_bytes(&stored.outcome.stats_a))?);
+    outputs.push(write_output(out, "stats_b.json", &to_json_bytes(&stored.outcome.stats_b))?);
 
     inputs[0].build = Some(s.a.build.build.label().into());
     inputs[0].sample = s.a.sample.clone();
     inputs[1].build = Some(s.b.build.build.label().into());
     inputs[1].sample = s.b.sample.clone();
-    let parameters =
-        genoz_core::compare::manifest_parameters(&opts, &selector(&args.sample_a), &selector(&args.sample_b));
+    let parameters = genoz_core::compare::manifest_parameters(&spec.opts, &spec.sample_a, &spec.sample_b);
     let platform = format!("cli-{}-{}", std::env::consts::OS, std::env::consts::ARCH);
-    let manifest = Manifest::new("compare", inputs, parameters, outputs, &platform, &now_utc());
-    std::fs::write(args.out.join("manifest.json"), to_json_bytes(&manifest))?;
+    let kind = if spec.chip { "compare_chip" } else { "compare" };
+    let manifest = Manifest::new(kind, inputs, parameters, outputs, &platform, &now_utc());
+    std::fs::write(out.join("manifest.json"), to_json_bytes(&manifest))?;
+    Ok((manifest, s))
+}
+
+pub fn compare_cmd(args: CompareArgs) -> Result<(), GenozError> {
+    let opts = CompareOptions {
+        call_filter: args.quality.filter(),
+        truth: args.truth.map(|t| match t {
+            TruthArg::A => Truth::A,
+            TruthArg::B => Truth::B,
+        }),
+        allow_build_mismatch: args.allow_build_mismatch,
+        force_in_memory: false,
+        normalize_with_reference: args.fasta.is_some(),
+    };
+    let spec = RunSpec {
+        a: args.a.clone(),
+        b: args.b.clone(),
+        sample_a: selector(&args.sample_a),
+        sample_b: selector(&args.sample_b),
+        bed_a: args.bed_a.clone(),
+        bed_b: args.bed_b.clone(),
+        fasta: args.fasta.clone(),
+        opts,
+        chip: false,
+    };
+    let (manifest, summary) = run_compare(&spec, &args.out)?;
+    let s = &summary;
 
     let mode = match s.mode {
         genoz_core::compare::CompareMode::Streaming => "streaming, memória constante",
@@ -452,61 +503,23 @@ pub fn density_cmd(args: DensityArgs) -> Result<(), GenozError> {
 }
 
 pub fn chip_compare_cmd(args: ChipCompareArgs) -> Result<(), GenozError> {
-    let Some((header, calls, rejected)) = genoz_core::consumer::read_chip(File::open(&args.chip)?)? else {
-        return Err(GenozError::InvalidParam(format!(
-            "{} não é um arquivo de chip reconhecido (23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA)",
-            args.chip.display()
-        )));
+    let spec = RunSpec {
+        a: args.chip.clone(),
+        b: args.vcf.clone(),
+        sample_a: SampleSelector::First,
+        sample_b: selector(&args.sample),
+        bed_a: None,
+        bed_b: args.bed.clone(),
+        fasta: args.fasta.clone(),
+        opts: CompareOptions {
+            call_filter: args.quality.filter(),
+            allow_build_mismatch: args.allow_build_mismatch,
+            ..Default::default()
+        },
+        chip: true,
     };
-    let chip = genoz_core::chip_compare::ChipInput { label: "A".into(), header, calls, rejected_lines: rejected };
-    let mut vcf = file_input("B", &args.vcf, selector(&args.sample));
-    let mut inputs = vec![input_ref("a", &args.chip)?, input_ref("b", &args.vcf)?];
-    if let Some(path) = &args.bed {
-        let (set, issues) = read_bed(File::open(path)?)?;
-        if let Some(i) = issues.first() {
-            return Err(GenozError::InvalidParam(format!("BED {} linha {}: {}", path.display(), i.line, i.message)));
-        }
-        vcf.callable = Some(set);
-        inputs.push(input_ref("callable_b", path)?);
-    }
-    let mut fasta = match &args.fasta {
-        Some(path) => {
-            let (fa, _) = genoz_core::fasta::open_fasta(path)?;
-            inputs.push(input_ref("reference", path)?);
-            Some(fa)
-        }
-        None => None,
-    };
-    let opts = CompareOptions {
-        call_filter: args.quality.filter(),
-        allow_build_mismatch: args.allow_build_mismatch,
-        ..Default::default()
-    };
-    std::fs::create_dir_all(&args.out)?;
-    let rows_file = BufWriter::new(File::create(args.out.join("rows.bgz"))?);
-    let stored = genoz_core::chip_compare::compare_chip_to_store(
-        chip,
-        &mut vcf,
-        &opts,
-        fasta.as_mut().map(|f| f as &mut dyn genoz_core::fasta::SequenceSource),
-        rows_file,
-    )?;
-    drop(stored.rows_out);
-    let s = &stored.outcome.summary;
-    let mut outputs = vec![output_ref(&args.out, "rows.bgz")?];
-    outputs.push(write_output(&args.out, "rows.idx", &stored.index.to_bytes())?);
-    outputs.push(write_output(&args.out, "summary.json", &to_json_bytes(s))?);
-    outputs.push(write_output(&args.out, "stats_a.json", &to_json_bytes(&stored.outcome.stats_a))?);
-    outputs.push(write_output(&args.out, "stats_b.json", &to_json_bytes(&stored.outcome.stats_b))?);
-    inputs[0].build = Some(s.a.build.build.label().into());
-    inputs[0].sample = s.a.sample.clone();
-    inputs[1].build = Some(s.b.build.build.label().into());
-    inputs[1].sample = s.b.sample.clone();
-    let parameters = genoz_core::compare::manifest_parameters(&opts, &SampleSelector::First, &selector(&args.sample));
-    let platform = format!("cli-{}-{}", std::env::consts::OS, std::env::consts::ARCH);
-    let manifest = Manifest::new("compare_chip", inputs, parameters, outputs, &platform, &now_utc());
-    std::fs::write(args.out.join("manifest.json"), to_json_bytes(&manifest))?;
-
+    let (manifest, summary) = run_compare(&spec, &args.out)?;
+    let s = &summary;
     let chip_info = s.chip.as_ref().expect("comparação de chip");
     println!("Chip × sequenciamento (só os sítios do chip)");
     println!("  A: {} — {}", args.chip.display(), s.a.sample.as_deref().unwrap_or("chip"));
