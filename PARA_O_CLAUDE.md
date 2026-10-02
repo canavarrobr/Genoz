@@ -1,22 +1,34 @@
 # Recado do Claude para o próximo Claude
 
-**Atualizado em:** 01/10/2026, ao concluir o **Módulo 10 — Anotação local**.
-**Uso de tokens ao escrever:** ~290 mil de 15 milhões neste trecho (bem abaixo de 90%), então:
+**Atualizado em:** 02/10/2026, ao concluir o **Módulo 11 — Relatórios, reprodutibilidade e criptografia**.
+**Uso de tokens ao escrever:** ~60 mil de 15 milhões neste trecho (bem abaixo de 90%), então:
 
-## ✅ Pode começar o Módulo 11 — Relatórios, reprodutibilidade e criptografia
+## ✅ Pode começar o Módulo 12 — Família e populações
 
 Regra do usuário: ao fim de cada módulo, atualizar este recado dizendo que o próximo pode começar, **somente se o uso de tokens estiver abaixo de 90%**.
 
 ### Pendências que dependem do usuário (ações públicas ou de conta)
 - **Site no GitHub Pages** (Módulo 6): Settings → Pages → Source: GitHub Actions; e variável de repositório `GENOZ_PAGES` = `1`.
-- **Release do APK** (Módulo 7): criar a tag da versão atual, ex.: `v0.10.0` (o workflow "APK Android e iOS" anexa os APKs a um pre-release). Só com o "sim" do usuário.
+- **Release do APK** (Módulo 7): criar a tag da versão atual, ex.: `v0.11.0` (o workflow "APK Android e iOS" anexa os APKs a um pre-release). Só com o "sim" do usuário.
 - **Chave de assinatura** do APK: sem os secrets `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` o APK sai com chave de depuração (cada runner tem uma diferente → atualizar pode exigir desinstalar). Gerar a chave com `keytool` e o usuário colar os 4 secrets (ou deixar para o Módulo 13).
 
-### O que fazer no Módulo 11
-Seção "Módulo 11" de `docs/modulos/PLANO_DE_MODULOS.md` (escrever o contrato antes de implementar).
-Pendências que podem entrar aqui: verificar a anotação no site (Edge headless: instalar um BED/TSV próprio e ver a
-coluna de genes; ClinVar de 190 MB na memória do wasm pode ser pesado — medir); exportações grandes ainda passam
-pela memória do Dart (streaming).
+### O que fazer no Módulo 12
+Seção "Módulo 12" de `docs/modulos/PLANO_DE_MODULOS.md` (escrever o contrato antes de implementar).
+Pendência antiga: exportações da TABELA (CSV/TSV/JSON/VCF) ainda passam pela memória do Dart — dá para usar
+`saveStoredFile` (lib/platform/file_saver.dart, cópia em fluxo no Android) se o núcleo gravar o arquivo no disco.
+
+### Como relatórios, reexecução e cofre funcionam (Módulo 11, ADR-017)
+- Núcleo: `report.rs` (modelo de blocos + HTML), `pdf.rs` (escritor de PDF próprio, WinAnsi), `pack.rs`
+  (pacote em fluxo), `vault.rs` (Argon2id + XChaCha20-Poly1305 em segmentos de 64 KiB). O núcleo NÃO sorteia:
+  sal/nonce vêm do app (`secureRandom32`). Não adicione `getrandom` (quebra o wasm32).
+- CLI: `report`, `verify`, `rerun`, `unpack` (senha em `GENOZ_SENHA`). `analysis::run_compare` é a única execução de
+  comparação da CLI (compare, compare-chip e rerun usam).
+- App: `features/vault/` (project_vault.dart = exportar/importar/proteger/abrir; vault_ui.dart = telas),
+  `features/analysis/reproducibility.dart` e `report_actions.dart`. Banco v3 (`projects.locked`).
+- Proteger apaga linhas e faz `VACUUM` — sem ele o conteúdo fica nas páginas livres do SQLite (há teste).
+- Testes do cofre no Dart usam um formato FALSO (JSON com a senha) no `FakeGenozCore`; a cifra real é testada no Rust.
+- Emulador: `ui.py` no scratchpad desta sessão (uiautomator: dump/tap por texto); site: `edge_ctl.mjs` (Edge headless
+  por CDP, com `/upload` para seletor de arquivos). O banco do app fica em `/data/data/br.genoz.app/app_flutter/genoz.sqlite`.
 
 ### Como a anotação funciona (Módulo 10, ADR-016)
 - Núcleo: `rust/genoz_core/src/annotation.rs` (pacote = manifest.json + records.bgz + records.idx; tipos `sites` e
