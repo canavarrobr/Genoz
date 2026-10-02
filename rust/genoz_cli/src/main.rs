@@ -113,18 +113,18 @@ fn run(cli: Cli) -> Result<ExitCode, GenozError> {
         Command::Inspect { file, json, max_issues } => {
             // Reconhece chip de consumidor ou VCF pelo conteúdo.
             let path = file.clone();
-            let (mut report, chip) = genoz_core::consumer::inspect_any(
+            let (mut report, extra) = genoz_core::consumer::inspect_any(
                 || Ok(Box::new(File::open(&path)?) as Box<dyn std::io::Read>),
                 &InspectOptions { max_issues },
             )?;
             report.digest = Some(sha256_reader(File::open(&file)?)?);
             if json {
                 let v: serde_json::Value =
-                    serde_json::from_str(&genoz_core::consumer::report_json(&report, chip.as_ref())).expect("JSON");
+                    serde_json::from_str(&genoz_core::consumer::report_json(&report, &extra)).expect("JSON");
                 println!("{}", serde_json::to_string_pretty(&v).expect("relatório serializável"));
             } else {
                 print_report(&file, &report);
-                if let Some(c) = &chip {
+                if let genoz_core::consumer::ReportExtra::Chip(c) = &extra {
                     println!(
                         "Chip:         {} — {} sítios, {} chamados, {} sem chamada, {} indels ignorados",
                         c.vendor_label, c.sites, c.called, c.no_calls, c.indels

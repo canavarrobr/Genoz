@@ -515,30 +515,52 @@ pub fn read_chip<R: Read>(source: R) -> Result<Option<(ChipHeader, Vec<ChipCall>
     Ok(Some((header, calls, rejected)))
 }
 
-/// Inspeção que reconhece o formato pelo conteúdo: chip de consumidor ou VCF.
-/// `fonte` é chamada duas vezes (espiar + ler), como em [`crate::compare::CompareInput`].
+/// Informação extra de um relatório, conforme o tipo de arquivo.
+#[derive(Debug, Clone)]
+pub enum ReportExtra {
+    /// VCF: nada além do relatório.
+    None,
+    Chip(ChipSummary),
+    Fasta(crate::fasta::FastaSummary),
+}
+
+/// Inspeção que reconhece o formato pelo conteúdo: chip de consumidor, FASTA ou VCF.
+/// `source` é chamada mais de uma vez (espiar + ler), como em [`crate::compare::CompareInput`].
 pub fn inspect_any<'a>(
     mut source: impl FnMut() -> Result<Box<dyn Read + 'a>>,
     opts: &crate::inspect::InspectOptions,
-) -> Result<(InspectReport, Option<ChipSummary>)> {
+) -> Result<(InspectReport, ReportExtra)> {
     let mut prefix = Vec::new();
     {
         let (_, mut r) = open_reader(source()?)?;
         r.by_ref().take(64 * 1024).read_to_end(&mut prefix)?;
     }
-    if sniff(&String::from_utf8_lossy(&prefix)).is_some() {
+    let text = String::from_utf8_lossy(&prefix);
+    if text.trim_start_matches('\u{feff}').trim_start().starts_with('>') {
+        let (report, fasta) = crate::fasta::inspect_fasta(source()?)?;
+        return Ok((report, ReportExtra::Fasta(fasta)));
+    }
+    if sniff(&text).is_some() {
         if let Some((report, chip)) = inspect_chip(source()?, opts.max_issues)? {
-            return Ok((report, Some(chip)));
+            return Ok((report, ReportExtra::Chip(chip)));
         }
     }
-    Ok((crate::inspect::inspect(source()?, opts)?, None))
+    Ok((crate::inspect::inspect(source()?, opts)?, ReportExtra::None))
 }
 
-/// JSON do relatório; para chip, com o bloco `chip` acrescentado.
-pub fn report_json(report: &InspectReport, chip: Option<&ChipSummary>) -> String {
+/// JSON do relatório, com o bloco `chip` ou `fasta` acrescentado quando houver.
+pub fn report_json(report: &InspectReport, extra: &ReportExtra) -> String {
     let mut v = serde_json::to_value(report).expect("relatório serializável");
-    if let (Some(chip), Some(obj)) = (chip, v.as_object_mut()) {
-        obj.insert("chip".into(), serde_json::to_value(chip).expect("serializável"));
+    if let Some(obj) = v.as_object_mut() {
+        match extra {
+            ReportExtra::None => {}
+            ReportExtra::Chip(c) => {
+                obj.insert("chip".into(), serde_json::to_value(c).expect("serializável"));
+            }
+            ReportExtra::Fasta(f) => {
+                obj.insert("fasta".into(), serde_json::to_value(f).expect("serializável"));
+            }
+        }
     }
     serde_json::to_string(&v).expect("serializável")
 }
@@ -640,16 +662,18 @@ RSID,CHROMOSOME,POSITION,RESULT\n\
     #[test]
     fn inspect_any_escolhe_o_formato() {
         let opts = crate::inspect::InspectOptions::default();
-        let (r, chip) = inspect_any(|| Ok(Box::new(T23.as_bytes()) as Box<dyn Read>), &opts).unwrap();
-        assert!(chip.is_some());
-        assert!(report_json(&r, chip.as_ref()).contains("\"vendor_label\":\"23andMe\""));
-        let vcf = "##fileformat=VCFv4.3
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
-1	5	.	A	G	.	.	.
-";
-        let (r, chip) = inspect_any(|| Ok(Box::new(vcf.as_bytes()) as Box<dyn Read>), &opts).unwrap();
-        assert!(chip.is_none());
-        assert!(!report_json(&r, None).contains("\"chip\""));
+        let open = |text: &'static str| move || Ok(Box::new(text.as_bytes()) as Box<dyn Read>);
+        let (r, extra) = inspect_any(open(T23), &opts).unwrap();
+        assert!(matches!(extra, ReportExtra::Chip(_)));
+        assert!(report_json(&r, &extra).contains("\"vendor_label\":\"23andMe\""));
+        let vcf = "##fileformat=VCFv4.3\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n1\t5\t.\tA\tG\t.\t.\t.\n";
+        let (r, extra) = inspect_any(open(vcf), &opts).unwrap();
+        assert!(matches!(extra, ReportExtra::None));
+        assert!(!report_json(&r, &extra).contains("\"chip\""));
+        let (r, extra) = inspect_any(open(">chr21\nACGT\nAC\n"), &opts).unwrap();
+        assert_eq!(r.file_format.as_deref(), Some("fasta"));
+        let ReportExtra::Fasta(f) = extra else { panic!("esperado FASTA") };
+        assert_eq!((f.sequences, f.total_bases), (1, 6));
     }
 
     #[test]

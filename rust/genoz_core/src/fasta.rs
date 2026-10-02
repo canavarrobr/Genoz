@@ -209,6 +209,79 @@ pub fn open_fasta(path: &std::path::Path) -> Result<(IndexedFasta<std::io::BufRe
     Ok((IndexedFasta::new(reader, index), created))
 }
 
+/// Resumo de um FASTA importado.
+#[derive(Debug, Clone, Default, serde::Serialize)]
+pub struct FastaSummary {
+    pub sequences: u64,
+    pub total_bases: u64,
+    /// Nomes e comprimentos (os primeiros 50).
+    pub names: Vec<(String, u64)>,
+    /// Texto do índice `.fai` (o app grava ao lado do arquivo).
+    pub fai: String,
+}
+
+/// Inspeção de um FASTA: indexa (valida) e deduz o build pelos comprimentos
+/// dos cromossomos, como no cabeçalho de um VCF.
+pub fn inspect_fasta<R: Read>(source: R) -> Result<(crate::inspect::InspectReport, FastaSummary)> {
+    use crate::inspect::{ChromCount, InspectReport, Verdict};
+    let (index, fatal) = match FastaIndex::build(source) {
+        Ok(i) => (i, None),
+        Err(e) => (FastaIndex::default(), Some(e.user_message())),
+    };
+    let contigs: Vec<crate::header::Contig> = index
+        .entries
+        .iter()
+        .map(|e| crate::header::Contig {
+            id: e.name.clone(),
+            canonical: canonical_chrom(&e.name),
+            length: Some(e.length),
+            assembly: None,
+        })
+        .collect();
+    let build = crate::build::guess_build(&contigs, None);
+    let summary = FastaSummary {
+        sequences: index.entries.len() as u64,
+        total_bases: index.entries.iter().map(|e| e.length).sum(),
+        names: index.entries.iter().take(50).map(|e| (e.name.clone(), e.length)).collect(),
+        fai: index.to_fai(),
+    };
+    let report = InspectReport {
+        core_version: crate::CORE_VERSION,
+        digest: None,
+        compression: crate::io::Compression::None,
+        file_format: Some("fasta".into()),
+        build,
+        chrom_style: crate::chrom::ChromStyle::Unknown,
+        contigs_in_header: index.entries.len(),
+        info_fields: 0,
+        format_fields: 0,
+        samples: Vec::new(),
+        records_read: 0,
+        records_ok: 0,
+        records_rejected: 0,
+        multiallelic: 0,
+        biallelic_after_split: 0,
+        by_kind: Default::default(),
+        by_chrom: index
+            .entries
+            .iter()
+            .map(|e| ChromCount { chrom: canonical_chrom(&e.name), raw: e.name.clone(), records: e.length })
+            .collect(),
+        filter_pass: 0,
+        filter_failed: 0,
+        filter_missing: 0,
+        sorted: true,
+        errors: u64::from(fatal.is_some()),
+        warnings: 0,
+        issue_counts: Default::default(),
+        issues: Vec::new(),
+        issues_truncated: false,
+        verdict: if fatal.is_some() { Verdict::Invalid } else { Verdict::Valid },
+        fatal,
+    };
+    Ok((report, summary))
+}
+
 /// Resultado da normalização de uma variante.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Normalized {
