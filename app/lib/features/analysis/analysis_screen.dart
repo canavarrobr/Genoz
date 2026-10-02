@@ -78,6 +78,44 @@ class AnalysisScreen extends ConsumerWidget {
   }
 }
 
+/// Chip × sequenciamento: o que o resumo comum não mostra.
+class _ChipCard extends StatelessWidget {
+  const _ChipCard({required this.summary, required this.chip});
+  final CompareSummary summary;
+  final ChipCompareInfo chip;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = Theme.of(context).textTheme;
+    Widget row(String label, String value) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 3),
+          child: Row(children: [Expanded(child: Text(label)), Text(value, style: t.titleSmall)]),
+        );
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l.chipCompareTitle(summary.a.sample ?? 'chip'), style: t.titleMedium),
+            const SizedBox(height: 4),
+            Text(l.chipCompareRestricted, style: t.bodySmall),
+            const SizedBox(height: 8),
+            row(l.chipSites, '${chip.sites}'),
+            row(l.chipNoCalls, '${chip.noCalls}'),
+            row(l.chipCompareNonref, percent(chip.nonrefConcordance)),
+            row(l.chipCompareOffChip, '${chip.vcfVariantsOffChip}'),
+            if (!chip.referenceUsed || chip.unknownReference > 0) row(l.chipCompareUnknownRef, '${chip.unknownReference}'),
+            if (chip.referenceUsed) row(l.chipCompareRefNotAssessed, '${chip.referenceNotAssessed}'),
+            if (chip.possibleStrandFlips > 0) row(l.chipCompareStrandFlips, '${chip.possibleStrandFlips}'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _SummaryTab extends StatelessWidget {
   const _SummaryTab({required this.summary});
   final CompareSummary summary;
@@ -105,6 +143,7 @@ class _SummaryTab extends StatelessWidget {
             ),
           ),
         ),
+        if (s.chip case final chip?) _ChipCard(summary: s, chip: chip),
         Card(child: Padding(padding: const EdgeInsets.all(16), child: IntersectionDiagram(summary: s))),
         Card(
           child: Padding(

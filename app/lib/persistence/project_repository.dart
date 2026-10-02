@@ -105,6 +105,8 @@ class ProjectRepository {
   Future<void> deleteFile(ProjectFile file) async {
     await (_db.delete(_db.projectFiles)..where((t) => t.id.equals(file.id))).go();
     await _storage.deleteFile(file.storedPath);
+    // FASTA: o índice .fai gravado ao lado na importação.
+    await _storage.deleteFile('${file.storedPath}.fai');
     await _touch(file.projectId);
   }
 
@@ -122,6 +124,15 @@ extension ProjectFileX on ProjectFile {
   Verdict get verdictValue => verdictFromCode(verdict);
   List<String> get sampleNames => (jsonDecode(samplesJson) as List).cast<String>();
   InspectReport get report => InspectReport.parse(reportJson);
+
+  /// Arquivo bruto de chip de consumidor (23andMe, AncestryDNA…).
+  bool get isChip => fileFormat?.startsWith('chip:') ?? false;
+
+  /// FASTA de referência.
+  bool get isFasta => fileFormat == 'fasta';
+
+  /// Fornecedor do chip (`23andMe`…), ou `null`.
+  String? get chipVendor => isChip ? fileFormat!.substring(5) : null;
 }
 
 final databaseProvider = Provider<GenozDatabase>((ref) {

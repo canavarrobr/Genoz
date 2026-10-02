@@ -2168,6 +2168,192 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Abra a comparação da aula: as respostas estão no Resumo, na Tabela e no Mapa.'**
   String get packageOpenStep;
+
+  /// No description provided for @chipModeHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'A é um arquivo de chip: a comparação fica restrita aos sítios que o chip avalia. B precisa ser um VCF.'**
+  String get chipModeHint;
+
+  /// No description provided for @referenceTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Referência (FASTA)'**
+  String get referenceTitle;
+
+  /// No description provided for @referenceHintChip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Opcional. Com a referência, sítios homozigotos do chip sem registro no VCF também podem ser julgados.'**
+  String get referenceHintChip;
+
+  /// No description provided for @referenceHintVcf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Opcional. Alinha os indels à esquerda antes de comparar e confere o REF de cada variante (usa mais memória).'**
+  String get referenceHintVcf;
+
+  /// No description provided for @referenceNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem referência'**
+  String get referenceNone;
+
+  /// No description provided for @kindChip.
+  ///
+  /// In pt, this message translates to:
+  /// **'chip {vendor}'**
+  String kindChip(String vendor);
+
+  /// No description provided for @kindFasta.
+  ///
+  /// In pt, this message translates to:
+  /// **'FASTA de referência'**
+  String get kindFasta;
+
+  /// No description provided for @sitesCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} sítios'**
+  String sitesCount(int count);
+
+  /// No description provided for @sequencesCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} sequências'**
+  String sequencesCount(int count);
+
+  /// No description provided for @sectionChip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Chip de consumidor'**
+  String get sectionChip;
+
+  /// No description provided for @chipVendor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Empresa'**
+  String get chipVendor;
+
+  /// No description provided for @chipSites.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sítios no chip'**
+  String get chipSites;
+
+  /// No description provided for @chipCalled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Com genótipo'**
+  String get chipCalled;
+
+  /// No description provided for @chipNoCalls.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem chamada (--)'**
+  String get chipNoCalls;
+
+  /// No description provided for @chipHet.
+  ///
+  /// In pt, this message translates to:
+  /// **'Heterozigotos'**
+  String get chipHet;
+
+  /// No description provided for @chipHom.
+  ///
+  /// In pt, this message translates to:
+  /// **'Homozigotos'**
+  String get chipHom;
+
+  /// No description provided for @chipHaploid.
+  ///
+  /// In pt, this message translates to:
+  /// **'Haploides (X/Y/MT)'**
+  String get chipHaploid;
+
+  /// No description provided for @chipIndels.
+  ///
+  /// In pt, this message translates to:
+  /// **'Indels ignorados'**
+  String get chipIndels;
+
+  /// No description provided for @chipNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Chips medem só posições escolhidas pelo fabricante e não informam a base de referência. Na comparação com um VCF os genótipos são comparados letra a letra, só nesses sítios.'**
+  String get chipNote;
+
+  /// No description provided for @sectionFasta.
+  ///
+  /// In pt, this message translates to:
+  /// **'Referência (FASTA)'**
+  String get sectionFasta;
+
+  /// No description provided for @fastaSequences.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sequências'**
+  String get fastaSequences;
+
+  /// No description provided for @fastaTotalBases.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bases no total'**
+  String get fastaTotalBases;
+
+  /// No description provided for @fastaNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Usado para alinhar indels à esquerda e para julgar sítios do chip sem registro no VCF. Fica só neste aparelho.'**
+  String get fastaNote;
+
+  /// No description provided for @chipCompareTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Chip {vendor} × sequenciamento'**
+  String chipCompareTitle(String vendor);
+
+  /// No description provided for @chipCompareRestricted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só os sítios que o chip avalia. Variantes do VCF fora do chip não entram na conta (ver abaixo).'**
+  String get chipCompareRestricted;
+
+  /// No description provided for @chipCompareNonref.
+  ///
+  /// In pt, this message translates to:
+  /// **'Concordância sem os sítios referência × referência'**
+  String get chipCompareNonref;
+
+  /// No description provided for @chipCompareOffChip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Variantes do VCF fora do chip'**
+  String get chipCompareOffChip;
+
+  /// No description provided for @chipCompareUnknownRef.
+  ///
+  /// In pt, this message translates to:
+  /// **'Homozigotos do chip sem registro no VCF (referência desconhecida)'**
+  String get chipCompareUnknownRef;
+
+  /// No description provided for @chipCompareRefNotAssessed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Homozigotos de referência sem registro no VCF'**
+  String get chipCompareRefNotAssessed;
+
+  /// No description provided for @chipCompareStrandFlips.
+  ///
+  /// In pt, this message translates to:
+  /// **'Diferenças que parecem troca de fita'**
+  String get chipCompareStrandFlips;
+
+  /// No description provided for @zipError.
+  ///
+  /// In pt, this message translates to:
+  /// **'{code, select, invalid{Não foi possível abrir o .zip.} empty{O .zip não tem um arquivo de dados (.txt, .csv, .vcf).} many{O .zip tem mais de um arquivo de dados; extraia e importe o que quiser.} tooLarge{O arquivo dentro do .zip é grande demais.} other{Não foi possível importar o .zip.}}'**
+  String zipError(String code);
 }
 
 class _AppLocalizationsDelegate

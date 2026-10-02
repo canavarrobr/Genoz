@@ -84,6 +84,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String? dco_decode_opt_String(dynamic raw);
 
   @protected
+  CompareSide? dco_decode_opt_box_autoadd_compare_side(dynamic raw);
+
+  @protected
+  MemorySide? dco_decode_opt_box_autoadd_memory_side(dynamic raw);
+
+  @protected
   ResultPage dco_decode_result_page(dynamic raw);
 
   @protected
@@ -155,6 +161,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
+
+  @protected
+  CompareSide? sse_decode_opt_box_autoadd_compare_side(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  MemorySide? sse_decode_opt_box_autoadd_memory_side(
+    SseDeserializer deserializer,
+  );
 
   @protected
   ResultPage sse_decode_result_page(SseDeserializer deserializer);
@@ -245,6 +261,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_compare_side(
+    CompareSide? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_memory_side(
+    MemorySide? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_result_page(ResultPage self, SseSerializer serializer);

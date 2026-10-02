@@ -1,0 +1,56 @@
+{
+  "biallelic_after_split": 0,
+  "build": {
+    "build": "unknown",
+    "confidence": "none",
+    "evidence": [
+      "o cabeçalho não traz comprimentos de contig nem nome da referência"
+    ]
+  },
+  "by_chrom": [
+    {
+      "chrom": "1",
+      "raw": "1",
+      "records": 20000
+    }
+  ],
+  "by_kind": {},
+  "chrom_style": "unknown",
+  "compression": "none",
+  "contigs_in_header": 1,
+  "core_version": "0.1.0",
+  "digest": {
+    "bytes": 20398,
+    "sha256": "dc2fcdb2b9c1c213c9d62179eaa94652600229313fa1673fb7bc2ebd233e1359"
+  },
+  "errors": 0,
+  "fasta": {
+    "fai": "1\t20000\t64\t60\t61\n",
+    "names": [
+      [
+        "1",
+        20000
+      ]
+    ],
+    "sequences": 1,
+    "total_bases": 20000
+  },
+  "fatal": null,
+  "file_format": "fasta",
+  "filter_failed": 0,
+  "filter_missing": 0,
+  "filter_pass": 0,
+  "format_fields": 0,
+  "info_fields": 0,
+  "issue_counts": {},
+  "issues": [],
+  "issues_truncated": false,
+  "multiallelic": 0,
+  "records_ok": 0,
+  "records_read": 0,
+  "records_rejected": 0,
+  "samples": [],
+  "sorted": true,
+  "verdict": "valid",
+  "warnings": 0
+}

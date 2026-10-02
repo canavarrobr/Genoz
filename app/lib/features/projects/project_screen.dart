@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/genoz_core.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../platform/picker_cache.dart';
+import '../import/zip_source.dart';
 import '../../persistence/analysis_repository.dart';
 import '../../persistence/database.dart';
 import '../../persistence/project_repository.dart';
@@ -94,8 +97,23 @@ class ProjectScreen extends ConsumerWidget {
 
   Future<void> _pickAndImport(BuildContext context, WidgetRef ref) async {
     // FileType.any: muitos seletores não reconhecem .vcf/.gz como tipo próprio.
-    final file = await FilePicker.pickFile(type: FileType.any);
-    if (file == null) return;
+    final picked = await FilePicker.pickFile(type: FileType.any);
+    if (picked == null) return;
+    // 23andMe e AncestryDNA entregam os dados num .zip: abre e importa o arquivo de dentro.
+    if (picked.name.toLowerCase().endsWith('.zip')) {
+      try {
+        final source = await unzipSingleDataFile(picked.name, await _readAll(picked.readAsByteStream()));
+        await ref.read(importControllerProvider.notifier).importFile(projectId: projectId, source: source);
+      } on ZipImportError catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).zipError(e.code))));
+        }
+      } finally {
+        await clearPickerCache();
+      }
+      return;
+    }
+    final file = picked;
     // No navegador (e no Android com `content://`) não há caminho: lemos como fluxo de bytes.
     try {
       await ref
@@ -211,9 +229,17 @@ class _FileTile extends ConsumerWidget {
         subtitle: Text(
           [
             l.verdict(v),
+            if (file.isChip) l.kindChip(file.chipVendor!),
+            if (file.isFasta) l.kindFasta,
             l.buildName(file.build),
-            l.samplesCount(file.sampleNames.length),
-            l.variantsCount(file.recordsOk),
+            if (file.isChip)
+              l.sitesCount(file.recordsOk)
+            else if (file.isFasta)
+              l.sequencesCount(file.report.fasta?.sequences ?? 0)
+            else ...[
+              l.samplesCount(file.sampleNames.length),
+              l.variantsCount(file.recordsOk),
+            ],
             formatBytes(file.bytes),
           ].join(' · '),
         ),
@@ -276,4 +302,12 @@ class _AnalysesSection extends ConsumerWidget {
       ],
     );
   }
+}
+
+Future<Uint8List> _readAll(Stream<List<int>> stream) async {
+  final b = BytesBuilder(copy: false);
+  await for (final chunk in stream) {
+    b.add(chunk);
+  }
+  return b.takeBytes();
 }

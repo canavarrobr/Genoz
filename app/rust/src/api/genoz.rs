@@ -12,7 +12,7 @@ use std::sync::{Arc, LazyLock, Mutex};
 
 use genoz_core::build::GenomeBuild;
 use genoz_core::digest::FileDigest;
-use genoz_core::inspect::{inspect, InspectOptions};
+use genoz_core::inspect::InspectOptions;
 use genoz_core::io::BgzfWriter;
 use genoz_core::synth::{write_synthetic_vcf, SynthParams};
 use sha2::{Digest, Sha256};
@@ -182,23 +182,30 @@ fn run_import(
     let Some(digest) = copy_and_hash(source, dest, cancel, sink)? else {
         return Ok(Outcome::Cancelled);
     };
-    let reader = ProgressReader {
-        inner: File::open(dest).map_err(|e| format!("não foi possível reabrir a cópia: {e}"))?,
-        done: 0,
-        last: 0,
-        total: digest.bytes,
-        cancel,
-        sink,
-    };
-    let mut report =
-        inspect(reader, &InspectOptions { max_issues: 500 }).map_err(|e| e.user_message())?;
+    // VCF, chip de consumidor ou FASTA: reconhecido pelo conteúdo.
+    let (mut report, extra) = genoz_core::consumer::inspect_any(
+        || {
+            Ok(Box::new(ProgressReader {
+                inner: File::open(dest)?,
+                done: 0,
+                last: 0,
+                total: digest.bytes,
+                cancel,
+                sink,
+            }) as Box<dyn Read + '_>)
+        },
+        &InspectOptions { max_issues: 500 },
+    )
+    .map_err(|e| e.user_message())?;
     if cancel.load(Ordering::SeqCst) {
         return Ok(Outcome::Cancelled);
     }
+    // FASTA: grava o índice ao lado (o app busca trechos por posição depois).
+    if let genoz_core::consumer::ReportExtra::Fasta(f) = &extra {
+        let _ = std::fs::write(format!("{}.fai", dest.display()), &f.fai);
+    }
     report.digest = Some(digest);
-    Ok(Outcome::Done(
-        serde_json::to_string(&report).expect("relatório serializável"),
-    ))
+    Ok(Outcome::Done(genoz_core::consumer::report_json(&report, &extra)))
 }
 
 /// Copia um VCF para a pasta privada do app (`dest_path`), calcula o SHA-256

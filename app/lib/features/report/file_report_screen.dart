@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart' show NumberFormat;
 
 import '../../core/inspect_report.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -37,6 +38,8 @@ class _ReportBody extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     final c = Theme.of(context).colorScheme;
     final r = report;
+    final vcf = r.kind == FileKind.vcf;
+    final fmt = NumberFormat.decimalPattern(Localizations.localeOf(context).toString());
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 8),
       children: [
@@ -52,13 +55,55 @@ class _ReportBody extends StatelessWidget {
           _Field(l.fieldSha256, r.sha256, mono: true, copyable: true),
           _Field(l.fieldSize, formatBytes(r.bytes)),
           _Field(l.fieldCompression, l.compression(r.compression)),
-          _Field(l.fieldFormat, r.fileFormat ?? '—'),
-          _Field(l.fieldRecords, l.recordsSummary(r.recordsOk, r.recordsRead, r.recordsRejected)),
-          _Field(l.fieldMultiallelic, l.multiallelicSummary(r.multiallelic, r.biallelicAfterSplit)),
-          _Field(l.fieldFilter, l.filterSummary(r.filterPass, r.filterFailed, r.filterMissing)),
-          _Field(l.fieldSorted, r.sorted ? l.yes : l.no),
-          _Field(l.fieldChromStyle, l.chromStyle(r.chromStyle)),
+          _Field(
+            l.fieldFormat,
+            switch (r.kind) {
+              FileKind.chip => l.kindChip(r.chip!.vendor),
+              FileKind.fasta => l.kindFasta,
+              FileKind.vcf => r.fileFormat ?? '—',
+            },
+          ),
+          if (r.kind != FileKind.fasta)
+            _Field(l.fieldRecords, l.recordsSummary(r.recordsOk, r.recordsRead, r.recordsRejected)),
+          if (vcf) ...[
+            _Field(l.fieldMultiallelic, l.multiallelicSummary(r.multiallelic, r.biallelicAfterSplit)),
+            _Field(l.fieldFilter, l.filterSummary(r.filterPass, r.filterFailed, r.filterMissing)),
+            _Field(l.fieldSorted, r.sorted ? l.yes : l.no),
+            _Field(l.fieldChromStyle, l.chromStyle(r.chromStyle)),
+          ],
         ]),
+        if (r.chip case final chip?)
+          _Section(title: l.sectionChip, children: [
+            _Field(l.chipVendor, chip.vendor),
+            _Field(l.chipSites, fmt.format(chip.sites)),
+            _Field(l.chipCalled, fmt.format(chip.called)),
+            _Field(l.chipNoCalls, fmt.format(chip.noCalls)),
+            _Field(l.chipHet, fmt.format(chip.heterozygous)),
+            _Field(l.chipHom, fmt.format(chip.homozygous)),
+            _Field(l.chipHaploid, fmt.format(chip.haploid)),
+            _Field(l.chipIndels, fmt.format(chip.indels)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Text(l.chipNote, style: t.bodySmall),
+            ),
+          ]),
+        if (r.fasta case final fasta?)
+          _Section(title: l.sectionFasta, children: [
+            _Field(l.fastaSequences, fmt.format(fasta.sequences)),
+            _Field(l.fastaTotalBases, fmt.format(fasta.totalBases)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [for (final (name, len) in fasta.names) Chip(label: Text('$name: ${fmt.format(len)}'))],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Text(l.fastaNote, style: t.bodySmall),
+            ),
+          ]),
         _Section(title: l.sectionBuild, children: [
           _Field(l.buildName(r.build), l.buildConfidence(r.buildConfidence)),
           for (final e in r.buildEvidence)
@@ -67,7 +112,7 @@ class _ReportBody extends StatelessWidget {
               child: Text('• $e', style: t.bodySmall),
             ),
         ]),
-        if (r.samples.isNotEmpty)
+        if (vcf && r.samples.isNotEmpty)
           _Section(title: l.sectionSamples, children: [
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -94,10 +139,12 @@ class _ReportBody extends StatelessWidget {
               ),
             ),
           ]),
-        _Section(title: l.sectionKinds, children: [
-          for (final e in r.byKind.entries) _Field(l.kind(e.key), '${e.value}'),
-        ]),
-        _Section(title: l.sectionChromosomes, children: [
+        if (vcf)
+          _Section(title: l.sectionKinds, children: [
+            for (final e in r.byKind.entries) _Field(l.kind(e.key), '${e.value}'),
+          ]),
+        if (r.kind != FileKind.fasta)
+          _Section(title: l.sectionChromosomes, children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Wrap(

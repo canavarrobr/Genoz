@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/compare_models.dart';
+import '../../core/inspect_report.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../persistence/database.dart';
 import '../../persistence/project_repository.dart';
@@ -28,6 +29,9 @@ class _CompareSetupScreenState extends ConsumerState<CompareSetupScreen> {
   final _minGq = TextEditingController();
   String? _truth;
 
+  /// FASTA de referência escolhido (`null` = sem referência).
+  String? _reference;
+
   @override
   void dispose() {
     _minQual.dispose();
@@ -36,20 +40,23 @@ class _CompareSetupScreenState extends ConsumerState<CompareSetupScreen> {
     super.dispose();
   }
 
-  CompareOptions get _options => CompareOptions(
+  /// No chip × VCF não há "verdade" (o chip define os sítios).
+  CompareOptions _options({required bool chip}) => CompareOptions(
         passOnly: _passOnly,
         minQual: double.tryParse(_minQual.text.replaceAll(',', '.')),
         minDp: int.tryParse(_minDp.text),
         minGq: int.tryParse(_minGq.text),
-        truth: _truth,
+        truth: chip ? null : _truth,
       );
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final files = (ref.watch(projectFilesProvider(widget.projectId)).value ?? const <ProjectFile>[])
-        .where((f) => f.recordsOk > 0)
-        .toList();
+    final all = ref.watch(projectFilesProvider(widget.projectId)).value ?? const <ProjectFile>[];
+    // A: VCF ou chip; B: só VCF (o chip define os sítios). FASTA só como referência.
+    final files = all.where((f) => f.recordsOk > 0).toList();
+    final filesB = files.where((f) => !f.isChip).toList();
+    final fastas = all.where((f) => f.isFasta && f.verdictValue != Verdict.invalid).toList();
     final state = ref.watch(compareControllerProvider);
     ref.listen(compareControllerProvider, (_, next) {
       final c = ref.read(compareControllerProvider.notifier);
@@ -77,21 +84,24 @@ class _CompareSetupScreenState extends ConsumerState<CompareSetupScreen> {
     });
 
     // Pré-seleção: dois primeiros arquivos (ou o mesmo arquivo com amostras 1 e 2).
-    if (_fileA == null && files.isNotEmpty) {
-      _fileA = files.first.id;
-      _fileB = files.length > 1 ? files[1].id : files.first.id;
-      final samples = files.first.sampleNames;
-      if (files.length == 1 && samples.length > 1) _sampleB = samples[1];
+    if (_fileA == null && files.isNotEmpty && filesB.isNotEmpty) {
+      // Com chip no projeto, o chip vai para A automaticamente.
+      final first = files.firstWhere((f) => f.isChip, orElse: () => files.first);
+      _fileA = first.id;
+      _fileB = filesB.firstWhere((f) => f.id != first.id, orElse: () => filesB.first).id;
+      final samples = first.sampleNames;
+      if (_fileA == _fileB && samples.length > 1) _sampleB = samples[1];
     }
     ProjectFile? byId(String? id) => files.where((f) => f.id == id).firstOrNull;
     final a = byId(_fileA);
-    final b = byId(_fileB);
+    final b = filesB.where((f) => f.id == _fileB).firstOrNull;
+    final chipMode = a?.isChip ?? false;
     final running = state is CompareRunning;
     final same = a != null && a.id == b?.id && (_sampleA ?? a.sampleNames.firstOrNull) == (_sampleB ?? a.sampleNames.firstOrNull);
 
     return Scaffold(
       appBar: AppBar(title: Text(l.compareTitle)),
-      body: files.isEmpty
+      body: files.isEmpty || filesB.isEmpty
           ? Center(child: Padding(padding: const EdgeInsets.all(32), child: Text(l.compareNeedsFiles)))
           : ListView(
               padding: const EdgeInsets.only(bottom: 120),
@@ -107,9 +117,14 @@ class _CompareSetupScreenState extends ConsumerState<CompareSetupScreen> {
                   }),
                   onSample: (s) => setState(() => _sampleA = s),
                 ),
+                if (chipMode)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+                    child: Text(l.chipModeHint, style: Theme.of(context).textTheme.bodySmall),
+                  ),
                 _SidePicker(
                   title: l.sideB,
-                  files: files,
+                  files: filesB,
                   fileId: _fileB,
                   sample: _sampleB,
                   onFile: (id) => setState(() {
@@ -147,25 +162,60 @@ class _CompareSetupScreenState extends ConsumerState<CompareSetupScreen> {
                             Expanded(child: _NumberField(controller: _minGq, label: l.minGqShort)),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        Text(l.truthLabel, style: Theme.of(context).textTheme.titleSmall),
-                        const SizedBox(height: 8),
-                        SegmentedButton<String?>(
-                          segments: [
-                            ButtonSegment(value: null, label: Text(l.truthNone)),
-                            const ButtonSegment(value: 'a', label: Text('A')),
-                            const ButtonSegment(value: 'b', label: Text('B')),
-                          ],
-                          selected: {_truth},
-                          onSelectionChanged: (s) => setState(() => _truth = s.first),
-                        ),
+                        // Precisão/sensibilidade não fazem sentido quando o chip define os sítios.
+                        if (!chipMode) ...[
+                          const SizedBox(height: 16),
+                          Text(l.truthLabel, style: Theme.of(context).textTheme.titleSmall),
+                          const SizedBox(height: 8),
+                          SegmentedButton<String?>(
+                            segments: [
+                              ButtonSegment(value: null, label: Text(l.truthNone)),
+                              const ButtonSegment(value: 'a', label: Text('A')),
+                              const ButtonSegment(value: 'b', label: Text('B')),
+                            ],
+                            selected: {_truth},
+                            onSelectionChanged: (s) => setState(() => _truth = s.first),
+                          ),
+                        ],
                       ],
                     ),
                   ),
                 ),
+                if (fastas.isNotEmpty)
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(l.referenceTitle, style: Theme.of(context).textTheme.titleSmall),
+                          const SizedBox(height: 4),
+                          Text(
+                            chipMode ? l.referenceHintChip : l.referenceHintVcf,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const SizedBox(height: 8),
+                          DropdownButtonFormField<String?>(
+                            initialValue: _reference,
+                            isExpanded: true,
+                            decoration: const InputDecoration(border: OutlineInputBorder(), isDense: true),
+                            items: [
+                              DropdownMenuItem(value: null, child: Text(l.referenceNone)),
+                              for (final f in fastas)
+                                DropdownMenuItem(
+                                  value: f.id,
+                                  child: Text('${f.displayName} · ${l.buildName(f.build)}', overflow: TextOverflow.ellipsis),
+                                ),
+                            ],
+                            onChanged: (v) => setState(() => _reference = v),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
-      bottomNavigationBar: files.isEmpty
+      bottomNavigationBar: files.isEmpty || filesB.isEmpty
           ? null
           : SafeArea(
               child: Padding(
@@ -191,7 +241,7 @@ class _CompareSetupScreenState extends ConsumerState<CompareSetupScreen> {
                         ],
                       )
                     : FilledButton.icon(
-                        onPressed: a == null || b == null ? null : () => _run(a, b),
+                        onPressed: a == null || b == null ? null : () => _run(a, b, fastas),
                         icon: const Icon(Icons.compare_arrows),
                         label: Text(l.runCompare),
                       ),
@@ -200,14 +250,15 @@ class _CompareSetupScreenState extends ConsumerState<CompareSetupScreen> {
     );
   }
 
-  void _run(ProjectFile a, ProjectFile b) {
+  void _run(ProjectFile a, ProjectFile b, List<ProjectFile> fastas) {
     final l = AppLocalizations.of(context);
     ref.read(compareControllerProvider.notifier).run(
           projectId: widget.projectId,
-          a: (file: a, sample: _sampleA),
+          a: (file: a, sample: a.isChip ? null : _sampleA),
           b: (file: b, sample: _sampleB),
-          options: _options,
+          options: _options(chip: a.isChip),
           journalMessage: l.logCompare,
+          reference: fastas.where((f) => f.id == _reference).firstOrNull,
         );
   }
 }

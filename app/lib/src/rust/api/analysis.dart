@@ -9,7 +9,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'analysis.freezed.dart';
 
-// These functions are ignored because they are not marked as `pub`: `density_of`, `forget_key`, `manifest_json`, `matching`, `open_result`, `output_ref`, `page_of`, `parse_filter`, `run_compare`, `write_output`
+// These functions are ignored because they are not marked as `pub`: `chip_input`, `density_of`, `forget_key`, `manifest_json`, `matching`, `open_result`, `output_ref`, `page_of`, `parse_filter`, `read_chip_file`, `run_compare_job`, `run_compare`, `write_output`
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `CountingReader`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `read`
 
@@ -18,6 +18,7 @@ part 'analysis.freezed.dart';
 Stream<CompareEvent> compareFiles({
   required CompareSide a,
   required CompareSide b,
+  CompareSide? reference,
   required String optionsJson,
   required String outDir,
   required String createdAt,
@@ -25,6 +26,27 @@ Stream<CompareEvent> compareFiles({
 }) => RustLib.instance.api.crateApiAnalysisCompareFiles(
   a: a,
   b: b,
+  reference: reference,
+  optionsJson: optionsJson,
+  outDir: outDir,
+  createdAt: createdAt,
+  jobId: jobId,
+);
+
+/// Chip de consumidor (A) × uma amostra de VCF (B), restrito aos sítios do chip.
+/// O FASTA (opcional) permite julgar homozigotos sem registro no VCF.
+Stream<CompareEvent> compareChipFiles({
+  required CompareSide chip,
+  required CompareSide vcf,
+  CompareSide? reference,
+  required String optionsJson,
+  required String outDir,
+  required String createdAt,
+  required String jobId,
+}) => RustLib.instance.api.crateApiAnalysisCompareChipFiles(
+  chip: chip,
+  vcf: vcf,
+  reference: reference,
   optionsJson: optionsJson,
   outDir: outDir,
   createdAt: createdAt,

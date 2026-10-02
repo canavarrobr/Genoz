@@ -71,7 +71,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => 581572737;
+  int get rustContentHash => 514620460;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -88,13 +88,33 @@ abstract class RustLibApi extends BaseApi {
   Future<CompareOutputs> crateApiMemoryCompareBytes({
     required MemorySide a,
     required MemorySide b,
+    MemorySide? reference,
     required String optionsJson,
     required String createdAt,
+  });
+
+  Future<CompareOutputs> crateApiMemoryCompareChipBytes({
+    required MemorySide chip,
+    required MemorySide vcf,
+    MemorySide? reference,
+    required String optionsJson,
+    required String createdAt,
+  });
+
+  Stream<CompareEvent> crateApiAnalysisCompareChipFiles({
+    required CompareSide chip,
+    required CompareSide vcf,
+    CompareSide? reference,
+    required String optionsJson,
+    required String outDir,
+    required String createdAt,
+    required String jobId,
   });
 
   Stream<CompareEvent> crateApiAnalysisCompareFiles({
     required CompareSide a,
     required CompareSide b,
+    CompareSide? reference,
     required String optionsJson,
     required String outDir,
     required String createdAt,
@@ -220,6 +240,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<CompareOutputs> crateApiMemoryCompareBytes({
     required MemorySide a,
     required MemorySide b,
+    MemorySide? reference,
     required String optionsJson,
     required String createdAt,
   }) {
@@ -229,6 +250,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_memory_side(a, serializer);
           sse_encode_box_autoadd_memory_side(b, serializer);
+          sse_encode_opt_box_autoadd_memory_side(reference, serializer);
           sse_encode_String(optionsJson, serializer);
           sse_encode_String(createdAt, serializer);
           pdeCallFfi(
@@ -243,7 +265,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_String,
         ),
         constMeta: kCrateApiMemoryCompareBytesConstMeta,
-        argValues: [a, b, optionsJson, createdAt],
+        argValues: [a, b, reference, optionsJson, createdAt],
         apiImpl: this,
       ),
     );
@@ -251,13 +273,123 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiMemoryCompareBytesConstMeta => const TaskConstMeta(
     debugName: "compare_bytes",
-    argNames: ["a", "b", "optionsJson", "createdAt"],
+    argNames: ["a", "b", "reference", "optionsJson", "createdAt"],
   );
+
+  @override
+  Future<CompareOutputs> crateApiMemoryCompareChipBytes({
+    required MemorySide chip,
+    required MemorySide vcf,
+    MemorySide? reference,
+    required String optionsJson,
+    required String createdAt,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_memory_side(chip, serializer);
+          sse_encode_box_autoadd_memory_side(vcf, serializer);
+          sse_encode_opt_box_autoadd_memory_side(reference, serializer);
+          sse_encode_String(optionsJson, serializer);
+          sse_encode_String(createdAt, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_compare_outputs,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiMemoryCompareChipBytesConstMeta,
+        argValues: [chip, vcf, reference, optionsJson, createdAt],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiMemoryCompareChipBytesConstMeta =>
+      const TaskConstMeta(
+        debugName: "compare_chip_bytes",
+        argNames: ["chip", "vcf", "reference", "optionsJson", "createdAt"],
+      );
+
+  @override
+  Stream<CompareEvent> crateApiAnalysisCompareChipFiles({
+    required CompareSide chip,
+    required CompareSide vcf,
+    CompareSide? reference,
+    required String optionsJson,
+    required String outDir,
+    required String createdAt,
+    required String jobId,
+  }) {
+    final sink = RustStreamSink<CompareEvent>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_box_autoadd_compare_side(chip, serializer);
+            sse_encode_box_autoadd_compare_side(vcf, serializer);
+            sse_encode_opt_box_autoadd_compare_side(reference, serializer);
+            sse_encode_String(optionsJson, serializer);
+            sse_encode_String(outDir, serializer);
+            sse_encode_String(createdAt, serializer);
+            sse_encode_String(jobId, serializer);
+            sse_encode_StreamSink_compare_event_Sse(sink, serializer);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 4,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: null,
+          ),
+          constMeta: kCrateApiAnalysisCompareChipFilesConstMeta,
+          argValues: [
+            chip,
+            vcf,
+            reference,
+            optionsJson,
+            outDir,
+            createdAt,
+            jobId,
+            sink,
+          ],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiAnalysisCompareChipFilesConstMeta =>
+      const TaskConstMeta(
+        debugName: "compare_chip_files",
+        argNames: [
+          "chip",
+          "vcf",
+          "reference",
+          "optionsJson",
+          "outDir",
+          "createdAt",
+          "jobId",
+          "sink",
+        ],
+      );
 
   @override
   Stream<CompareEvent> crateApiAnalysisCompareFiles({
     required CompareSide a,
     required CompareSide b,
+    CompareSide? reference,
     required String optionsJson,
     required String outDir,
     required String createdAt,
@@ -271,6 +403,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             final serializer = SseSerializer(generalizedFrbRustBinding);
             sse_encode_box_autoadd_compare_side(a, serializer);
             sse_encode_box_autoadd_compare_side(b, serializer);
+            sse_encode_opt_box_autoadd_compare_side(reference, serializer);
             sse_encode_String(optionsJson, serializer);
             sse_encode_String(outDir, serializer);
             sse_encode_String(createdAt, serializer);
@@ -279,7 +412,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 3,
+              funcId: 5,
               port: port_,
             );
           },
@@ -288,7 +421,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             decodeErrorData: null,
           ),
           constMeta: kCrateApiAnalysisCompareFilesConstMeta,
-          argValues: [a, b, optionsJson, outDir, createdAt, jobId, sink],
+          argValues: [
+            a,
+            b,
+            reference,
+            optionsJson,
+            outDir,
+            createdAt,
+            jobId,
+            sink,
+          ],
           apiImpl: this,
         ),
       ),
@@ -302,6 +444,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         argNames: [
           "a",
           "b",
+          "reference",
           "optionsJson",
           "outDir",
           "createdAt",
@@ -316,7 +459,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -352,7 +495,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 7,
             port: port_,
           );
         },
@@ -394,7 +537,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 8,
             port: port_,
           );
         },
@@ -428,7 +571,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(outDir, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -463,7 +606,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 8,
+              funcId: 10,
               port: port_,
             );
           },
@@ -494,7 +637,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 9,
+            funcId: 11,
             port: port_,
           );
         },
@@ -522,7 +665,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 10,
+            funcId: 12,
             port: port_,
           );
         },
@@ -547,7 +690,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(text, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_String,
@@ -579,7 +722,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 12,
+            funcId: 14,
             port: port_,
           );
         },
@@ -616,7 +759,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 13,
+            funcId: 15,
             port: port_,
           );
         },
@@ -644,7 +787,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(key, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -676,7 +819,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 15,
+            funcId: 17,
             port: port_,
           );
         },
@@ -714,7 +857,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 16,
+            funcId: 18,
             port: port_,
           );
         },
@@ -752,7 +895,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 17,
+            funcId: 19,
             port: port_,
           );
         },
@@ -780,7 +923,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(key, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -812,7 +955,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 19,
+            funcId: 21,
             port: port_,
           );
         },
@@ -853,7 +996,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 20,
+            funcId: 22,
             port: port_,
           );
         },
@@ -1049,6 +1192,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   String? dco_decode_opt_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
+  CompareSide? dco_decode_opt_box_autoadd_compare_side(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_compare_side(raw);
+  }
+
+  @protected
+  MemorySide? dco_decode_opt_box_autoadd_memory_side(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_memory_side(raw);
   }
 
   @protected
@@ -1293,6 +1448,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CompareSide? sse_decode_opt_box_autoadd_compare_side(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_compare_side(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  MemorySide? sse_decode_opt_box_autoadd_memory_side(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_memory_side(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   ResultPage sse_decode_result_page(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_total = sse_decode_u_32(deserializer);
@@ -1527,6 +1708,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_compare_side(
+    CompareSide? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_compare_side(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_memory_side(
+    MemorySide? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_memory_side(self, serializer);
     }
   }
 

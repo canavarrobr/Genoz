@@ -30,6 +30,8 @@ class FakeGenozCore implements GenozCore {
   CompareOptions? lastOptions;
   CompareInputFile? lastA;
   CompareInputFile? lastB;
+  CompareInputFile? lastReference;
+  bool lastChip = false;
 
   /// Armazenamento do teste (definido por TestEnv).
   late AppStorage storage;
@@ -100,8 +102,12 @@ class FakeGenozCore implements GenozCore {
     required String outDirRelative,
     required String createdAt,
     required String jobId,
+    CompareInputFile? reference,
+    bool chip = false,
   }) async* {
     lastOptions = options;
+    lastReference = reference;
+    lastChip = chip;
     lastA = a;
     lastB = b;
     yield const CompareProgress(50, 100);

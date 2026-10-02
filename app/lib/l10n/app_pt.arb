@@ -780,5 +780,71 @@
   "packageSave": "Salvar pacote",
   "packageSaved": "Pacote de aula salvo.",
   "exerciseHint": "Sua resposta",
-  "packageOpenStep": "Abra a comparação da aula: as respostas estão no Resumo, na Tabela e no Mapa."
+  "packageOpenStep": "Abra a comparação da aula: as respostas estão no Resumo, na Tabela e no Mapa.",
+  "chipModeHint": "A é um arquivo de chip: a comparação fica restrita aos sítios que o chip avalia. B precisa ser um VCF.",
+  "referenceTitle": "Referência (FASTA)",
+  "referenceHintChip": "Opcional. Com a referência, sítios homozigotos do chip sem registro no VCF também podem ser julgados.",
+  "referenceHintVcf": "Opcional. Alinha os indels à esquerda antes de comparar e confere o REF de cada variante (usa mais memória).",
+  "referenceNone": "Sem referência",
+  "kindChip": "chip {vendor}",
+  "@kindChip": {
+    "placeholders": {
+      "vendor": {
+        "type": "String"
+      }
+    }
+  },
+  "kindFasta": "FASTA de referência",
+  "sitesCount": "{count} sítios",
+  "@sitesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sequencesCount": "{count} sequências",
+  "@sequencesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sectionChip": "Chip de consumidor",
+  "chipVendor": "Empresa",
+  "chipSites": "Sítios no chip",
+  "chipCalled": "Com genótipo",
+  "chipNoCalls": "Sem chamada (--)",
+  "chipHet": "Heterozigotos",
+  "chipHom": "Homozigotos",
+  "chipHaploid": "Haploides (X/Y/MT)",
+  "chipIndels": "Indels ignorados",
+  "chipNote": "Chips medem só posições escolhidas pelo fabricante e não informam a base de referência. Na comparação com um VCF os genótipos são comparados letra a letra, só nesses sítios.",
+  "sectionFasta": "Referência (FASTA)",
+  "fastaSequences": "Sequências",
+  "fastaTotalBases": "Bases no total",
+  "fastaNote": "Usado para alinhar indels à esquerda e para julgar sítios do chip sem registro no VCF. Fica só neste aparelho.",
+  "chipCompareTitle": "Chip {vendor} × sequenciamento",
+  "@chipCompareTitle": {
+    "placeholders": {
+      "vendor": {
+        "type": "String"
+      }
+    }
+  },
+  "chipCompareRestricted": "Só os sítios que o chip avalia. Variantes do VCF fora do chip não entram na conta (ver abaixo).",
+  "chipCompareNonref": "Concordância sem os sítios referência × referência",
+  "chipCompareOffChip": "Variantes do VCF fora do chip",
+  "chipCompareUnknownRef": "Homozigotos do chip sem registro no VCF (referência desconhecida)",
+  "chipCompareRefNotAssessed": "Homozigotos de referência sem registro no VCF",
+  "chipCompareStrandFlips": "Diferenças que parecem troca de fita",
+  "zipError": "{code, select, invalid{Não foi possível abrir o .zip.} empty{O .zip não tem um arquivo de dados (.txt, .csv, .vcf).} many{O .zip tem mais de um arquivo de dados; extraia e importe o que quiser.} tooLarge{O arquivo dentro do .zip é grande demais.} other{Não foi possível importar o .zip.}}",
+  "@zipError": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -141,6 +141,9 @@ abstract interface class GenozCore {
   });
 
   /// Compara A × B e grava o resultado em `outDirRelative`.
+  /// Compara A × B. `chip`: A é um arquivo de chip de consumidor (comparação
+  /// restrita aos sítios do chip). `reference`: FASTA local opcional
+  /// (normaliza indels; no chip × VCF, julga homozigotos sem registro no VCF).
   Stream<CoreCompareEvent> compare({
     required CompareInputFile a,
     required CompareInputFile b,
@@ -148,6 +151,8 @@ abstract interface class GenozCore {
     required String outDirRelative,
     required String createdAt,
     required String jobId,
+    CompareInputFile? reference,
+    bool chip = false,
   });
 
   Future<RowsPage> page({required String resultDirRelative, required RowFilter filter, required int start, required int count});
@@ -246,16 +251,28 @@ class NativeGenozCore implements GenozCore {
     required String outDirRelative,
     required String createdAt,
     required String jobId,
+    CompareInputFile? reference,
+    bool chip = false,
   }) =>
-      rust_analysis
-          .compareFiles(
-            a: _side(a),
-            b: _side(b),
-            optionsJson: options.toJsonString(),
-            outDir: storage.absolute(outDirRelative),
-            createdAt: createdAt,
-            jobId: jobId,
-          )
+      (chip
+              ? rust_analysis.compareChipFiles(
+                  chip: _side(a),
+                  vcf: _side(b),
+                  reference: reference == null ? null : _side(reference),
+                  optionsJson: options.toJsonString(),
+                  outDir: storage.absolute(outDirRelative),
+                  createdAt: createdAt,
+                  jobId: jobId,
+                )
+              : rust_analysis.compareFiles(
+                  a: _side(a),
+                  b: _side(b),
+                  reference: reference == null ? null : _side(reference),
+                  optionsJson: options.toJsonString(),
+                  outDir: storage.absolute(outDirRelative),
+                  createdAt: createdAt,
+                  jobId: jobId,
+                ))
           .map((e) => switch (e) {
                 rust_analysis.CompareEvent_Progress(:final bytesDone, :final bytesTotal) =>
                   CompareProgress(bytesDone.toInt(), bytesTotal.toInt()),
@@ -401,8 +418,10 @@ class WebGenozCore implements GenozCore {
     required String outDirRelative,
     required String createdAt,
     required String jobId,
+    CompareInputFile? reference,
+    bool chip = false,
   }) async* {
-    for (final f in [a, b]) {
+    for (final f in [a, b, ?reference]) {
       if (f.bytes > webMaxFileBytes) {
         yield CompareFailed(webTooLarge(f.bytes));
         return;
@@ -410,12 +429,22 @@ class WebGenozCore implements GenozCore {
     }
     yield const CompareProgress(0, 0);
     try {
-      final out = await rust_memory.compareBytes(
-        a: await _side(a),
-        b: await _side(b),
-        optionsJson: options.toJsonString(),
-        createdAt: createdAt,
-      );
+      final ref = reference == null ? null : await _side(reference);
+      final out = chip
+          ? await rust_memory.compareChipBytes(
+              chip: await _side(a),
+              vcf: await _side(b),
+              reference: ref,
+              optionsJson: options.toJsonString(),
+              createdAt: createdAt,
+            )
+          : await rust_memory.compareBytes(
+              a: await _side(a),
+              b: await _side(b),
+              reference: ref,
+              optionsJson: options.toJsonString(),
+              createdAt: createdAt,
+            );
       if (_cancelled.remove(jobId)) {
         yield const CompareCancelled();
         return;

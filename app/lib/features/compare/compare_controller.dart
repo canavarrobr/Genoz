@@ -11,6 +11,7 @@ import '../../persistence/analysis_repository.dart';
 import '../../persistence/app_storage.dart';
 import '../../platform/network_audit.dart';
 import '../../persistence/database.dart';
+import '../../persistence/project_repository.dart';
 
 sealed class CompareState {
   const CompareState();
@@ -60,6 +61,7 @@ class CompareController extends Notifier<CompareState> {
     required CompareChoice b,
     required CompareOptions options,
     required String Function(String a, String b, String id) journalMessage,
+    ProjectFile? reference,
   }) async {
     if (isRunning) return;
     final storage = ref.read(appStorageProvider);
@@ -87,6 +89,9 @@ class CompareController extends Notifier<CompareState> {
           outDirRelative: resultDir,
           createdAt: DateTime.now().toUtc().toIso8601String(),
           jobId: analysisId,
+          // A é chip: comparação restrita aos sítios do chip.
+          chip: a.file.isChip,
+          reference: reference == null ? null : side((file: reference, sample: null)),
         )
         .listen((event) async {
       switch (event) {

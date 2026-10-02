@@ -8,7 +8,7 @@ import 'analysis.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `mem_key`, `output`, `reader_for`
+// These functions are ignored because they are not marked as `pub`: `compare_memory`, `mem_key`, `output`, `reader_for`
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `SharedBytes`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `as_ref`, `clone`
 
@@ -17,14 +17,32 @@ Future<String> inspectBytes({required List<int> data}) =>
     RustLib.instance.api.crateApiMemoryInspectBytes(data: data);
 
 /// Compara A × B em memória. Mesmo resultado (bytes) que `compare_files`.
+/// `reference`: FASTA opcional (normalização dos indels).
 Future<CompareOutputs> compareBytes({
   required MemorySide a,
   required MemorySide b,
+  MemorySide? reference,
   required String optionsJson,
   required String createdAt,
 }) => RustLib.instance.api.crateApiMemoryCompareBytes(
   a: a,
   b: b,
+  reference: reference,
+  optionsJson: optionsJson,
+  createdAt: createdAt,
+);
+
+/// Chip × VCF em memória. Mesmo resultado (bytes) que `compare_chip_files`.
+Future<CompareOutputs> compareChipBytes({
+  required MemorySide chip,
+  required MemorySide vcf,
+  MemorySide? reference,
+  required String optionsJson,
+  required String createdAt,
+}) => RustLib.instance.api.crateApiMemoryCompareChipBytes(
+  chip: chip,
+  vcf: vcf,
+  reference: reference,
   optionsJson: optionsJson,
   createdAt: createdAt,
 );

@@ -1,0 +1,56 @@
+{
+  "biallelic_after_split": 12,
+  "build": {
+    "build": "GRCh37",
+    "confidence": "high",
+    "evidence": [
+      "contig 1 com comprimento 249250621 = GRCh37"
+    ]
+  },
+  "by_chrom": [
+    {
+      "chrom": "1",
+      "raw": "1",
+      "records": 12
+    }
+  ],
+  "by_kind": {
+    "deletion": 1,
+    "snv": 11
+  },
+  "chrom_style": "ensembl",
+  "compression": "none",
+  "contigs_in_header": 1,
+  "core_version": "0.1.0",
+  "digest": {
+    "bytes": 603,
+    "sha256": "c77f5f831b19d4c1105323c5cefe0eecdfcc2751937bf1a24d3e629bfc756a67"
+  },
+  "errors": 0,
+  "fatal": null,
+  "file_format": "VCFv4.3",
+  "filter_failed": 0,
+  "filter_missing": 0,
+  "filter_pass": 12,
+  "format_fields": 1,
+  "info_fields": 0,
+  "issue_counts": {},
+  "issues": [],
+  "issues_truncated": false,
+  "multiallelic": 0,
+  "records_ok": 12,
+  "records_read": 12,
+  "records_rejected": 0,
+  "samples": [
+    {
+      "het": 6,
+      "hom_alt": 6,
+      "hom_ref": 0,
+      "missing": 0,
+      "name": "PESSOA_FICTICIA"
+    }
+  ],
+  "sorted": true,
+  "verdict": "valid",
+  "warnings": 0
+}

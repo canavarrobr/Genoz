@@ -8,7 +8,9 @@ use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, LazyLock, Mutex};
 
 use genoz_core::call::SampleSelector;
-use genoz_core::compare::{compare_to_store, to_json_bytes, CompareInput, CompareOptions};
+use genoz_core::chip_compare::{compare_chip_to_store, ChipInput};
+use genoz_core::compare::{compare_to_store_with, to_json_bytes, CompareInput, CompareOptions};
+use genoz_core::consumer::read_chip;
 use genoz_core::filter::RowFilter;
 use genoz_core::manifest::{InputRef, Manifest, OutputRef};
 use genoz_core::results::{export_rows as export, ExportFormat, ResultReader, RowIndex};
@@ -87,9 +89,12 @@ fn write_output(dir: &Path, name: &str, bytes: &[u8]) -> Result<OutputRef, Strin
     output_ref(dir, name)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn run_compare(
     a: &CompareSide,
     b: &CompareSide,
+    chip_a: bool,
+    reference: Option<&CompareSide>,
     options_json: &str,
     out_dir: &Path,
     created_at: &str,
@@ -129,12 +134,29 @@ fn run_compare(
             callable: None,
         }
     };
-    let (mut ia, mut ib) = (input("A", a), input("B", b));
+    let mut ib = input("B", b);
+    let mut fasta = match reference {
+        Some(r) => Some(
+            genoz_core::fasta::open_fasta(Path::new(&r.path))
+                .map_err(|e| e.user_message())?
+                .0,
+        ),
+        None => None,
+    };
+    let seq = fasta
+        .as_mut()
+        .map(|f| f as &mut dyn genoz_core::fasta::SequenceSource);
 
     std::fs::create_dir_all(out_dir)
         .map_err(|e| format!("não foi possível criar a pasta da análise: {e}"))?;
     let rows = BufWriter::new(File::create(out_dir.join("rows.bgz")).map_err(|e| e.to_string())?);
-    let stored = compare_to_store(&mut ia, &mut ib, &opts, rows).map_err(|e| e.user_message())?;
+    let stored = if chip_a {
+        let chip = read_chip_file(&a.path)?;
+        compare_chip_to_store(chip, &mut ib, &opts, seq, rows).map_err(|e| e.user_message())?
+    } else {
+        let mut ia = input("A", a);
+        compare_to_store_with(&mut ia, &mut ib, &opts, seq, rows).map_err(|e| e.user_message())?
+    };
     drop(stored.rows_out);
     let s = &stored.outcome.summary;
 
@@ -155,8 +177,10 @@ fn run_compare(
         )?,
     ];
     let manifest_json = manifest_json(
-        (&a.display_name, &a.sha256, a.bytes, &a.sample),
-        (&b.display_name, &b.sha256, b.bytes, &b.sample),
+        if chip_a { "compare_chip" } else { "compare" },
+        side_ref(a),
+        side_ref(b),
+        reference.map(side_ref),
         s,
         &opts,
         outputs,
@@ -169,14 +193,38 @@ fn run_compare(
     ))
 }
 
+fn side_ref(x: &CompareSide) -> SideRef<'_> {
+    (&x.display_name, &x.sha256, x.bytes, &x.sample)
+}
+
+/// Lê um arquivo de chip (23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA).
+pub(crate) fn chip_input<R: Read>(source: R) -> Result<ChipInput, String> {
+    let (header, calls, rejected_lines) = read_chip(source)
+        .map_err(|e| e.user_message())?
+        .ok_or_else(|| "o arquivo A não é um arquivo de chip reconhecido".to_string())?;
+    Ok(ChipInput {
+        label: "A".into(),
+        header,
+        calls,
+        rejected_lines,
+    })
+}
+
+fn read_chip_file(path: &str) -> Result<ChipInput, String> {
+    chip_input(File::open(path).map_err(|e| format!("não foi possível abrir o chip: {e}"))?)
+}
+
 /// (nome, sha256, bytes, amostra) de um lado da comparação.
 pub(crate) type SideRef<'a> = (&'a str, &'a str, u64, &'a Option<String>);
 
 /// Manifesto da comparação. Única montagem para o caminho por arquivo e o por bytes,
 /// para que o ID da análise seja o mesmo em todas as plataformas.
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn manifest_json(
+    analysis_type: &str,
     a: SideRef,
     b: SideRef,
+    reference: Option<SideRef>,
     s: &genoz_core::compare::CompareSummary,
     opts: &CompareOptions,
     outputs: Vec<OutputRef>,
@@ -190,18 +238,62 @@ pub(crate) fn manifest_json(
         build: Some(info.build.build.label().into()),
         sample: info.sample.clone(),
     };
-    let inputs = vec![input_ref("a", a, &s.a), input_ref("b", b, &s.b)];
+    let mut inputs = vec![input_ref("a", a, &s.a), input_ref("b", b, &s.b)];
+    // FASTA usado na normalização / no chip × VCF: entra no ID da análise.
+    if let Some(r) = reference {
+        inputs.push(InputRef {
+            role: "reference".into(),
+            name: r.0.to_string(),
+            sha256: r.1.to_string(),
+            bytes: r.2,
+            build: None,
+            sample: None,
+        });
+    }
     let selector = |s: &Option<String>| s.clone().map_or(SampleSelector::First, SampleSelector::Name);
     let parameters = genoz_core::compare::manifest_parameters(opts, &selector(a.3), &selector(b.3));
     let platform = format!("app-{}-{}", std::env::consts::OS, std::env::consts::ARCH);
-    to_json_bytes(&Manifest::new("compare", inputs, parameters, outputs, &platform, created_at))
+    to_json_bytes(&Manifest::new(analysis_type, inputs, parameters, outputs, &platform, created_at))
 }
 
 /// Compara A × B e grava o resultado em `out_dir`. `options_json` segue
 /// `genoz_core::compare::CompareOptions`. Em falha ou cancelamento a pasta é apagada.
+#[allow(clippy::too_many_arguments)]
 pub fn compare_files(
     a: CompareSide,
     b: CompareSide,
+    reference: Option<CompareSide>,
+    options_json: String,
+    out_dir: String,
+    created_at: String,
+    job_id: String,
+    sink: StreamSink<CompareEvent>,
+) {
+    run_compare_job(a, b, false, reference, options_json, out_dir, created_at, job_id, sink);
+}
+
+/// Chip de consumidor (A) × uma amostra de VCF (B), restrito aos sítios do chip.
+/// O FASTA (opcional) permite julgar homozigotos sem registro no VCF.
+#[allow(clippy::too_many_arguments)]
+pub fn compare_chip_files(
+    chip: CompareSide,
+    vcf: CompareSide,
+    reference: Option<CompareSide>,
+    options_json: String,
+    out_dir: String,
+    created_at: String,
+    job_id: String,
+    sink: StreamSink<CompareEvent>,
+) {
+    run_compare_job(chip, vcf, true, reference, options_json, out_dir, created_at, job_id, sink);
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_compare_job(
+    a: CompareSide,
+    b: CompareSide,
+    chip_a: bool,
+    reference: Option<CompareSide>,
     options_json: String,
     out_dir: String,
     created_at: String,
@@ -211,7 +303,17 @@ pub fn compare_files(
     let cancel = register(&job_id);
     let sink = Arc::new(sink);
     let dir = Path::new(&out_dir);
-    let event = match run_compare(&a, &b, &options_json, dir, &created_at, &cancel, &sink) {
+    let event = match run_compare(
+        &a,
+        &b,
+        chip_a,
+        reference.as_ref(),
+        &options_json,
+        dir,
+        &created_at,
+        &cancel,
+        &sink,
+    ) {
         Ok((summary_json, manifest_json)) => CompareEvent::Done {
             summary_json,
             manifest_json,

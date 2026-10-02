@@ -73,6 +73,59 @@ class ChromCount {
   final int records;
 }
 
+enum FileKind { vcf, chip, fasta }
+
+/// Resumo de um arquivo de chip de consumidor.
+class ChipSummary {
+  const ChipSummary({
+    required this.vendor,
+    required this.sites,
+    required this.called,
+    required this.noCalls,
+    required this.indels,
+    required this.heterozygous,
+    required this.homozygous,
+    required this.haploid,
+  });
+
+  /// `23andMe`, `AncestryDNA`, `MyHeritage` ou `FamilyTreeDNA`.
+  final String vendor;
+  final int sites;
+  final int called;
+  final int noCalls;
+  final int indels;
+  final int heterozygous;
+  final int homozygous;
+  final int haploid;
+
+  factory ChipSummary.fromJson(Map<String, dynamic> j) => ChipSummary(
+        vendor: j['vendor_label'] as String,
+        sites: j['sites'] as int,
+        called: j['called'] as int,
+        noCalls: j['no_calls'] as int,
+        indels: j['indels'] as int,
+        heterozygous: j['heterozygous'] as int,
+        homozygous: j['homozygous'] as int,
+        haploid: j['haploid'] as int,
+      );
+}
+
+/// Resumo de um FASTA de referência.
+class FastaSummary {
+  const FastaSummary({required this.sequences, required this.totalBases, required this.names});
+  final int sequences;
+  final int totalBases;
+
+  /// (nome, comprimento) das primeiras sequências.
+  final List<(String, int)> names;
+
+  factory FastaSummary.fromJson(Map<String, dynamic> j) => FastaSummary(
+        sequences: j['sequences'] as int,
+        totalBases: j['total_bases'] as int,
+        names: [for (final n in j['names'] as List) ((n as List)[0] as String, n[1] as int)],
+      );
+}
+
 class InspectReport {
   const InspectReport({
     required this.coreVersion,
@@ -102,6 +155,8 @@ class InspectReport {
     required this.issuesTruncated,
     required this.fatal,
     required this.verdict,
+    this.chip,
+    this.fasta,
   });
 
   final String coreVersion;
@@ -142,7 +197,20 @@ class InspectReport {
   final String? fatal;
   final Verdict verdict;
 
+  /// Arquivo bruto de chip de consumidor (23andMe, AncestryDNA…).
+  final ChipSummary? chip;
+
+  /// FASTA de referência.
+  final FastaSummary? fasta;
+
   bool get isUsable => verdict != Verdict.invalid;
+
+  /// `vcf`, `chip` ou `fasta`.
+  FileKind get kind => chip != null
+      ? FileKind.chip
+      : fasta != null
+          ? FileKind.fasta
+          : FileKind.vcf;
 
   factory InspectReport.fromJson(Map<String, dynamic> j) {
     final digest = j['digest'] as Map<String, dynamic>?;
@@ -181,6 +249,8 @@ class InspectReport {
       issuesTruncated: j['issues_truncated'] as bool,
       fatal: j['fatal'] as String?,
       verdict: _verdict(j['verdict'] as String),
+      chip: j['chip'] == null ? null : ChipSummary.fromJson(j['chip'] as Map<String, dynamic>),
+      fasta: j['fasta'] == null ? null : FastaSummary.fromJson(j['fasta'] as Map<String, dynamic>),
     );
   }
 

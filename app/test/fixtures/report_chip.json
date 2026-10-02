@@ -1,0 +1,67 @@
+{
+  "biallelic_after_split": 11,
+  "build": {
+    "build": "GRCh37",
+    "confidence": "high",
+    "evidence": [
+      "o arquivo declara GRCh37 (build 37)"
+    ]
+  },
+  "by_chrom": [
+    {
+      "chrom": "1",
+      "raw": "1",
+      "records": 14
+    }
+  ],
+  "by_kind": {
+    "snv": 11
+  },
+  "chip": {
+    "called": 11,
+    "duplicate_positions": 0,
+    "haploid": 0,
+    "heterozygous": 7,
+    "homozygous": 4,
+    "indels": 1,
+    "no_calls": 2,
+    "sites": 14,
+    "vendor": "23andme",
+    "vendor_label": "23andMe"
+  },
+  "chrom_style": "ensembl",
+  "compression": "none",
+  "contigs_in_header": 0,
+  "core_version": "0.1.0",
+  "digest": {
+    "bytes": 464,
+    "sha256": "8592636cb597e2a43baf2a394d08d1c8bb343d06230b564448b668ceafc93417"
+  },
+  "errors": 0,
+  "fatal": null,
+  "file_format": "chip:23andMe",
+  "filter_failed": 0,
+  "filter_missing": 0,
+  "filter_pass": 0,
+  "format_fields": 0,
+  "info_fields": 0,
+  "issue_counts": {},
+  "issues": [],
+  "issues_truncated": false,
+  "multiallelic": 0,
+  "records_ok": 14,
+  "records_read": 14,
+  "records_rejected": 0,
+  "samples": [
+    {
+      "het": 7,
+      "hom_alt": 0,
+      "hom_ref": 0,
+      "missing": 2,
+      "name": "23andMe"
+    }
+  ],
+  "sorted": true,
+  "verdict": "valid",
+  "warnings": 0
+}

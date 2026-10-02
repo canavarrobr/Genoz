@@ -1213,4 +1213,124 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get packageOpenStep =>
       'Open the lesson\'s comparison: the answers are in the Summary, the Table and the Map.';
+
+  @override
+  String get chipModeHint =>
+      'A is a chip file: the comparison is restricted to the sites the chip assesses. B must be a VCF.';
+
+  @override
+  String get referenceTitle => 'Reference (FASTA)';
+
+  @override
+  String get referenceHintChip =>
+      'Optional. With the reference, homozygous chip sites without a VCF record can also be judged.';
+
+  @override
+  String get referenceHintVcf =>
+      'Optional. Left-aligns indels before comparing and checks each variant\'s REF (uses more memory).';
+
+  @override
+  String get referenceNone => 'No reference';
+
+  @override
+  String kindChip(String vendor) {
+    return '$vendor chip';
+  }
+
+  @override
+  String get kindFasta => 'reference FASTA';
+
+  @override
+  String sitesCount(int count) {
+    return '$count sites';
+  }
+
+  @override
+  String sequencesCount(int count) {
+    return '$count sequences';
+  }
+
+  @override
+  String get sectionChip => 'Consumer chip';
+
+  @override
+  String get chipVendor => 'Company';
+
+  @override
+  String get chipSites => 'Sites on the chip';
+
+  @override
+  String get chipCalled => 'With genotype';
+
+  @override
+  String get chipNoCalls => 'No call (--)';
+
+  @override
+  String get chipHet => 'Heterozygous';
+
+  @override
+  String get chipHom => 'Homozygous';
+
+  @override
+  String get chipHaploid => 'Haploid (X/Y/MT)';
+
+  @override
+  String get chipIndels => 'Indels ignored';
+
+  @override
+  String get chipNote =>
+      'Chips only measure positions chosen by the manufacturer and don\'t state the reference base. When compared with a VCF, genotypes are compared letter by letter, only at those sites.';
+
+  @override
+  String get sectionFasta => 'Reference (FASTA)';
+
+  @override
+  String get fastaSequences => 'Sequences';
+
+  @override
+  String get fastaTotalBases => 'Total bases';
+
+  @override
+  String get fastaNote =>
+      'Used to left-align indels and to judge chip sites without a VCF record. Stays on this device only.';
+
+  @override
+  String chipCompareTitle(String vendor) {
+    return '$vendor chip × sequencing';
+  }
+
+  @override
+  String get chipCompareRestricted =>
+      'Only the sites the chip assesses. VCF variants off the chip are not counted (see below).';
+
+  @override
+  String get chipCompareNonref =>
+      'Concordance without reference × reference sites';
+
+  @override
+  String get chipCompareOffChip => 'VCF variants off the chip';
+
+  @override
+  String get chipCompareUnknownRef =>
+      'Homozygous chip sites without a VCF record (unknown reference)';
+
+  @override
+  String get chipCompareRefNotAssessed =>
+      'Homozygous reference sites without a VCF record';
+
+  @override
+  String get chipCompareStrandFlips =>
+      'Differences that look like a strand flip';
+
+  @override
+  String zipError(String code) {
+    String _temp0 = intl.Intl.selectLogic(code, {
+      'invalid': 'Could not open the .zip.',
+      'empty': 'The .zip has no data file (.txt, .csv, .vcf).',
+      'many': 'The .zip has more than one data file; extract it and import the one you want.',
+      'tooLarge': 'The file inside the .zip is too large.',
+      'other': 'Could not import the .zip.',
+    });
+    return '$_temp0';
+  }
 }

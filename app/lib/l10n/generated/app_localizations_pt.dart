@@ -1214,4 +1214,123 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get packageOpenStep =>
       'Abra a comparação da aula: as respostas estão no Resumo, na Tabela e no Mapa.';
+
+  @override
+  String get chipModeHint =>
+      'A é um arquivo de chip: a comparação fica restrita aos sítios que o chip avalia. B precisa ser um VCF.';
+
+  @override
+  String get referenceTitle => 'Referência (FASTA)';
+
+  @override
+  String get referenceHintChip =>
+      'Opcional. Com a referência, sítios homozigotos do chip sem registro no VCF também podem ser julgados.';
+
+  @override
+  String get referenceHintVcf =>
+      'Opcional. Alinha os indels à esquerda antes de comparar e confere o REF de cada variante (usa mais memória).';
+
+  @override
+  String get referenceNone => 'Sem referência';
+
+  @override
+  String kindChip(String vendor) {
+    return 'chip $vendor';
+  }
+
+  @override
+  String get kindFasta => 'FASTA de referência';
+
+  @override
+  String sitesCount(int count) {
+    return '$count sítios';
+  }
+
+  @override
+  String sequencesCount(int count) {
+    return '$count sequências';
+  }
+
+  @override
+  String get sectionChip => 'Chip de consumidor';
+
+  @override
+  String get chipVendor => 'Empresa';
+
+  @override
+  String get chipSites => 'Sítios no chip';
+
+  @override
+  String get chipCalled => 'Com genótipo';
+
+  @override
+  String get chipNoCalls => 'Sem chamada (--)';
+
+  @override
+  String get chipHet => 'Heterozigotos';
+
+  @override
+  String get chipHom => 'Homozigotos';
+
+  @override
+  String get chipHaploid => 'Haploides (X/Y/MT)';
+
+  @override
+  String get chipIndels => 'Indels ignorados';
+
+  @override
+  String get chipNote =>
+      'Chips medem só posições escolhidas pelo fabricante e não informam a base de referência. Na comparação com um VCF os genótipos são comparados letra a letra, só nesses sítios.';
+
+  @override
+  String get sectionFasta => 'Referência (FASTA)';
+
+  @override
+  String get fastaSequences => 'Sequências';
+
+  @override
+  String get fastaTotalBases => 'Bases no total';
+
+  @override
+  String get fastaNote =>
+      'Usado para alinhar indels à esquerda e para julgar sítios do chip sem registro no VCF. Fica só neste aparelho.';
+
+  @override
+  String chipCompareTitle(String vendor) {
+    return 'Chip $vendor × sequenciamento';
+  }
+
+  @override
+  String get chipCompareRestricted =>
+      'Só os sítios que o chip avalia. Variantes do VCF fora do chip não entram na conta (ver abaixo).';
+
+  @override
+  String get chipCompareNonref =>
+      'Concordância sem os sítios referência × referência';
+
+  @override
+  String get chipCompareOffChip => 'Variantes do VCF fora do chip';
+
+  @override
+  String get chipCompareUnknownRef =>
+      'Homozigotos do chip sem registro no VCF (referência desconhecida)';
+
+  @override
+  String get chipCompareRefNotAssessed =>
+      'Homozigotos de referência sem registro no VCF';
+
+  @override
+  String get chipCompareStrandFlips => 'Diferenças que parecem troca de fita';
+
+  @override
+  String zipError(String code) {
+    String _temp0 = intl.Intl.selectLogic(code, {
+      'invalid': 'Não foi possível abrir o .zip.',
+      'empty': 'O .zip não tem um arquivo de dados (.txt, .csv, .vcf).',
+      'many': 'O .zip tem mais de um arquivo de dados; extraia e importe o que quiser.',
+      'tooLarge': 'O arquivo dentro do .zip é grande demais.',
+      'other': 'Não foi possível importar o .zip.',
+    });
+    return '$_temp0';
+  }
 }

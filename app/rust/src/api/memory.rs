@@ -8,22 +8,27 @@ use std::sync::{Arc, LazyLock, Mutex};
 
 use genoz_core::build::GenomeBuild;
 use genoz_core::call::SampleSelector;
-use genoz_core::compare::{compare_to_store, to_json_bytes, CompareInput, CompareOptions};
+use genoz_core::chip_compare::compare_chip_to_store;
+use genoz_core::compare::{compare_to_store_with, to_json_bytes, CompareInput, CompareOptions};
 use genoz_core::digest::{sha256_bytes, FileDigest};
-use genoz_core::inspect::{inspect, InspectOptions};
+use genoz_core::inspect::InspectOptions;
 use genoz_core::io::BgzfWriter;
 use genoz_core::manifest::OutputRef;
 use genoz_core::results::{export_rows, ExportFormat, ResultReader, RowIndex};
 use genoz_core::synth::{write_synthetic_vcf, SynthParams};
 
-use super::analysis::{density_of, forget_key, manifest_json, page_of, parse_filter, ResultPage};
+use super::analysis::{chip_input, density_of, forget_key, manifest_json, page_of, parse_filter, ResultPage};
 
 /// Inspeciona um VCF já em memória e devolve o relatório em JSON (com SHA-256).
 pub fn inspect_bytes(data: Vec<u8>) -> Result<String, String> {
     let digest = FileDigest { sha256: sha256_bytes(&data), bytes: data.len() as u64 };
-    let mut report = inspect(&data[..], &InspectOptions { max_issues: 500 }).map_err(|e| e.user_message())?;
+    let (mut report, extra) = genoz_core::consumer::inspect_any(
+        || Ok(Box::new(&data[..]) as Box<dyn Read>),
+        &InspectOptions { max_issues: 500 },
+    )
+    .map_err(|e| e.user_message())?;
     report.digest = Some(digest);
-    Ok(serde_json::to_string(&report).expect("relatório serializável"))
+    Ok(genoz_core::consumer::report_json(&report, &extra))
 }
 
 /// Um lado da comparação em memória.
@@ -49,7 +54,36 @@ fn output(name: &str, bytes: &[u8]) -> OutputRef {
 }
 
 /// Compara A × B em memória. Mesmo resultado (bytes) que `compare_files`.
-pub fn compare_bytes(a: MemorySide, b: MemorySide, options_json: String, created_at: String) -> Result<CompareOutputs, String> {
+/// `reference`: FASTA opcional (normalização dos indels).
+pub fn compare_bytes(
+    a: MemorySide,
+    b: MemorySide,
+    reference: Option<MemorySide>,
+    options_json: String,
+    created_at: String,
+) -> Result<CompareOutputs, String> {
+    compare_memory(a, b, false, reference, options_json, created_at)
+}
+
+/// Chip × VCF em memória. Mesmo resultado (bytes) que `compare_chip_files`.
+pub fn compare_chip_bytes(
+    chip: MemorySide,
+    vcf: MemorySide,
+    reference: Option<MemorySide>,
+    options_json: String,
+    created_at: String,
+) -> Result<CompareOutputs, String> {
+    compare_memory(chip, vcf, true, reference, options_json, created_at)
+}
+
+fn compare_memory(
+    a: MemorySide,
+    b: MemorySide,
+    chip_a: bool,
+    reference: Option<MemorySide>,
+    options_json: String,
+    created_at: String,
+) -> Result<CompareOutputs, String> {
     let opts: CompareOptions = serde_json::from_str(&options_json).map_err(|e| format!("opções inválidas: {e}"))?;
     let (data_a, data_b) = (Arc::new(a.data), Arc::new(b.data));
     let input = |label: &str, data: &Arc<Vec<u8>>, sample: &Option<String>| {
@@ -61,8 +95,23 @@ pub fn compare_bytes(a: MemorySide, b: MemorySide, options_json: String, created
             callable: None,
         }
     };
-    let (mut ia, mut ib) = (input("A", &data_a, &a.sample), input("B", &data_b, &b.sample));
-    let stored = compare_to_store(&mut ia, &mut ib, &opts, Vec::new()).map_err(|e| e.user_message())?;
+    let mut ib = input("B", &data_b, &b.sample);
+    let reference_len = reference.as_ref().map(|r| r.data.len() as u64);
+    let mut fasta = match &reference {
+        Some(r) => {
+            let index = genoz_core::fasta::FastaIndex::build(&r.data[..]).map_err(|e| e.user_message())?;
+            Some(genoz_core::fasta::IndexedFasta::new(Cursor::new(&r.data[..]), index))
+        }
+        None => None,
+    };
+    let seq = fasta.as_mut().map(|f| f as &mut dyn genoz_core::fasta::SequenceSource);
+    let stored = if chip_a {
+        let chip = chip_input(&data_a[..])?;
+        compare_chip_to_store(chip, &mut ib, &opts, seq, Vec::new()).map_err(|e| e.user_message())?
+    } else {
+        let mut ia = input("A", &data_a, &a.sample);
+        compare_to_store_with(&mut ia, &mut ib, &opts, seq, Vec::new()).map_err(|e| e.user_message())?
+    };
     let s = &stored.outcome.summary;
     let rows_bgz = stored.rows_out;
     let rows_idx = stored.index.to_bytes();
@@ -77,8 +126,10 @@ pub fn compare_bytes(a: MemorySide, b: MemorySide, options_json: String, created
         output("stats_b.json", &stats_b),
     ];
     let manifest = manifest_json(
+        if chip_a { "compare_chip" } else { "compare" },
         (&a.display_name, &a.sha256, data_a.len() as u64, &a.sample),
         (&b.display_name, &b.sha256, data_b.len() as u64, &b.sample),
+        reference.as_ref().map(|r| (r.display_name.as_str(), r.sha256.as_str(), reference_len.unwrap_or(0), &r.sample)),
         s,
         &opts,
         outputs,
@@ -204,7 +255,7 @@ mod tests {
             sample: None,
             data: fixture(name),
         };
-        let out = compare_bytes(side("pessoa_a.vcf"), side("pessoa_b.vcf"), "{}".into(), "t".into()).unwrap();
+        let out = compare_bytes(side("pessoa_a.vcf"), side("pessoa_b.vcf"), None, "{}".into(), "t".into()).unwrap();
         // Mesmo hash fixo do teste do núcleo (rows + índice + resumo).
         let digest = sha256_bytes(&[out.rows_bgz.clone(), out.rows_idx.clone(), out.summary_json.clone().into_bytes()].concat());
         assert_eq!(digest, "b4d285566563faf250abef42a9e869abfcc7d2f380a81df2337d0f9a8cb75435");
@@ -229,6 +280,40 @@ mod tests {
         assert!(mem.contains("\"total\":12"), "{mem}");
         result_unload("t1".into());
         assert!(!result_is_loaded("t1".into()));
+    }
+
+    #[test]
+    fn chip_em_memoria_tem_o_mesmo_id_da_cli() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../test_fixtures/consumidor");
+        let side = |name: &str| {
+            let data = std::fs::read(dir.join(name)).unwrap();
+            MemorySide { display_name: name.into(), sha256: sha256_bytes(&data), sample: None, data }
+        };
+        let id = |m: &str| -> String {
+            let v: serde_json::Value = serde_json::from_str(m).unwrap();
+            v["analysis_id"].as_str().unwrap().to_string()
+        };
+        let out = compare_chip_bytes(side("chip_23andme.txt"), side("pessoa_ficticia_grch37.vcf"), None, "{}".into(), "t".into())
+            .unwrap();
+        assert!(out.manifest_json.contains("\"compare_chip\""));
+        assert!(out.summary_json.contains("\"chip\""));
+        // Mesmo ID do `genoz-cli compare-chip` (sem e com FASTA).
+        assert_eq!(id(&out.manifest_json), "b0cbdd59-a37a-8e74-8d73-24df662e9aed");
+        let with_fasta = compare_chip_bytes(
+            side("chip_23andme.txt"),
+            side("pessoa_ficticia_grch37.vcf"),
+            Some(side("referencia_chr1_trecho.fa")),
+            "{}".into(),
+            "t".into(),
+        )
+        .unwrap();
+        assert!(with_fasta.manifest_json.contains("\"reference\""));
+        assert_eq!(id(&with_fasta.manifest_json), "23828628-4d22-8479-ada1-9b0dbc3399d0");
+        // O arquivo de chip também é reconhecido na inspeção.
+        let report = inspect_bytes(side("chip_ancestrydna.txt").data).unwrap();
+        assert!(report.contains("\"file_format\":\"chip:AncestryDNA\""));
+        let report = inspect_bytes(side("referencia_chr1_trecho.fa").data).unwrap();
+        assert!(report.contains("\"file_format\":\"fasta\""));
     }
 
     #[test]

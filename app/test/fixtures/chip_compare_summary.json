@@ -1,0 +1,101 @@
+{
+  "core_version": "0.1.0",
+  "mode": "in_memory",
+  "a": {
+    "label": "A",
+    "sample": "23andMe",
+    "build": {
+      "build": "GRCh37",
+      "confidence": "high",
+      "evidence": [
+        "o arquivo declara GRCh37 (build 37)"
+      ]
+    },
+    "records": 13,
+    "rejected_lines": 0,
+    "duplicate_keys": 0,
+    "callable_regions": false
+  },
+  "b": {
+    "label": "B",
+    "sample": "PESSOA_FICTICIA",
+    "build": {
+      "build": "GRCh37",
+      "confidence": "high",
+      "evidence": [
+        "contig 1 com comprimento 249250621 = GRCh37"
+      ]
+    },
+    "records": 12,
+    "rejected_lines": 0,
+    "duplicate_keys": 0,
+    "callable_regions": false
+  },
+  "rows": 11,
+  "counts": {
+    "shared": 6,
+    "genotype_difference": 3,
+    "only_a": 1,
+    "only_b": 0,
+    "missing_uncertain": 1,
+    "not_assessed": 0
+  },
+  "by_kind": {
+    "shared": {
+      "snv": 6
+    },
+    "genotype_difference": {
+      "snv": 3
+    },
+    "only_a": {
+      "snv": 1
+    },
+    "missing_uncertain": {
+      "snv": 1
+    }
+  },
+  "by_chrom": [
+    {
+      "chrom": "1",
+      "counts": {
+        "shared": 6,
+        "genotype_difference": 3,
+        "only_a": 1,
+        "missing_uncertain": 1
+      }
+    }
+  ],
+  "sites_in_both": 9,
+  "genotype_concordance": 0.6666666666666666,
+  "jaccard": null,
+  "benchmark": null,
+  "options": {
+    "call_filter": {
+      "pass_only": false,
+      "min_qual": null,
+      "min_dp": null,
+      "min_gq": null,
+      "conditions": []
+    },
+    "truth": null,
+    "allow_build_mismatch": false,
+    "force_in_memory": false
+  },
+  "warnings": [
+    "1 sítios homozigotos do chip não têm registro no VCF e a base de referência é desconhecida; com um FASTA de referência eles podem ser avaliados"
+  ],
+  "chip": {
+    "vendor": "23andme",
+    "sites": 13,
+    "no_calls": 2,
+    "indels_skipped": 1,
+    "duplicate_positions": 0,
+    "vcf_variants_off_chip": 2,
+    "unknown_reference": 1,
+    "reference_not_assessed": 0,
+    "possible_strand_flips": 0,
+    "reference_mismatches": 0,
+    "reference_used": false,
+    "nonref_concordance": 0.6666666666666666
+  }
+}

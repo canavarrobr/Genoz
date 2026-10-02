@@ -110,6 +110,7 @@ class CompareSummary {
     required this.jaccard,
     required this.benchmark,
     required this.warnings,
+    this.chip,
   });
 
   /// `streaming` ou `in_memory`.
@@ -124,6 +125,9 @@ class CompareSummary {
   final Benchmark? benchmark;
   final List<String> warnings;
 
+  /// Só na comparação chip × sequenciamento (A = chip, B = VCF).
+  final ChipCompareInfo? chip;
+
   int count(String category) => counts[category] ?? 0;
 
   factory CompareSummary.fromJson(Map<String, dynamic> j) => CompareSummary(
@@ -137,9 +141,50 @@ class CompareSummary {
         jaccard: _d(j['jaccard']),
         benchmark: j['benchmark'] == null ? null : Benchmark.fromJson(j['benchmark'] as Map<String, dynamic>),
         warnings: (j['warnings'] as List).cast<String>(),
+        chip: j['chip'] == null ? null : ChipCompareInfo.fromJson(j['chip'] as Map<String, dynamic>),
       );
 
   factory CompareSummary.parse(String json) => CompareSummary.fromJson(jsonDecode(json) as Map<String, dynamic>);
+}
+
+/// Números próprios da comparação chip × sequenciamento.
+class ChipCompareInfo {
+  const ChipCompareInfo({
+    required this.sites,
+    required this.noCalls,
+    required this.indelsSkipped,
+    required this.vcfVariantsOffChip,
+    required this.unknownReference,
+    required this.referenceNotAssessed,
+    required this.possibleStrandFlips,
+    required this.referenceMismatches,
+    required this.referenceUsed,
+    required this.nonrefConcordance,
+  });
+
+  final int sites;
+  final int noCalls;
+  final int indelsSkipped;
+  final int vcfVariantsOffChip;
+  final int unknownReference;
+  final int referenceNotAssessed;
+  final int possibleStrandFlips;
+  final int referenceMismatches;
+  final bool referenceUsed;
+  final double? nonrefConcordance;
+
+  factory ChipCompareInfo.fromJson(Map<String, dynamic> j) => ChipCompareInfo(
+        sites: j['sites'] as int,
+        noCalls: j['no_calls'] as int,
+        indelsSkipped: j['indels_skipped'] as int,
+        vcfVariantsOffChip: j['vcf_variants_off_chip'] as int,
+        unknownReference: j['unknown_reference'] as int,
+        referenceNotAssessed: j['reference_not_assessed'] as int,
+        possibleStrandFlips: j['possible_strand_flips'] as int,
+        referenceMismatches: j['reference_mismatches'] as int,
+        referenceUsed: j['reference_used'] as bool,
+        nonrefConcordance: _d(j['nonref_concordance']),
+      );
 }
 
 class HistBin {
