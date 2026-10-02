@@ -9,6 +9,7 @@
 //! As funções trabalham sobre `std::io::Read`, e não sobre caminhos, para que o
 //! mesmo código rode no navegador (WASM), no celular e no PC.
 
+pub mod annotation;
 pub mod build;
 pub mod call;
 pub mod chip_compare;

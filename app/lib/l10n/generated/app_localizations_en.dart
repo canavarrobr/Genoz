@@ -519,7 +519,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clearFilters => 'Clear';
 
   @override
-  String get searchHint => 'chr1:1000, chr7:1M-2M or rs123';
+  String get searchHint => 'BRCA2, chr7:1M-2M or rs123';
 
   @override
   String get noRows => 'No rows match these filters.';
@@ -1333,4 +1333,128 @@ class AppLocalizationsEn extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get annotTitle => 'Annotations';
+
+  @override
+  String get annotIntro =>
+      'Annotation adds what public sources say about each variant and region: genes (GENCODE) and ClinVar. Everything is looked up on the device. Genoz does not classify variants: it only shows what each source says, with version and date.';
+
+  @override
+  String get annotNoInternet =>
+      'Genoz has no internet access. For a catalog package, download the official file with your browser and import it here: the app only accepts it if its fingerprint (SHA-256) is exactly the catalog\'s.';
+
+  @override
+  String get annotInstalled => 'Installed';
+
+  @override
+  String get annotCatalog => 'Catalog (download with the browser)';
+
+  @override
+  String get annotCustom => 'Your own package';
+
+  @override
+  String get annotCustomImport => 'Import BED or TSV';
+
+  @override
+  String get annotCustomHint =>
+      'E.g. the gene list of a course. BED (0-based) or TSV with columns chrom, start, end, name…';
+
+  @override
+  String get annotCustomName => 'Package name';
+
+  @override
+  String get annotChooseFile => 'Choose file';
+
+  @override
+  String get annotBuilding => 'Building the package…';
+
+  @override
+  String get annotChecking =>
+      'Checking the SHA-256 and building the package. Large files (ClinVar) may take a few minutes.';
+
+  @override
+  String annotInstalledOk(String name, int records) {
+    return 'Package \"$name\" installed ($records records).';
+  }
+
+  @override
+  String get annotHashMismatch =>
+      'This file is not the catalog\'s (different SHA-256). Nothing was installed. Check that you downloaded the file from the given link and that the download finished.';
+
+  @override
+  String annotBuildFailed(String detail) {
+    return 'Could not build the package: $detail';
+  }
+
+  @override
+  String annotRecords(String count) {
+    return '$count records';
+  }
+
+  @override
+  String get annotEmbedded => 'built-in';
+
+  @override
+  String get annotVersion => 'Version';
+
+  @override
+  String get annotLicense => 'License';
+
+  @override
+  String get annotCitation => 'How to cite';
+
+  @override
+  String get annotSourceUrl => 'Origin';
+
+  @override
+  String get annotHowTo =>
+      '1. Download the file with your browser. 2. Import the downloaded file here. The app checks the SHA-256 before using it.';
+
+  @override
+  String get annotOpenBrowser => 'Download in browser';
+
+  @override
+  String get annotCopyUrl => 'Copy link';
+
+  @override
+  String get annotUrlCopied => 'Link copied.';
+
+  @override
+  String get annotImportDownloaded => 'Import downloaded file';
+
+  @override
+  String get sourcesTitle => 'What the sources say';
+
+  @override
+  String sourcesSays(String source, String version, String date) {
+    return '$source · version $version ($date)';
+  }
+
+  @override
+  String sourcesMore(int count) {
+    return '… and $count more';
+  }
+
+  @override
+  String get sourcesNoClassification =>
+      'Genoz does not classify variants: the texts above come from the stated source, in the stated version.';
+
+  @override
+  String geneFound(String gene, String region) {
+    return '$gene: $region';
+  }
+
+  @override
+  String get clinvarLicense =>
+      'Free use and redistribution with attribution to ClinVar';
+
+  @override
+  String get clinvarDisclaimer =>
+      'ClinVar is not intended for direct diagnostic use or medical decision-making without review by a genetics professional; NIH does not independently verify submitted information.';
+
+  @override
+  String get gencodeLicense =>
+      'Open access (EMBL-EBI: no additional restrictions; attribution expected)';
 }

@@ -303,7 +303,7 @@
   },
   "filters": "Filtros",
   "clearFilters": "Limpar",
-  "searchHint": "chr1:1000, chr7:1M-2M ou rs123",
+  "searchHint": "BRCA2, chr7:1M-2M ou rs123",
   "noRows": "Nenhuma linha com esses filtros.",
   "saveFilter": "Salvar filtro",
   "filterName": "Nome do filtro",
@@ -846,5 +846,93 @@
         "type": "String"
       }
     }
-  }
+  },
+  "annotTitle": "Anotações",
+  "annotIntro": "Anotação acrescenta o que fontes públicas dizem sobre cada variante e região: genes (GENCODE) e o ClinVar. Tudo é consultado no aparelho. O Genoz não classifica variantes: só mostra o que cada fonte diz, com versão e data.",
+  "annotNoInternet": "O Genoz não tem acesso à internet. Para um pacote do catálogo, baixe o arquivo oficial pelo seu navegador e importe aqui: o app só aceita se a impressão digital (SHA-256) for exatamente a do catálogo.",
+  "annotInstalled": "Instalados",
+  "annotCatalog": "Catálogo (baixar pelo navegador)",
+  "annotCustom": "Pacote próprio",
+  "annotCustomImport": "Importar BED ou TSV",
+  "annotCustomHint": "Ex.: a lista de genes de uma disciplina. BED (0-based) ou TSV com colunas chrom, start, end, nome…",
+  "annotCustomName": "Nome do pacote",
+  "annotChooseFile": "Escolher arquivo",
+  "annotBuilding": "Montando o pacote…",
+  "annotChecking": "Conferindo o SHA-256 e montando o pacote. Arquivos grandes (ClinVar) podem levar alguns minutos.",
+  "annotInstalledOk": "Pacote \"{name}\" instalado ({records} registros).",
+  "@annotInstalledOk": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "records": {
+        "type": "int"
+      }
+    }
+  },
+  "annotHashMismatch": "Este arquivo não é o do catálogo (SHA-256 diferente). Nada foi instalado. Confira se baixou o arquivo do link indicado e se o download terminou.",
+  "annotBuildFailed": "Não foi possível montar o pacote: {detail}",
+  "@annotBuildFailed": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "annotRecords": "{count} registros",
+  "@annotRecords": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "annotEmbedded": "embutido",
+  "annotVersion": "Versão",
+  "annotLicense": "Licença",
+  "annotCitation": "Como citar",
+  "annotSourceUrl": "Origem",
+  "annotHowTo": "1. Baixe o arquivo pelo navegador. 2. Importe o arquivo baixado aqui. O app confere o SHA-256 antes de usar.",
+  "annotOpenBrowser": "Baixar no navegador",
+  "annotCopyUrl": "Copiar link",
+  "annotUrlCopied": "Link copiado.",
+  "annotImportDownloaded": "Importar arquivo baixado",
+  "sourcesTitle": "O que as fontes dizem",
+  "sourcesSays": "{source} · versão {version} ({date})",
+  "@sourcesSays": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesMore": "… e mais {count}",
+  "@sourcesMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sourcesNoClassification": "O Genoz não classifica variantes: os textos acima são da fonte indicada, na versão indicada.",
+  "geneFound": "{gene}: {region}",
+  "@geneFound": {
+    "placeholders": {
+      "gene": {
+        "type": "String"
+      },
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "clinvarLicense": "Uso e redistribuição livres com atribuição ao ClinVar",
+  "clinvarDisclaimer": "O ClinVar não é para uso diagnóstico direto nem decisão médica sem revisão de um profissional de genética; o NIH não verifica as informações enviadas.",
+  "gencodeLicense": "Acesso aberto (EMBL-EBI: sem restrições adicionais; atribuição esperada)"
 }

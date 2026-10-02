@@ -10,6 +10,7 @@ import '../../persistence/database.dart';
 import '../../persistence/project_repository.dart';
 import '../../platform/picker_cache.dart';
 import '../../ui/theme.dart';
+import '../annotation/annotation_store.dart';
 import '../learn/content.dart';
 import '../learn/progress.dart';
 import 'settings.dart';
@@ -36,10 +37,17 @@ Future<void> wipeAll({
   await storage.deleteDir('projetos');
   // Modo estudante: progresso e aulas importadas.
   await storage.deleteDir(learnDir);
+  // Pacotes de anotação baixados (os embutidos são copiados de novo ao abrir).
+  await storage.deleteDir(annotationDir);
   await settings.reset();
 }
 
 Future<void> wipeAllData(WidgetRef ref) async {
+  // Fecha os pacotes de anotação abertos antes de apagar as pastas.
+  final core = ref.read(genozCoreProvider);
+  for (final p in ref.read(installedPackagesProvider).value ?? const <InstalledPackage>[]) {
+    core.forgetAnnotation(p.dir);
+  }
   await wipeAll(
     db: ref.read(databaseProvider),
     storage: ref.read(appStorageProvider),
@@ -50,6 +58,7 @@ Future<void> wipeAllData(WidgetRef ref) async {
   await clearPickerCache();
   ref.invalidate(learnProgressProvider);
   ref.invalidate(learnContentProvider);
+  ref.invalidate(installedPackagesProvider);
 }
 
 /// Campo de confirmação: o botão só funciona depois de digitar a palavra pedida.

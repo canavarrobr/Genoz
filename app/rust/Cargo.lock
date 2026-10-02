@@ -396,6 +396,7 @@ version = "0.3.0"
 dependencies = [
  "flutter_rust_bridge",
  "genoz_core",
+ "serde",
  "serde_json",
  "sha2",
 ]

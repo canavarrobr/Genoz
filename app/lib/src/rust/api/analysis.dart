@@ -9,7 +9,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'analysis.freezed.dart';
 
-// These functions are ignored because they are not marked as `pub`: `chip_input`, `density_of`, `forget_key`, `manifest_json`, `matching`, `open_result`, `output_ref`, `page_of`, `parse_filter`, `read_chip_file`, `run_compare_job`, `run_compare`, `write_output`
+// These functions are ignored because they are not marked as `pub`: `chip_input`, `density_of`, `forget_key`, `manifest_json`, `matching`, `open_result`, `output_ref`, `page_of`, `parse_filter`, `read_chip_file`, `run_compare_job`, `run_compare`, `side_ref`, `write_output`
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `CountingReader`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `read`
 

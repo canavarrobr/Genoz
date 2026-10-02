@@ -38,3 +38,6 @@ Thumbs.db
 
 # Artigos com copyright de editora: ficam só localmente (ver docs/referencias/artigos/README.md)
 docs/referencias/artigos/*.pdf
+
+# Dados brutos de fontes externas (baixados para gerar pacotes; nunca vão para o git)
+dados_brutos/

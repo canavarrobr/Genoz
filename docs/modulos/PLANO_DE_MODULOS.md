@@ -437,3 +437,42 @@ Limitações: perguntas de múltipla escolha levam a alternativa certa no pacote
 Achados corrigidos no caminho: `ZipDecoder` aceita qualquer lixo como ZIP vazio (agora confere a assinatura PK); fixtures geradas em Windows saíam com CRLF (gerador força LF); `.fai` do FASTA ficava órfão ao apagar o arquivo.
 Núcleo: 73 testes (+ 32 de CLI/integração); ponte: 3; app: 100. Decisões em [ADR-015](../adr/ADR-015-chip-x-sequenciamento-e-fasta.md).
 Limitações: chips de indel ignorados; sem liftover (chip GRCh37 × VCF GRCh38 é recusado); normalização VCF × VCF com FASTA carrega os dois VCFs em memória; exportações grandes ainda passam pela memória do Dart (fica para depois).
+
+---
+
+## Contrato do Módulo 10 — Anotação local (antes de implementar)
+
+**Entradas:** resultados de comparação (linhas com cromossomo/posição/REF/ALT); arquivos de anotação: GENCODE (genes), ClinVar (VCF mensal oficial do NCBI), BED/TSV do usuário.
+
+**Licenças verificadas (01/10/2026):** GENCODE — acesso aberto, EMBL-EBI não impõe restrições e pede atribuição; ClinVar — redistribuição livre com atribuição (PMID 29165669), e aviso de que não é para uso diagnóstico direto. **Ficam fora deste módulo:** dbSNP completo (~25 GB) e gnomAD (dezenas de GB, licença ODbL com compartilhamento pela mesma licença) — exigem hospedar subconjuntos (ação pública, só com o "sim" do usuário). rsIDs já vêm nos VCFs, nos chips e no próprio ClinVar.
+
+**Decisão de rede ("online controlado"):** o app **continua sem permissão de internet**. Um item do catálogo mostra URL, tamanho, licença e SHA-256 esperado; o botão abre o navegador do sistema; o usuário baixa e importa o arquivo; o app confere o SHA-256 antes de usar. Nada é enviado; o arquivo nunca é baixado sem o usuário.
+
+**Saídas — núcleo, CLI e ponte:**
+- formato de **pacote de anotação** próprio, compacto e indexado: `manifest.json` (id, nome, tipo `sites` ou `intervals`, build, fonte, URL, versão, data, licença, citação, campos, SHA-256 da entrada e dos dados), `records.bgz` (registros ordenados em BGZF) e `records.idx` (blocos com faixa de posições e deslocamento virtual) + índice de nomes (genes);
+- construtores: GTF (genes), VCF (ClinVar: significado clínico, status de revisão, condição, gene, rsID), BED/TSV do usuário;
+- consultas: por região (sobreposição), por sítio (posição + REF/ALT), por nome de gene; anotação de uma página de linhas de resultado;
+- CLI: `anot build|info|query|gene`.
+
+**App:**
+- tela **Anotações** (menu ☰): pacotes instalados com fonte, versão, data, licença e citação; catálogo (ClinVar GRCh38/GRCh37 do mês, com URL/tamanho/SHA-256); importar BED/TSV próprio; remover pacote;
+- **genes GENCODE v50 embutidos** (GRCh38 e GRCh37), já instalados — busca por gene funciona sem nada baixar;
+- **tabela:** gene e o que o ClinVar diz em cada linha (quando houver pacote do mesmo build); **busca por gene** na caixa de busca (ex.: `BRCA2`) vira filtro de região;
+- **ficha da variante:** seção "O que as fontes dizem", com fonte + versão + data e o aviso de que o Genoz não classifica variantes.
+
+**Invariantes:** pacote só é usado com análise do mesmo build; anotação nunca muda categoria nem contagem de comparação; textos clínicos sempre atribuídos à fonte ("o ClinVar, versão X, diz…"), nunca como conclusão do Genoz; nada é diagnóstico; APK sem INTERNET (o CI confere); "Apagar todos os dados" remove os pacotes baixados (os embutidos voltam a ser instalados).
+
+**Erros:** arquivo importado com SHA-256 diferente do catálogo (recusado, nada instalado); build do pacote diferente da análise (pacote ignorado com aviso); BED/TSV malformado (problemas por linha); pacote de versão futura.
+
+**Testes:** núcleo (construtores com fixtures pequenas de GTF/VCF/BED; consulta por região e sítio = busca linear; índice com muitos blocos; nome de gene); CLI; ponte caminho = memória; app (tela de anotações, catálogo com hash errado recusado, coluna/ficha na tabela, busca por gene); verificação no emulador e no navegador com o ClinVar real do mês.
+
+**Status:** concluído em 01/10/2026. Verificado no emulador Android (API 35, APK de release, sem permissão INTERNET):
+genes GENCODE v50 GRCh38 (78.733) e GRCh37 (80.315, lift37 oficial) embutidos e instalados sozinhos (1,5 MB cada);
+"Baixar no navegador" abre o Chrome; arquivo errado importado para o ClinVar GRCh37 → recusado (SHA-256 diferente),
+nada instalado; ClinVar 2026-09-05 GRCh38 real (193 MB) importado e conferido → pacote com 4.467.926 registros em
+~70 s; dois VCFs fictícios com sítios reais do ClinVar → tabela com "BRCA2 · ClinVar: Pathogenic/Benign" e "CFTR";
+ficha da variante com GENCODE e ClinVar (fonte, versão, data, campos e aviso do ClinVar); busca `cftr` → só a linha
+do gene; atualizar o app manteve o ClinVar instalado e acrescentou o pacote GRCh37. Licença e aviso das fontes
+conhecidas aparecem no idioma do app. 106 testes Dart, 111 Rust (núcleo e CLI) + 4 da ponte. Decisões em
+[ADR-016](../adr/ADR-016-anotacao-local-e-online-controlado.md). No navegador, o mesmo código roda com os pacotes no
+OPFS (`annot_load`); a verificação manual no site ficou para o Módulo 11 (o CI compila a versão Web).

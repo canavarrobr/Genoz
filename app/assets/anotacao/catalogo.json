@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "packages": [
+    {
+      "id": "clinvar_20260905_grch38",
+      "name": "ClinVar 2026-09-05 (GRCh38)",
+      "kind": "clinvar",
+      "build": "GRCh38",
+      "url": "https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/archive_2.0/2026/clinvar_20260905.vcf.gz",
+      "bytes": 193476678,
+      "sha256": "8cff3c5fb9bad5b2afaee6d3d2df11067349ba31b2c4e3d1bbdeaa5cb2fc098a",
+      "meta": {
+        "id": "clinvar_20260905_grch38",
+        "name": "ClinVar 2026-09-05 (GRCh38)",
+        "build": "GRCh38",
+        "source": "ClinVar (NCBI)",
+        "source_url": "https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/archive_2.0/2026/clinvar_20260905.vcf.gz",
+        "version": "20260905",
+        "date": "2026-09-05",
+        "license": "Uso e redistribuição livres com atribuição ao ClinVar",
+        "license_url": "https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/",
+        "citation": "Landrum MJ et al. ClinVar: improving access to variant interpretations and supporting evidence. Nucleic Acids Res. 2018;46(D1):D1062-D1067. PMID 29165669",
+        "disclaimer": "O ClinVar não é para uso diagnóstico direto nem decisão médica sem revisão de um profissional de genética; o NIH não verifica as informações enviadas."
+      }
+    },
+    {
+      "id": "clinvar_20260905_grch37",
+      "name": "ClinVar 2026-09-05 (GRCh37)",
+      "kind": "clinvar",
+      "build": "GRCh37",
+      "url": "https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/archive_2.0/2026/clinvar_20260905.vcf.gz",
+      "bytes": 193451062,
+      "sha256": "68a479604a683df6c2431a68f1d3150922f872d8c33885fa2ad2d1fe333692f9",
+      "meta": {
+        "id": "clinvar_20260905_grch37",
+        "name": "ClinVar 2026-09-05 (GRCh37)",
+        "build": "GRCh37",
+        "source": "ClinVar (NCBI)",
+        "source_url": "https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/archive_2.0/2026/clinvar_20260905.vcf.gz",
+        "version": "20260905",
+        "date": "2026-09-05",
+        "license": "Uso e redistribuição livres com atribuição ao ClinVar",
+        "license_url": "https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/",
+        "citation": "Landrum MJ et al. ClinVar: improving access to variant interpretations and supporting evidence. Nucleic Acids Res. 2018;46(D1):D1062-D1067. PMID 29165669",
+        "disclaimer": "O ClinVar não é para uso diagnóstico direto nem decisão médica sem revisão de um profissional de genética; o NIH não verifica as informações enviadas."
+      }
+    }
+  ]
+}

@@ -15,8 +15,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../persistence/app_storage.dart';
 import '../src/rust/api/analysis.dart' as rust_analysis;
+import '../src/rust/api/annotation.dart' as rust_annot;
 import '../src/rust/api/genoz.dart' as rust;
 import '../src/rust/api/memory.dart' as rust_memory;
+import 'annotation_models.dart';
 import 'compare_models.dart';
 import 'density.dart';
 export 'density.dart';
@@ -67,6 +69,26 @@ class ImportCancelled extends CoreImportEvent {
 // ---- Comparação ------------------------------------------------------------
 
 /// Um lado da comparação (arquivo já importado).
+/// Resultado da construção de um pacote de anotação.
+class AnnotBuildResult {
+  const AnnotBuildResult(this.manifest, this.skipped);
+  final PackageManifest manifest;
+
+  /// Linhas do arquivo de origem ignoradas (malformadas).
+  final int skipped;
+}
+
+String _rowsJson(List<ComparisonRow> rows) =>
+    jsonEncode([for (final r in rows) {'chrom': r.chrom, 'pos': r.pos, 'ref': r.reference, 'alt': r.alt}]);
+
+Future<Uint8List> _allBytes(SourceFile source) async {
+  final b = BytesBuilder(copy: false);
+  await for (final chunk in source.open!()) {
+    b.add(chunk);
+  }
+  return b.takeBytes();
+}
+
 class CompareInputFile {
   const CompareInputFile({
     required this.relativePath,
@@ -170,6 +192,28 @@ abstract interface class GenozCore {
   Future<DensityMap> density({required String resultDirRelative, required RowFilter filter, int binSize = 1000000});
 
   void forgetResult(String resultDirRelative);
+
+  // ---- Anotação local (Módulo 10) ----
+
+  /// Constrói um pacote (`kind`: `gtf`, `clinvar` ou `custom`) a partir de um arquivo
+  /// e grava `manifest.json`, `records.bgz` e `records.idx` em `outDirRelative`.
+  Future<AnnotBuildResult> buildAnnotation({
+    required String kind,
+    required SourceFile source,
+    required String outDirRelative,
+    required Map<String, Object?> meta,
+  });
+
+  /// SHA-256 de um arquivo escolhido (conferência de download do catálogo).
+  Future<String> sha256Of(SourceFile source);
+
+  /// Anotação das linhas com os pacotes (pastas relativas). Uma lista por linha.
+  Future<List<List<AnnotHit>>> annotate({required List<String> packages, required List<ComparisonRow> rows});
+
+  /// Procura um nome (ex.: gene) num pacote.
+  Future<List<AnnotRecord>> findName({required String package, required String name});
+
+  void forgetAnnotation(String package);
 
   /// Interpreta `chr7:117.5M-117.6M`, `chr1:1000`, `X`... `null` se não for região.
   Region? parseRegion(String text);
@@ -326,6 +370,53 @@ class NativeGenozCore implements GenozCore {
 
   @override
   void forgetResult(String resultDirRelative) => rust_analysis.forgetResult(outDir: storage.absolute(resultDirRelative));
+
+  @override
+  Future<AnnotBuildResult> buildAnnotation({
+    required String kind,
+    required SourceFile source,
+    required String outDirRelative,
+    required Map<String, Object?> meta,
+  }) async {
+    var path = source.path;
+    String? temp;
+    if (path == null) {
+      // Origem só como fluxo (ex.: content:// no Android): grava uma cópia temporária.
+      temp = '$outDirRelative.entrada';
+      await storage.blobs.writeStream(temp, source.open!());
+      path = storage.absolute(temp);
+    }
+    try {
+      final r = await rust_annot.annotBuild(
+        kind: kind,
+        inputPath: path,
+        outDir: storage.absolute(outDirRelative),
+        metaJson: jsonEncode(meta),
+      );
+      return AnnotBuildResult(PackageManifest.parse(r.manifestJson), r.skipped.toInt());
+    } finally {
+      if (temp != null) await storage.blobs.deleteFile(temp);
+    }
+  }
+
+  @override
+  Future<String> sha256Of(SourceFile source) async => source.path != null
+      ? rust_annot.sha256File(path: source.path!)
+      : rust_annot.sha256OfBytes(data: await _allBytes(source));
+
+  @override
+  Future<List<List<AnnotHit>>> annotate({required List<String> packages, required List<ComparisonRow> rows}) async =>
+      AnnotHit.parseRows(await rust_annot.annotAnnotate(
+        packages: [for (final p in packages) storage.absolute(p)],
+        rowsJson: _rowsJson(rows),
+      ));
+
+  @override
+  Future<List<AnnotRecord>> findName({required String package, required String name}) async =>
+      AnnotRecord.parseList(await rust_annot.annotFindName(package: storage.absolute(package), name: name));
+
+  @override
+  void forgetAnnotation(String package) => rust_annot.annotForget(key: storage.absolute(package));
 
   @override
   Region? parseRegion(String text) => _parseRegion(text);
@@ -519,6 +610,55 @@ class WebGenozCore implements GenozCore {
 
   @override
   void forgetResult(String resultDirRelative) => rust_memory.resultUnload(key: resultDirRelative);
+
+  @override
+  Future<AnnotBuildResult> buildAnnotation({
+    required String kind,
+    required SourceFile source,
+    required String outDirRelative,
+    required Map<String, Object?> meta,
+  }) async {
+    if ((source.size ?? 0) > webMaxFileBytes) throw StateError(webTooLarge(source.size!));
+    final b = await rust_annot.annotBuildBytes(kind: kind, data: await _allBytes(source), metaJson: jsonEncode(meta));
+    final blobs = storage.blobs;
+    await blobs.writeBytes('$outDirRelative/records.bgz', b.recordsBgz);
+    await blobs.writeBytes('$outDirRelative/records.idx', b.indexJson);
+    await blobs.writeBytes('$outDirRelative/manifest.json', Uint8List.fromList(utf8.encode(b.report.manifestJson)));
+    rust_annot.annotForget(key: outDirRelative);
+    return AnnotBuildResult(PackageManifest.parse(b.report.manifestJson), b.report.skipped.toInt());
+  }
+
+  @override
+  Future<String> sha256Of(SourceFile source) async => rust_annot.sha256OfBytes(data: await _allBytes(source));
+
+  /// No navegador o pacote é carregado na memória do núcleo uma vez.
+  Future<void> _ensureAnnot(String package) async {
+    if (rust_annot.annotIsLoaded(key: package)) return;
+    final blobs = storage.blobs;
+    await rust_annot.annotLoad(
+      key: package,
+      manifestJson: await blobs.readBytes('$package/manifest.json'),
+      indexJson: await blobs.readBytes('$package/records.idx'),
+      recordsBgz: await blobs.readBytes('$package/records.bgz'),
+    );
+  }
+
+  @override
+  Future<List<List<AnnotHit>>> annotate({required List<String> packages, required List<ComparisonRow> rows}) async {
+    for (final p in packages) {
+      await _ensureAnnot(p);
+    }
+    return AnnotHit.parseRows(await rust_annot.annotAnnotate(packages: packages, rowsJson: _rowsJson(rows)));
+  }
+
+  @override
+  Future<List<AnnotRecord>> findName({required String package, required String name}) async {
+    await _ensureAnnot(package);
+    return AnnotRecord.parseList(await rust_annot.annotFindName(package: package, name: name));
+  }
+
+  @override
+  void forgetAnnotation(String package) => rust_annot.annotForget(key: package);
 
   @override
   Region? parseRegion(String text) => _parseRegion(text);

@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:genoz/core/annotation_models.dart';
 import 'package:genoz/core/compare_models.dart';
 import 'package:genoz/core/genoz_core.dart';
 import 'package:genoz/core/inspect_report.dart';
@@ -135,7 +136,8 @@ class FakeGenozCore implements GenozCore {
   List<ComparisonRow> _filtered(RowFilter f) => [
         for (final r in _rows)
           if ((f.categories.isEmpty || f.categories.contains(r.category)) &&
-              (f.idContains == null || r.ids.any((i) => i.contains(f.idContains!))))
+              (f.idContains == null || r.ids.any((i) => i.contains(f.idContains!))) &&
+              (f.region == null || (r.chrom == f.region!.chrom && r.pos >= f.region!.start && r.pos <= f.region!.end)))
             r,
       ];
 
@@ -179,6 +181,48 @@ class FakeGenozCore implements GenozCore {
 
   @override
   void forgetResult(String resultDirRelative) {}
+
+  /// Anotação falsa: o teste define o que cada pacote devolve.
+  Map<String, List<List<AnnotHit>> Function(List<ComparisonRow>)> annotations = {};
+  Map<String, List<AnnotRecord>> names = {};
+  String sha256Result = '';
+  final forgotten = <String>[];
+
+  @override
+  Future<AnnotBuildResult> buildAnnotation({
+    required String kind,
+    required SourceFile source,
+    required String outDirRelative,
+    required Map<String, Object?> meta,
+  }) async {
+    final manifest = {...meta, 'kind': kind == 'custom' || kind == 'gtf' ? 'intervals' : 'sites', 'fields': [], 'records': 1};
+    await storage.blobs.writeBytes('$outDirRelative/manifest.json', Uint8List.fromList(utf8.encode(jsonEncode(manifest))));
+    return AnnotBuildResult(PackageManifest.fromJson(manifest), 0);
+  }
+
+  @override
+  Future<String> sha256Of(SourceFile source) async => sha256Result;
+
+  @override
+  Future<List<List<AnnotHit>>> annotate({required List<String> packages, required List<ComparisonRow> rows}) async {
+    final out = [for (final _ in rows) <AnnotHit>[]];
+    for (final p in packages) {
+      final f = annotations[p];
+      if (f == null) continue;
+      final hits = f(rows);
+      for (var i = 0; i < rows.length; i++) {
+        out[i].addAll(hits[i]);
+      }
+    }
+    return out;
+  }
+
+  @override
+  Future<List<AnnotRecord>> findName({required String package, required String name}) async =>
+      names['$package/${name.toUpperCase()}'] ?? const [];
+
+  @override
+  void forgetAnnotation(String package) => forgotten.add(package);
 
   @override
   Region? parseRegion(String text) {

@@ -14,3 +14,4 @@ As decisões tomadas durante o desenvolvimento ficam registradas aqui, uma por a
 | [ADR-013](ADR-013-bloqueio-do-app.md) | Bloqueio do app por PIN/biometria (não é criptografia) | 7 |
 | [ADR-014](ADR-014-modo-estudante-e-pacote-de-aula.md) | Modo estudante: respostas calculadas e pacote de aula | 8 |
 | [ADR-015](ADR-015-chip-x-sequenciamento-e-fasta.md) | Chip × sequenciamento por letras; FASTA local para normalizar | 9 |
+| [ADR-016](ADR-016-anotacao-local-e-online-controlado.md) | Anotação local em pacotes próprios; "online controlado" sem internet | 10 |

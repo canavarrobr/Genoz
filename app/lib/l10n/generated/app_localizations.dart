@@ -995,7 +995,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchHint.
   ///
   /// In pt, this message translates to:
-  /// **'chr1:1000, chr7:1M-2M ou rs123'**
+  /// **'BRCA2, chr7:1M-2M ou rs123'**
   String get searchHint;
 
   /// No description provided for @noRows.
@@ -2354,6 +2354,210 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'{code, select, invalid{Não foi possível abrir o .zip.} empty{O .zip não tem um arquivo de dados (.txt, .csv, .vcf).} many{O .zip tem mais de um arquivo de dados; extraia e importe o que quiser.} tooLarge{O arquivo dentro do .zip é grande demais.} other{Não foi possível importar o .zip.}}'**
   String zipError(String code);
+
+  /// No description provided for @annotTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anotações'**
+  String get annotTitle;
+
+  /// No description provided for @annotIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anotação acrescenta o que fontes públicas dizem sobre cada variante e região: genes (GENCODE) e o ClinVar. Tudo é consultado no aparelho. O Genoz não classifica variantes: só mostra o que cada fonte diz, com versão e data.'**
+  String get annotIntro;
+
+  /// No description provided for @annotNoInternet.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Genoz não tem acesso à internet. Para um pacote do catálogo, baixe o arquivo oficial pelo seu navegador e importe aqui: o app só aceita se a impressão digital (SHA-256) for exatamente a do catálogo.'**
+  String get annotNoInternet;
+
+  /// No description provided for @annotInstalled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Instalados'**
+  String get annotInstalled;
+
+  /// No description provided for @annotCatalog.
+  ///
+  /// In pt, this message translates to:
+  /// **'Catálogo (baixar pelo navegador)'**
+  String get annotCatalog;
+
+  /// No description provided for @annotCustom.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pacote próprio'**
+  String get annotCustom;
+
+  /// No description provided for @annotCustomImport.
+  ///
+  /// In pt, this message translates to:
+  /// **'Importar BED ou TSV'**
+  String get annotCustomImport;
+
+  /// No description provided for @annotCustomHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ex.: a lista de genes de uma disciplina. BED (0-based) ou TSV com colunas chrom, start, end, nome…'**
+  String get annotCustomHint;
+
+  /// No description provided for @annotCustomName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome do pacote'**
+  String get annotCustomName;
+
+  /// No description provided for @annotChooseFile.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolher arquivo'**
+  String get annotChooseFile;
+
+  /// No description provided for @annotBuilding.
+  ///
+  /// In pt, this message translates to:
+  /// **'Montando o pacote…'**
+  String get annotBuilding;
+
+  /// No description provided for @annotChecking.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conferindo o SHA-256 e montando o pacote. Arquivos grandes (ClinVar) podem levar alguns minutos.'**
+  String get annotChecking;
+
+  /// No description provided for @annotInstalledOk.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pacote \"{name}\" instalado ({records} registros).'**
+  String annotInstalledOk(String name, int records);
+
+  /// No description provided for @annotHashMismatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Este arquivo não é o do catálogo (SHA-256 diferente). Nada foi instalado. Confira se baixou o arquivo do link indicado e se o download terminou.'**
+  String get annotHashMismatch;
+
+  /// No description provided for @annotBuildFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível montar o pacote: {detail}'**
+  String annotBuildFailed(String detail);
+
+  /// No description provided for @annotRecords.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} registros'**
+  String annotRecords(String count);
+
+  /// No description provided for @annotEmbedded.
+  ///
+  /// In pt, this message translates to:
+  /// **'embutido'**
+  String get annotEmbedded;
+
+  /// No description provided for @annotVersion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Versão'**
+  String get annotVersion;
+
+  /// No description provided for @annotLicense.
+  ///
+  /// In pt, this message translates to:
+  /// **'Licença'**
+  String get annotLicense;
+
+  /// No description provided for @annotCitation.
+  ///
+  /// In pt, this message translates to:
+  /// **'Como citar'**
+  String get annotCitation;
+
+  /// No description provided for @annotSourceUrl.
+  ///
+  /// In pt, this message translates to:
+  /// **'Origem'**
+  String get annotSourceUrl;
+
+  /// No description provided for @annotHowTo.
+  ///
+  /// In pt, this message translates to:
+  /// **'1. Baixe o arquivo pelo navegador. 2. Importe o arquivo baixado aqui. O app confere o SHA-256 antes de usar.'**
+  String get annotHowTo;
+
+  /// No description provided for @annotOpenBrowser.
+  ///
+  /// In pt, this message translates to:
+  /// **'Baixar no navegador'**
+  String get annotOpenBrowser;
+
+  /// No description provided for @annotCopyUrl.
+  ///
+  /// In pt, this message translates to:
+  /// **'Copiar link'**
+  String get annotCopyUrl;
+
+  /// No description provided for @annotUrlCopied.
+  ///
+  /// In pt, this message translates to:
+  /// **'Link copiado.'**
+  String get annotUrlCopied;
+
+  /// No description provided for @annotImportDownloaded.
+  ///
+  /// In pt, this message translates to:
+  /// **'Importar arquivo baixado'**
+  String get annotImportDownloaded;
+
+  /// No description provided for @sourcesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'O que as fontes dizem'**
+  String get sourcesTitle;
+
+  /// No description provided for @sourcesSays.
+  ///
+  /// In pt, this message translates to:
+  /// **'{source} · versão {version} ({date})'**
+  String sourcesSays(String source, String version, String date);
+
+  /// No description provided for @sourcesMore.
+  ///
+  /// In pt, this message translates to:
+  /// **'… e mais {count}'**
+  String sourcesMore(int count);
+
+  /// No description provided for @sourcesNoClassification.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Genoz não classifica variantes: os textos acima são da fonte indicada, na versão indicada.'**
+  String get sourcesNoClassification;
+
+  /// No description provided for @geneFound.
+  ///
+  /// In pt, this message translates to:
+  /// **'{gene}: {region}'**
+  String geneFound(String gene, String region);
+
+  /// No description provided for @clinvarLicense.
+  ///
+  /// In pt, this message translates to:
+  /// **'Uso e redistribuição livres com atribuição ao ClinVar'**
+  String get clinvarLicense;
+
+  /// No description provided for @clinvarDisclaimer.
+  ///
+  /// In pt, this message translates to:
+  /// **'O ClinVar não é para uso diagnóstico direto nem decisão médica sem revisão de um profissional de genética; o NIH não verifica as informações enviadas.'**
+  String get clinvarDisclaimer;
+
+  /// No description provided for @gencodeLicense.
+  ///
+  /// In pt, this message translates to:
+  /// **'Acesso aberto (EMBL-EBI: sem restrições adicionais; atribuição esperada)'**
+  String get gencodeLicense;
 }
 
 class _AppLocalizationsDelegate

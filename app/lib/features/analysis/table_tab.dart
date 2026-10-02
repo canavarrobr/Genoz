@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/annotation_models.dart';
 import '../../core/compare_models.dart';
 import '../../core/genoz_core.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -9,6 +10,8 @@ import '../../persistence/analysis_repository.dart';
 import '../../persistence/database.dart';
 import '../../ui/labels.dart';
 import '../../ui/theme.dart';
+import '../annotation/annotation_store.dart';
+import '../annotation/sources_section.dart';
 import 'variant_sheet.dart';
 
 /// Filtro atual da tabela de cada análise (também usado pela exportação).
@@ -38,6 +41,11 @@ class TableTab extends ConsumerStatefulWidget {
 
 class _TableTabState extends ConsumerState<TableTab> with AutomaticKeepAliveClientMixin {
   final _pages = <int, List<ComparisonRow>>{};
+
+  /// Anotação de cada página (uma lista de registros por linha).
+  final _annots = <int, List<List<AnnotHit>>>{};
+  List<InstalledPackage> _packages = const [];
+  bool _packagesLoaded = false;
   final _loading = <int>{};
   int? _total;
   RowFilter? _loadedFor;
@@ -56,6 +64,7 @@ class _TableTabState extends ConsumerState<TableTab> with AutomaticKeepAliveClie
 
   void _reset(RowFilter f) {
     _pages.clear();
+    _annots.clear();
     _loading.clear();
     _total = null;
     _error = null;
@@ -75,6 +84,7 @@ class _TableTabState extends ConsumerState<TableTab> with AutomaticKeepAliveClie
         _pages[page] = r.rows;
         _total = r.total;
       });
+      await _annotate(page, r.rows, f);
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
     } finally {
@@ -82,7 +92,37 @@ class _TableTabState extends ConsumerState<TableTab> with AutomaticKeepAliveClie
     }
   }
 
-  void _applySearch(String text) {
+  /// Anota as linhas da página com os pacotes do mesmo build (genes, ClinVar…).
+  Future<void> _annotate(int page, List<ComparisonRow> rows, RowFilter f) async {
+    // Anotação é extra: se qualquer coisa falhar, a tabela continua funcionando.
+    try {
+      if (!_packagesLoaded) {
+        _packages = await ref.read(packagesForBuildProvider(analysisBuild(widget.analysis.summary)).future);
+        _packagesLoaded = true;
+        if (mounted) setState(() {});
+      }
+      if (_packages.isEmpty || rows.isEmpty) return;
+      final hits = await ref.read(genozCoreProvider).annotate(packages: [for (final p in _packages) p.dir], rows: rows);
+      if (mounted && f == _loadedFor) setState(() => _annots[page] = hits);
+    } catch (_) {
+      _packagesLoaded = true;
+    }
+  }
+
+  /// Procura um gene nos pacotes de intervalos do mesmo build.
+  Future<Region?> _geneRegion(String name) async {
+    final packages = await ref.read(packagesForBuildProvider(analysisBuild(widget.analysis.summary)).future);
+    for (final p in packages.where((p) => !p.manifest.isSites)) {
+      final found = await ref.read(genozCoreProvider).findName(package: p.dir, name: name);
+      if (found.isNotEmpty) {
+        final r = found.first;
+        return Region(r.chrom, r.start, r.end);
+      }
+    }
+    return null;
+  }
+
+  Future<void> _applySearch(String text) async {
     final l = AppLocalizations.of(context);
     final notifier = ref.read(tableFilterProvider(widget.analysis.id).notifier);
     final current = ref.read(tableFilterProvider(widget.analysis.id));
@@ -90,6 +130,21 @@ class _TableTabState extends ConsumerState<TableTab> with AutomaticKeepAliveClie
     if (q.isEmpty) {
       notifier.set(current.copyWith(region: () => null, idContains: () => null));
       return;
+    }
+    // Nome de gene (ex.: BRCA2, TP53) vira a região do gene, pelos pacotes de anotação.
+    // rsIDs e nomes de cromossomo não são procurados como gene.
+    final maybeGene = !q.contains(':') &&
+        RegExp(r'^[A-Za-z][A-Za-z0-9.-]+$').hasMatch(q) &&
+        !RegExp(r'^rs\d+$', caseSensitive: false).hasMatch(q) &&
+        !RegExp(r'^(chr)?([0-9]{1,2}|X|Y|MT|M)$', caseSensitive: false).hasMatch(q);
+    if (maybeGene) {
+      final gene = await _geneRegion(q);
+      if (!mounted) return;
+      if (gene != null) {
+        notifier.set(current.copyWith(region: () => gene, idContains: () => null));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.geneFound(q.toUpperCase(), gene.toString()))));
+        return;
+      }
     }
     // Sem ":" e começando com letras (rs123, syn4) é ID; com ":" ou só cromossomo é região.
     final looksLikeId = !q.contains(':') && RegExp(r'^[A-Za-z]{2,}\d').hasMatch(q);
@@ -216,7 +271,8 @@ class _TableTabState extends ConsumerState<TableTab> with AutomaticKeepAliveClie
       child: ListView.builder(
         itemCount: total,
         // Altura fixa (rolagem rápida em milhões de linhas), mas que cresce com a fonte do sistema.
-        itemExtent: max(_rowHeight, 20 + MediaQuery.textScalerOf(context).scale(46)),
+        // Com pacotes de anotação, uma terceira linha (gene, o que a fonte diz).
+        itemExtent: max(_rowHeight, 20 + MediaQuery.textScalerOf(context).scale(_packages.isEmpty ? 46 : 64)),
         itemBuilder: (context, i) {
           final page = i ~/ _pageSize;
           final rows = _pages[page];
@@ -226,8 +282,12 @@ class _TableTabState extends ConsumerState<TableTab> with AutomaticKeepAliveClie
           }
           final idx = i - page * _pageSize;
           if (idx >= rows.length) return const _PlaceholderRow();
+          final hits = _annots[page];
           return _RowTile(
             row: rows[idx],
+            annotation: hits == null || idx >= hits.length
+                ? null
+                : annotationLine(hits[idx], {for (final p in _packages) p.manifest.id: p.manifest}),
             onTap: () => showVariantSheet(context, widget.analysis, rows[idx]),
           );
         },
@@ -262,9 +322,12 @@ class _PlaceholderRow extends StatelessWidget {
 }
 
 class _RowTile extends StatelessWidget {
-  const _RowTile({required this.row, required this.onTap});
+  const _RowTile({required this.row, required this.onTap, this.annotation});
   final ComparisonRow row;
   final VoidCallback onTap;
+
+  /// Gene e o que as fontes dizem, numa linha (ou `null`).
+  final String? annotation;
 
   @override
   Widget build(BuildContext context) {
@@ -295,6 +358,12 @@ class _RowTile extends StatelessWidget {
                     style: t.bodySmall,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (annotation != null && annotation!.isNotEmpty)
+                    Text(
+                      annotation!,
+                      style: t.bodySmall?.copyWith(color: Theme.of(context).colorScheme.primary),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                 ],
               ),
             ),

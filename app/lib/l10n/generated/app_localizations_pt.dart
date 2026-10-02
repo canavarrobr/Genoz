@@ -522,7 +522,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get clearFilters => 'Limpar';
 
   @override
-  String get searchHint => 'chr1:1000, chr7:1M-2M ou rs123';
+  String get searchHint => 'BRCA2, chr7:1M-2M ou rs123';
 
   @override
   String get noRows => 'Nenhuma linha com esses filtros.';
@@ -1333,4 +1333,128 @@ class AppLocalizationsPt extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get annotTitle => 'Anotações';
+
+  @override
+  String get annotIntro =>
+      'Anotação acrescenta o que fontes públicas dizem sobre cada variante e região: genes (GENCODE) e o ClinVar. Tudo é consultado no aparelho. O Genoz não classifica variantes: só mostra o que cada fonte diz, com versão e data.';
+
+  @override
+  String get annotNoInternet =>
+      'O Genoz não tem acesso à internet. Para um pacote do catálogo, baixe o arquivo oficial pelo seu navegador e importe aqui: o app só aceita se a impressão digital (SHA-256) for exatamente a do catálogo.';
+
+  @override
+  String get annotInstalled => 'Instalados';
+
+  @override
+  String get annotCatalog => 'Catálogo (baixar pelo navegador)';
+
+  @override
+  String get annotCustom => 'Pacote próprio';
+
+  @override
+  String get annotCustomImport => 'Importar BED ou TSV';
+
+  @override
+  String get annotCustomHint =>
+      'Ex.: a lista de genes de uma disciplina. BED (0-based) ou TSV com colunas chrom, start, end, nome…';
+
+  @override
+  String get annotCustomName => 'Nome do pacote';
+
+  @override
+  String get annotChooseFile => 'Escolher arquivo';
+
+  @override
+  String get annotBuilding => 'Montando o pacote…';
+
+  @override
+  String get annotChecking =>
+      'Conferindo o SHA-256 e montando o pacote. Arquivos grandes (ClinVar) podem levar alguns minutos.';
+
+  @override
+  String annotInstalledOk(String name, int records) {
+    return 'Pacote \"$name\" instalado ($records registros).';
+  }
+
+  @override
+  String get annotHashMismatch =>
+      'Este arquivo não é o do catálogo (SHA-256 diferente). Nada foi instalado. Confira se baixou o arquivo do link indicado e se o download terminou.';
+
+  @override
+  String annotBuildFailed(String detail) {
+    return 'Não foi possível montar o pacote: $detail';
+  }
+
+  @override
+  String annotRecords(String count) {
+    return '$count registros';
+  }
+
+  @override
+  String get annotEmbedded => 'embutido';
+
+  @override
+  String get annotVersion => 'Versão';
+
+  @override
+  String get annotLicense => 'Licença';
+
+  @override
+  String get annotCitation => 'Como citar';
+
+  @override
+  String get annotSourceUrl => 'Origem';
+
+  @override
+  String get annotHowTo =>
+      '1. Baixe o arquivo pelo navegador. 2. Importe o arquivo baixado aqui. O app confere o SHA-256 antes de usar.';
+
+  @override
+  String get annotOpenBrowser => 'Baixar no navegador';
+
+  @override
+  String get annotCopyUrl => 'Copiar link';
+
+  @override
+  String get annotUrlCopied => 'Link copiado.';
+
+  @override
+  String get annotImportDownloaded => 'Importar arquivo baixado';
+
+  @override
+  String get sourcesTitle => 'O que as fontes dizem';
+
+  @override
+  String sourcesSays(String source, String version, String date) {
+    return '$source · versão $version ($date)';
+  }
+
+  @override
+  String sourcesMore(int count) {
+    return '… e mais $count';
+  }
+
+  @override
+  String get sourcesNoClassification =>
+      'O Genoz não classifica variantes: os textos acima são da fonte indicada, na versão indicada.';
+
+  @override
+  String geneFound(String gene, String region) {
+    return '$gene: $region';
+  }
+
+  @override
+  String get clinvarLicense =>
+      'Uso e redistribuição livres com atribuição ao ClinVar';
+
+  @override
+  String get clinvarDisclaimer =>
+      'O ClinVar não é para uso diagnóstico direto nem decisão médica sem revisão de um profissional de genética; o NIH não verifica as informações enviadas.';
+
+  @override
+  String get gencodeLicense =>
+      'Acesso aberto (EMBL-EBI: sem restrições adicionais; atribuição esperada)';
 }

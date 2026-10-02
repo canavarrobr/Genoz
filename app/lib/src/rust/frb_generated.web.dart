@@ -7,6 +7,7 @@
 // ignore_for_file: argument_type_not_assignable
 
 import 'api/analysis.dart';
+import 'api/annotation.dart';
 import 'api/genoz.dart';
 import 'api/memory.dart';
 
@@ -51,6 +52,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   MemorySide dco_decode_box_autoadd_memory_side(dynamic raw);
 
   @protected
+  BuildReport dco_decode_build_report(dynamic raw);
+
+  @protected
+  BuiltBytes dco_decode_built_bytes(dynamic raw);
+
+  @protected
   CompareEvent dco_decode_compare_event(dynamic raw);
 
   @protected
@@ -70,6 +77,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImportPhase dco_decode_import_phase(dynamic raw);
+
+  @protected
+  List<String> dco_decode_list_String(dynamic raw);
 
   @protected
   List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
@@ -130,6 +140,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   MemorySide sse_decode_box_autoadd_memory_side(SseDeserializer deserializer);
 
   @protected
+  BuildReport sse_decode_build_report(SseDeserializer deserializer);
+
+  @protected
+  BuiltBytes sse_decode_built_bytes(SseDeserializer deserializer);
+
+  @protected
   CompareEvent sse_decode_compare_event(SseDeserializer deserializer);
 
   @protected
@@ -149,6 +165,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImportPhase sse_decode_import_phase(SseDeserializer deserializer);
+
+  @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer);
 
   @protected
   List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
@@ -224,6 +243,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_build_report(BuildReport self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_built_bytes(BuiltBytes self, SseSerializer serializer);
+
+  @protected
   void sse_encode_compare_event(CompareEvent self, SseSerializer serializer);
 
   @protected
@@ -246,6 +271,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_import_phase(ImportPhase self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);

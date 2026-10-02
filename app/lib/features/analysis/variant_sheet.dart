@@ -7,6 +7,7 @@ import '../../persistence/analysis_repository.dart';
 import '../../persistence/database.dart';
 import '../../ui/labels.dart';
 import '../../ui/theme.dart';
+import '../annotation/sources_section.dart';
 
 Future<void> showVariantSheet(BuildContext context, Analysis analysis, ComparisonRow row) => showModalBottomSheet<void>(
       context: context,
@@ -129,6 +130,7 @@ class _VariantSheetState extends ConsumerState<_VariantSheet> {
                 side('B · ${summary.b.sample ?? ''}', r.b),
               ],
             ),
+            SourcesSection(summary: summary, row: r),
             const SizedBox(height: 12),
             TextField(
               controller: _note,

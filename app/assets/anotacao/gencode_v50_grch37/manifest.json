@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "id": "gencode_v50_grch37",
+  "name": "Genes GENCODE v50 (GRCh37)",
+  "kind": "intervals",
+  "build": "GRCh37",
+  "source": "GENCODE",
+  "source_url": "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_50/GRCh37_mapping/gencode.v50lift37.basic.annotation.gtf.gz",
+  "version": "v50lift37",
+  "date": "2026-06-09",
+  "license": "Acesso aberto (EMBL-EBI: sem restrições adicionais; atribuição esperada)",
+  "license_url": "https://www.ebi.ac.uk/about/terms-of-use",
+  "citation": "Mudge JM et al. GENCODE 2025: reference gene annotation for human and mouse. Nucleic Acids Res. 2025. https://www.gencodegenes.org",
+  "disclaimer": "",
+  "fields": [
+    {
+      "key": "gene_id",
+      "label_pt": "ID do gene",
+      "label_en": "Gene ID"
+    },
+    {
+      "key": "gene_type",
+      "label_pt": "Tipo",
+      "label_en": "Type"
+    },
+    {
+      "key": "strand",
+      "label_pt": "Fita",
+      "label_en": "Strand"
+    }
+  ],
+  "records": 80315,
+  "input_sha256": "57e3c7c9fdeb25f53d39d0c71479d780859a3c4d74db08111e7e8163a63b2268",
+  "data_sha256": "68f130d017e2f14d5f7a1b968475a9a044fe4a198e722340a7f44378a13e3112"
+}

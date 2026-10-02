@@ -70,6 +70,20 @@ flutter run
 Na primeira vez a compilação demora alguns minutos, porque o núcleo Rust é compilado para Android.
 No app: **Novo projeto → Gerar exemplo sintético** (ou **Importar VCF**) → toque no arquivo para ver o relatório.
 
+## Anotação local (Módulo 10)
+
+Menu ☰ → **Anotações**. Os genes do **GENCODE v50** (GRCh38 e GRCh37) já vêm no app: na tabela de uma análise,
+cada linha mostra o gene, e a busca aceita o nome do gene (ex.: `BRCA2`). O **ClinVar** do mês está no catálogo:
+o app **não tem permissão de internet**, então o botão abre o navegador para baixar o arquivo oficial do NCBI;
+depois é só importá-lo — o app confere o SHA-256 antes de aceitar. Na ficha da variante, "O que as fontes dizem"
+mostra o que o ClinVar registra, sempre com fonte, versão e data (o Genoz não classifica variantes).
+Também dá para importar um BED/TSV próprio. Pela linha de comando:
+
+```powershell
+genoz-cli anot build --from clinvar clinvar_20260905.vcf.gz --out clinvar38 --id clinvar38 --name ClinVar --build GRCh38 --version 20260905 --date 2026-09-05
+genoz-cli anot query clinvar38 13:32315086-32400268
+```
+
 ## Arquivos de testes de consumidor (Módulo 9)
 
 O botão **Importar** também aceita os arquivos brutos da 23andMe, AncestryDNA, MyHeritage e FamilyTreeDNA
