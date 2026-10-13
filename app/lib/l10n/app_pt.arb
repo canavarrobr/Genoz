@@ -1272,5 +1272,84 @@
   "ob2Body": "Os arquivos são processados aqui mesmo: o app Android nem tem permissão de internet, e o site não envia nada. Você pode conferir em Verificar privacidade e proteger projetos com senha.",
   "ob3Title": "Educação e pesquisa — não é diagnóstico",
   "ob3Body": "Os resultados dependem da qualidade dos arquivos e não substituem exames nem aconselhamento genético. O Genoz não classifica variantes: mostra o que as fontes dizem, sempre com a fonte.",
-  "aboutOnboarding": "Ver a apresentação de novo"
+  "aboutOnboarding": "Ver a apresentação de novo",
+  "mapOnlyWithData": "Só cromossomos com variantes ({count} de {total})",
+  "@mapOnlyWithData": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "total": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "analysisActions": "Compartilhar e verificar",
+  "exportData": "Exportar dados (CSV, TSV, JSON, VCF)",
+  "qcQuickTitle": "Leitura rápida da qualidade",
+  "qcFewSnvs": "{side}: poucos SNVs para julgar o Ti/Tv.",
+  "@qcFewSnvs": {
+    "placeholders": {
+      "side": {
+        "type": "String"
+      }
+    }
+  },
+  "qcTiTvOk": "{side}: Ti/Tv {value}, dentro do esperado (~2 em genoma, ~3 em exoma).",
+  "@qcTiTvOk": {
+    "placeholders": {
+      "side": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "qcTiTvLow": "{side}: Ti/Tv {value}, abaixo do esperado — pode haver muitas chamadas falsas (ou os dados são sintéticos).",
+  "@qcTiTvLow": {
+    "placeholders": {
+      "side": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "qcTiTvHigh": "{side}: Ti/Tv {value}, acima do esperado — comum em painéis pequenos; confira a origem dos dados.",
+  "@qcTiTvHigh": {
+    "placeholders": {
+      "side": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "qcMissingOk": "{side}: {value} de chamadas ausentes — baixo.",
+  "@qcMissingOk": {
+    "placeholders": {
+      "side": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "qcMissingHigh": "{side}: {value} de chamadas ausentes — alto; o que é compartilhado pode estar subestimado.",
+  "@qcMissingHigh": {
+    "placeholders": {
+      "side": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  }
 }

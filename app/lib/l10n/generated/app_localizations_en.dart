@@ -2143,4 +2143,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutOnboarding => 'See the introduction again';
+
+  @override
+  String mapOnlyWithData(int count, int total) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return 'Only chromosomes with variants ($countString of $totalString)';
+  }
+
+  @override
+  String get analysisActions => 'Share and verify';
+
+  @override
+  String get exportData => 'Export data (CSV, TSV, JSON, VCF)';
+
+  @override
+  String get qcQuickTitle => 'Quality at a glance';
+
+  @override
+  String qcFewSnvs(String side) {
+    return '$side: too few SNVs to judge Ti/Tv.';
+  }
+
+  @override
+  String qcTiTvOk(String side, String value) {
+    return '$side: Ti/Tv $value, as expected (~2 genome, ~3 exome).';
+  }
+
+  @override
+  String qcTiTvLow(String side, String value) {
+    return '$side: Ti/Tv $value, below expected — there may be many false calls (or the data is synthetic).';
+  }
+
+  @override
+  String qcTiTvHigh(String side, String value) {
+    return '$side: Ti/Tv $value, above expected — common in small panels; check where the data came from.';
+  }
+
+  @override
+  String qcMissingOk(String side, String value) {
+    return '$side: $value missing calls — low.';
+  }
+
+  @override
+  String qcMissingHigh(String side, String value) {
+    return '$side: $value missing calls — high; what is shared may be underestimated.';
+  }
 }

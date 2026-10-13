@@ -60,6 +60,9 @@ class _MapTabState extends ConsumerState<MapTab> {
   /// Vazio = todas as categorias.
   Set<String> _selected = {};
 
+  /// Mostrar só os cromossomos com variantes (padrão quando há cromossomos vazios).
+  bool _onlyWithData = true;
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -72,7 +75,11 @@ class _MapTabState extends ConsumerState<MapTab> {
       data: (map) {
         final s = widget.analysis.summary;
         final build = s.a.build.build;
-        final chroms = ideogramChroms(build, map);
+        final all = ideogramChroms(build, map);
+        final withData = [for (final c in all) if ((c.density?.countFor(const {}) ?? 0) > 0) c];
+        // Exemplo só nos cromossomos 20–22: abrir nos 24 parece vazio. Os com dados primeiro.
+        final hideEmpty = _onlyWithData && withData.isNotEmpty && withData.length < all.length;
+        final chroms = hideEmpty ? withData : all;
         final maxLen = chroms.fold<int>(1, (m, c) => math.max(m, c.length));
         final maxBin = chroms.fold<int>(
           1,
@@ -108,6 +115,16 @@ class _MapTabState extends ConsumerState<MapTab> {
                 ],
               ),
             ),
+            if (withData.isNotEmpty && withData.length < all.length)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                child: FilterChip(
+                  avatar: const Icon(Icons.visibility_outlined, size: 18),
+                  label: Text(l.mapOnlyWithData(withData.length, all.length)),
+                  selected: _onlyWithData,
+                  onSelected: (on) => setState(() => _onlyWithData = on),
+                ),
+              ),
             if (build != 'GRCh37' && build != 'GRCh38')
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),

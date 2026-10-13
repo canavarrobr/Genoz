@@ -116,8 +116,10 @@ void main() {
       await tester.pumpAndSettle();
     }
     await tester.tap(find.text('Experimentar com dados fictícios'));
-    // Criação do projeto e importação usam E/S real.
-    for (var i = 0; i < 40; i++) {
+    // Criação do projeto e importação usam E/S real: espera o arquivo aparecer no banco (com limite).
+    for (var i = 0; i < 200; i++) {
+      final n = (await tester.runAsync(() => env.db.select(env.db.projectFiles).get()))!.length;
+      if (n > 0) break;
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 25)));
       await tester.pump(const Duration(milliseconds: 50));
     }

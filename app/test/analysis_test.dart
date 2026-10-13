@@ -178,8 +178,8 @@ void main() {
     expect(find.text('PESSOA_A × PESSOA_B'), findsOneWidget);
     expect(find.text('12 linhas'), findsOneWidget);
     expect(find.text('Somente em A'), findsWidgets);
-    await tester.scrollUntilVisible(find.text('83.3%'), 200, scrollable: find.byType(Scrollable).last);
-    expect(find.text('83.3%'), findsOneWidget); // concordância 5/6
+    await tester.scrollUntilVisible(find.text('83,3%'), 200, scrollable: find.byType(Scrollable).last);
+    expect(find.text('83,3%'), findsOneWidget); // concordância 5/6
 
     await tester.tap(find.text('Tabela'));
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));

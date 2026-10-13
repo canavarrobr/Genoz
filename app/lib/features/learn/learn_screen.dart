@@ -58,7 +58,9 @@ class LearnScreen extends ConsumerWidget {
                       const SizedBox(height: 4),
                       Text(
                         l.learnProgress(progress.correct(lesson.id), lesson.exercises.length),
-                        style: t.labelMedium?.copyWith(color: context.palette.success),
+                        style: t.labelMedium?.copyWith(
+                          color: progress.correct(lesson.id) > 0 ? context.palette.success : t.bodySmall?.color,
+                        ),
                       ),
                     ],
                   ),

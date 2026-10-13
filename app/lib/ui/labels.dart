@@ -1,6 +1,7 @@
 // Tradução dos códigos que vêm do núcleo (snake_case) para textos da interface.
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' show NumberFormat;
 
 import '../core/inspect_report.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -98,7 +99,17 @@ IconData categoryIcon(String code) => switch (code) {
       _ => Icons.block,
     };
 
-String percent(double? v) => v == null ? '—' : '${(v * 100).toStringAsFixed(1)}%';
+String _locale(BuildContext c) => Localizations.localeOf(c).toString();
+
+/// Inteiro com separador de milhar do idioma (1.728 / 1,728).
+String fmtInt(BuildContext c, int n) => NumberFormat.decimalPattern(_locale(c)).format(n);
+
+/// Decimal com casas fixas e vírgula/ponto do idioma.
+String fmtDec(BuildContext c, double v, int digits) =>
+    NumberFormat.decimalPatternDigits(locale: _locale(c), decimalDigits: digits).format(v);
+
+/// Porcentagem com uma casa, no formato do idioma (59,6% / 59.6%).
+String percent(BuildContext c, double? v) => v == null ? '—' : '${fmtDec(c, v * 100, 1)}%';
 
 String formatBytes(int bytes) {
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];

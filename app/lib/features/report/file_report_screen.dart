@@ -130,10 +130,10 @@ class _ReportBody extends StatelessWidget {
                   for (final s in r.samples)
                     DataRow(cells: [
                       DataCell(Text(s.name)),
-                      DataCell(Text('${s.homRef}')),
-                      DataCell(Text('${s.het}')),
-                      DataCell(Text('${s.homAlt}')),
-                      DataCell(Text('${s.missing}')),
+                      DataCell(Text(fmt.format(s.homRef))),
+                      DataCell(Text(fmt.format(s.het))),
+                      DataCell(Text(fmt.format(s.homAlt))),
+                      DataCell(Text(fmt.format(s.missing))),
                     ]),
                 ],
               ),
@@ -141,7 +141,7 @@ class _ReportBody extends StatelessWidget {
           ]),
         if (vcf)
           _Section(title: l.sectionKinds, children: [
-            for (final e in r.byKind.entries) _Field(l.kind(e.key), '${e.value}'),
+            for (final e in r.byKind.entries) _Field(l.kind(e.key), fmt.format(e.value)),
           ]),
         if (r.kind != FileKind.fasta)
           _Section(title: l.sectionChromosomes, children: [
@@ -150,7 +150,7 @@ class _ReportBody extends StatelessWidget {
             child: Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: [for (final ch in r.byChrom) Chip(label: Text('${ch.raw}: ${ch.records}'))],
+              children: [for (final ch in r.byChrom) Chip(label: Text('${ch.raw}: ${fmt.format(ch.records)}'))],
             ),
           ),
         ]),

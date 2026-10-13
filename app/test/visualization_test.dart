@@ -114,8 +114,11 @@ void main() {
     await settle(tester);
     expect(find.byType(MapTab), findsOneWidget);
     expect(find.bySemanticsLabel('Cromossomo 1: 12 variantes. Toque para ver a região.'), findsOneWidget);
-    // Cromossomo sem variantes também aparece (GRCh38 = 24).
+    // Abre só nos cromossomos com variantes; o chip mostra todos (GRCh38 = 24).
     final mapList = find.descendant(of: find.byType(MapTab), matching: find.byType(Scrollable)).first;
+    expect(find.bySemanticsLabel(RegExp('Cromossomo Y: 0 variantes')), findsNothing);
+    await tester.tap(find.textContaining('Só cromossomos com variantes (1 de 24)'));
+    await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.bySemanticsLabel(RegExp('Cromossomo Y: 0 variantes')), 300, scrollable: mapList);
 
     // Filtra "Somente em A": o cromossomo 1 passa a ter 4.

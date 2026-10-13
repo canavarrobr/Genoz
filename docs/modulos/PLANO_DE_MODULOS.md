@@ -572,3 +572,25 @@ Testes: 118 Dart, 134 Rust (núcleo e CLI) + 7 da ponte. Decisões em [ADR-018](
 **Invariantes:** nada do que já funciona muda de resultado (IDs de análise e hashes dourados iguais); nada sai do aparelho.
 
 **Testes:** acessibilidade (diretrizes), onboarding (primeira vez × depois), traduções (chaves iguais nos dois idiomas), benchmarks executados e registrados, auditorias executadas no CI.
+
+## Contrato da Renovação de design e usabilidade (Módulo 13, parte 2 — antes de implementar)
+
+**Origem:** avaliação de 13/10/2026 (documento "Genoz — Avaliação de design e usabilidade"), aprovada pelo usuário. O 1.0 **não** será lançado agora. **A logo do Genoz não muda** (símbolo, nome, assinatura). O emulador fica aberto para o usuário ao fim de cada fase.
+
+**Fase 1 — correções rápidas:** números sempre formatados (barras, QC, tabelas, mapa); Mapa abre/destaca os cromossomos com dados; títulos e rótulos sem corte (duas linhas onde couber); ícones da barra da análise com nome; progresso do Aprender neutro quando zerado; semáforo no QC (dentro/fora do esperado, com o porquê).
+
+**Fase 2 — navegação e linguagem:**
+- barra inferior com 4 destinos fixos — Início, Projetos, Aprender, Ajustes (Anotações, Privacidade e Sobre dentro de Ajustes); o menu lateral sai;
+- **Início** novo: 3 caminhos (Aprender genética, Comparar duas pessoas, Estudar uma família), últimas análises, cartão "Próximo passo" conforme o que a pessoa já fez;
+- **modo Simples (padrão) × Especialista** (Ajustes e topo das telas de resultado): o Simples esconde QC, filtros, portão de qualidade e jargão ("uma cópia / duas cópias");
+- **frase-resumo** gerada no aparelho em cada resultado (comparação, família, ficha da variante), sem afirmações clínicas;
+- **glossário no lugar**: termos técnicos tocáveis abrem a definição numa folha;
+- Projeto com **um botão principal** conforme o estado; dados fictícios num menu próprio; Comparar com "Avançado" recolhido.
+
+**Fase 3 — visual:** família de ilustrações em vetor (DNA, cromossomo, duas pessoas, família, cadeado) no estilo do símbolo, sem imagens externas e sem tocar no logo; cromossomos desenhados no Mapa; ficha da variante com "duas pessoas"; árvore genealógica desenhada na Família; mais contraste entre fundo e cartões; transições curtas.
+
+**Features novas aprovadas:** liftover local GRCh37 ↔ GRCh38 (cadeias de conversão embutidas, compara chip GRCh37 × VCF GRCh38 em vez de recusar; sítios que não convertem são contados e explicados); trilha "Família e parentesco" no Aprender (respostas calculadas, como as outras).
+
+**Invariantes:** nenhum resultado científico muda (IDs de análise e hashes dourados iguais; o liftover só entra quando o build difere e é registrado no manifesto); nada sai do aparelho; acessibilidade (testes de diretrizes) continua passando em claro e escuro; pt-BR e inglês completos.
+
+**Testes:** cada fase com testes de widget (navegação, modos, frases-resumo calculadas, glossário), testes de acessibilidade estendidos às telas novas, liftover com casos conhecidos e com a fixture de chip; verificação no emulador e no navegador ao fim de cada fase.

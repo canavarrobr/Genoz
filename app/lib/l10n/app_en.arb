@@ -541,5 +541,15 @@
   "ob2Body": "Files are processed right here: the Android app does not even have internet permission, and the website sends nothing. You can check it in Check privacy and protect projects with a password.",
   "ob3Title": "Education and research — not a diagnosis",
   "ob3Body": "Results depend on the quality of the files and do not replace medical tests or genetic counselling. Genoz does not classify variants: it shows what the sources say, always citing the source.",
-  "aboutOnboarding": "See the introduction again"
+  "aboutOnboarding": "See the introduction again",
+  "mapOnlyWithData": "Only chromosomes with variants ({count} of {total})",
+  "analysisActions": "Share and verify",
+  "exportData": "Export data (CSV, TSV, JSON, VCF)",
+  "qcQuickTitle": "Quality at a glance",
+  "qcFewSnvs": "{side}: too few SNVs to judge Ti/Tv.",
+  "qcTiTvOk": "{side}: Ti/Tv {value}, as expected (~2 genome, ~3 exome).",
+  "qcTiTvLow": "{side}: Ti/Tv {value}, below expected — there may be many false calls (or the data is synthetic).",
+  "qcTiTvHigh": "{side}: Ti/Tv {value}, above expected — common in small panels; check where the data came from.",
+  "qcMissingOk": "{side}: {value} missing calls — low.",
+  "qcMissingHigh": "{side}: {value} missing calls — high; what is shared may be underestimated."
 }

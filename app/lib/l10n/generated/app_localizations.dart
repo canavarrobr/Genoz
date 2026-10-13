@@ -3356,6 +3356,66 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Ver a apresentação de novo'**
   String get aboutOnboarding;
+
+  /// No description provided for @mapOnlyWithData.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só cromossomos com variantes ({count} de {total})'**
+  String mapOnlyWithData(int count, int total);
+
+  /// No description provided for @analysisActions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar e verificar'**
+  String get analysisActions;
+
+  /// No description provided for @exportData.
+  ///
+  /// In pt, this message translates to:
+  /// **'Exportar dados (CSV, TSV, JSON, VCF)'**
+  String get exportData;
+
+  /// No description provided for @qcQuickTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Leitura rápida da qualidade'**
+  String get qcQuickTitle;
+
+  /// No description provided for @qcFewSnvs.
+  ///
+  /// In pt, this message translates to:
+  /// **'{side}: poucos SNVs para julgar o Ti/Tv.'**
+  String qcFewSnvs(String side);
+
+  /// No description provided for @qcTiTvOk.
+  ///
+  /// In pt, this message translates to:
+  /// **'{side}: Ti/Tv {value}, dentro do esperado (~2 em genoma, ~3 em exoma).'**
+  String qcTiTvOk(String side, String value);
+
+  /// No description provided for @qcTiTvLow.
+  ///
+  /// In pt, this message translates to:
+  /// **'{side}: Ti/Tv {value}, abaixo do esperado — pode haver muitas chamadas falsas (ou os dados são sintéticos).'**
+  String qcTiTvLow(String side, String value);
+
+  /// No description provided for @qcTiTvHigh.
+  ///
+  /// In pt, this message translates to:
+  /// **'{side}: Ti/Tv {value}, acima do esperado — comum em painéis pequenos; confira a origem dos dados.'**
+  String qcTiTvHigh(String side, String value);
+
+  /// No description provided for @qcMissingOk.
+  ///
+  /// In pt, this message translates to:
+  /// **'{side}: {value} de chamadas ausentes — baixo.'**
+  String qcMissingOk(String side, String value);
+
+  /// No description provided for @qcMissingHigh.
+  ///
+  /// In pt, this message translates to:
+  /// **'{side}: {value} de chamadas ausentes — alto; o que é compartilhado pode estar subestimado.'**
+  String qcMissingHigh(String side, String value);
 }
 
 class _AppLocalizationsDelegate

@@ -10,6 +10,7 @@ import '../../ui/labels.dart';
 import '../../ui/theme.dart';
 import '../learn/teacher_package_screen.dart';
 import 'export_sheet.dart';
+import 'report_actions.dart';
 import 'intersection_diagram.dart';
 import 'map_tab.dart';
 import 'table_tab.dart';
@@ -46,19 +47,33 @@ class AnalysisScreen extends ConsumerWidget {
           initialIndex: initialTab,
           child: Scaffold(
             appBar: AppBar(
-              title: Text(title, overflow: TextOverflow.ellipsis),
+              title: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              ),
               actions: [
-                IconButton(
-                  tooltip: l.packageCreateTitle,
-                  icon: const Icon(Icons.co_present_outlined),
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(builder: (_) => TeacherPackageScreen(analysis: a)),
-                  ),
-                ),
-                IconButton(
-                  tooltip: l.export,
-                  icon: const Icon(Icons.file_download_outlined),
-                  onPressed: () => showExportSheet(context, ref, a),
+                // Ações com nome (antes eram dois ícones sem rótulo).
+                PopupMenuButton<String>(
+                  tooltip: l.analysisActions,
+                  icon: const Icon(Icons.ios_share),
+                  onSelected: (v) => switch (v) {
+                    'export' => showExportSheet(context, ref, a),
+                    'html' => saveAnalysisReport(context, ref, a, pdf: false),
+                    'pdf' => saveAnalysisReport(context, ref, a, pdf: true),
+                    'verify' => verifyReproducibilityFlow(context, ref, a),
+                    _ => Navigator.of(context).push(
+                        MaterialPageRoute<void>(builder: (_) => TeacherPackageScreen(analysis: a)),
+                      ),
+                  },
+                  itemBuilder: (_) => [
+                    PopupMenuItem(value: 'export', child: ListTile(leading: const Icon(Icons.table_chart_outlined), title: Text(l.exportData))),
+                    PopupMenuItem(value: 'pdf', child: ListTile(leading: const Icon(Icons.picture_as_pdf_outlined), title: Text(l.reportPdf))),
+                    PopupMenuItem(value: 'html', child: ListTile(leading: const Icon(Icons.html_outlined), title: Text(l.reportHtml))),
+                    PopupMenuItem(value: 'verify', child: ListTile(leading: const Icon(Icons.verified_outlined), title: Text(l.reproVerify))),
+                    PopupMenuItem(value: 'lesson', child: ListTile(leading: const Icon(Icons.co_present_outlined), title: Text(l.packageCreateTitle))),
+                  ],
                 ),
               ],
               bottom: TabBar(tabs: [Tab(text: l.tabSummary), Tab(text: l.tabTable), Tab(text: l.tabMap), Tab(text: l.tabQc)]),
@@ -102,13 +117,13 @@ class _ChipCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(l.chipCompareRestricted, style: t.bodySmall),
             const SizedBox(height: 8),
-            row(l.chipSites, '${chip.sites}'),
-            row(l.chipNoCalls, '${chip.noCalls}'),
-            row(l.chipCompareNonref, percent(chip.nonrefConcordance)),
-            row(l.chipCompareOffChip, '${chip.vcfVariantsOffChip}'),
-            if (!chip.referenceUsed || chip.unknownReference > 0) row(l.chipCompareUnknownRef, '${chip.unknownReference}'),
-            if (chip.referenceUsed) row(l.chipCompareRefNotAssessed, '${chip.referenceNotAssessed}'),
-            if (chip.possibleStrandFlips > 0) row(l.chipCompareStrandFlips, '${chip.possibleStrandFlips}'),
+            row(l.chipSites, fmtInt(context, chip.sites)),
+            row(l.chipNoCalls, fmtInt(context, chip.noCalls)),
+            row(l.chipCompareNonref, percent(context, chip.nonrefConcordance)),
+            row(l.chipCompareOffChip, fmtInt(context, chip.vcfVariantsOffChip)),
+            if (!chip.referenceUsed || chip.unknownReference > 0) row(l.chipCompareUnknownRef, fmtInt(context, chip.unknownReference)),
+            if (chip.referenceUsed) row(l.chipCompareRefNotAssessed, fmtInt(context, chip.referenceNotAssessed)),
+            if (chip.possibleStrandFlips > 0) row(l.chipCompareStrandFlips, fmtInt(context, chip.possibleStrandFlips)),
           ],
         ),
       ),
@@ -150,8 +165,8 @@ class _SummaryTab extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                Expanded(child: _Metric(label: l.concordance, value: percent(s.genotypeConcordance))),
-                Expanded(child: _Metric(label: l.jaccard, value: percent(s.jaccard))),
+                Expanded(child: _Metric(label: l.concordance, value: percent(context, s.genotypeConcordance))),
+                Expanded(child: _Metric(label: l.jaccard, value: percent(context, s.jaccard))),
               ],
             ),
           ),
@@ -181,9 +196,9 @@ class _SummaryTab extends StatelessWidget {
                       ])
                         TableRow(children: [
                           Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Text(name)),
-                          Text(percent(m.precision)),
-                          Text(percent(m.recall)),
-                          Text(percent(m.f1)),
+                          Text(percent(context, m.precision)),
+                          Text(percent(context, m.recall)),
+                          Text(percent(context, m.f1)),
                         ]),
                     ],
                   ),
@@ -254,7 +269,7 @@ class _CategoryBar extends StatelessWidget {
         children: [
           Icon(categoryIcon(code), size: 20, color: color),
           const SizedBox(width: 8),
-          Expanded(flex: 5, child: Text(label, overflow: TextOverflow.ellipsis)),
+          Expanded(flex: 5, child: Text(label, maxLines: 2, overflow: TextOverflow.ellipsis)),
           const SizedBox(width: 8),
           Expanded(
             flex: 4,
@@ -263,7 +278,7 @@ class _CategoryBar extends StatelessWidget {
               child: LinearProgressIndicator(value: value / max, minHeight: 10, color: color),
             ),
           ),
-          SizedBox(width: 64, child: Text('$value', textAlign: TextAlign.end)),
+          SizedBox(width: 72, child: Text(fmtInt(context, value), textAlign: TextAlign.end)),
         ],
       ),
     );
@@ -301,30 +316,91 @@ class _QcTab extends ConsumerWidget {
       error: (e, _) => Center(child: Text('$e')),
       data: (pair) {
         final (a, b) = pair;
-        String ratio(double? v) => v == null ? '—' : v.toStringAsFixed(2);
+        String ratio(double? v) => v == null ? '—' : fmtDec(context, v, 2);
         return ListView(
           padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
+            _QcQuick(flags: [...qcFlags(context, 'A', a), ...qcFlags(context, 'B', b)]),
             _CompareTable(rows: [
-              (l.carriers, '${a.carriers}', '${b.carriers}'),
+              (l.carriers, fmtInt(context, a.carriers), fmtInt(context, b.carriers)),
               ('Ti/Tv', ratio(a.tiTv), ratio(b.tiTv)),
               (l.hetHom, ratio(a.hetHomRatio), ratio(b.hetHomRatio)),
-              (l.missingRate, percent(a.missingRate), percent(b.missingRate)),
-              (l.lowQualityCount, '${a.lowQuality}', '${b.lowQuality}'),
+              (l.missingRate, percent(context, a.missingRate), percent(context, b.missingRate)),
+              (l.lowQualityCount, fmtInt(context, a.lowQuality), fmtInt(context, b.lowQuality)),
               for (final k in kindCodes)
-                if ((a.byKind[k] ?? 0) + (b.byKind[k] ?? 0) > 0) (l.kind(k), '${a.byKind[k] ?? 0}', '${b.byKind[k] ?? 0}'),
+                if ((a.byKind[k] ?? 0) + (b.byKind[k] ?? 0) > 0) (l.kind(k), fmtInt(context, a.byKind[k] ?? 0), fmtInt(context, b.byKind[k] ?? 0)),
             ], footnote: l.tiTvHint),
             _Histogram(title: l.dpDistribution, a: a.dpHist, b: b.dpHist),
             _Histogram(title: l.gqDistribution, a: a.gqHist, b: b.gqHist),
             _Histogram(title: l.qualDistribution, a: a.qualHist, b: b.qualHist),
             if (a.xHetFraction != null || b.xHetFraction != null)
               _CompareTable(
-                rows: [(l.xHet, percent(a.xHetFraction), percent(b.xHetFraction))],
+                rows: [(l.xHet, percent(context, a.xHetFraction), percent(context, b.xHetFraction))],
                 footnote: l.xHetHint,
               ),
           ],
         );
       },
+    );
+  }
+}
+
+/// Semáforo do QC: o que está dentro ou fora do esperado, em uma frase (true = dentro).
+List<(bool, String)> qcFlags(BuildContext context, String side, SampleStats s) {
+  final l = AppLocalizations.of(context);
+  final out = <(bool, String)>[];
+  final snvs = s.byKind['snv'] ?? 0;
+  final tiTv = s.tiTv;
+  if (snvs < 500 || tiTv == null) {
+    out.add((true, l.qcFewSnvs(side)));
+  } else {
+    final v = fmtDec(context, tiTv, 2);
+    out.add(tiTv < 1.8
+        ? (false, l.qcTiTvLow(side, v))
+        : tiTv > 3.3
+            ? (false, l.qcTiTvHigh(side, v))
+            : (true, l.qcTiTvOk(side, v)));
+  }
+  final miss = s.missingRate;
+  if (miss != null) {
+    final v = percent(context, miss);
+    out.add(miss > 0.05 ? (false, l.qcMissingHigh(side, v)) : (true, l.qcMissingOk(side, v)));
+  }
+  return out;
+}
+
+class _QcQuick extends StatelessWidget {
+  const _QcQuick({required this.flags});
+  final List<(bool, String)> flags;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final pal = context.palette;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l.qcQuickTitle, style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 8),
+            for (final (ok, text) in flags)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(ok ? Icons.check_circle_outline : Icons.warning_amber_rounded,
+                        size: 20, color: ok ? pal.success : pal.warning),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(text)),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -418,7 +494,7 @@ class _Histogram extends StatelessWidget {
                     SizedBox(
                       width: 72,
                       child: Text(
-                        '${a[i].count} / ${i < b.length ? b[i].count : 0}',
+                        '${fmtInt(context, a[i].count)} / ${fmtInt(context, i < b.length ? b[i].count : 0)}',
                         style: t.bodySmall,
                         textAlign: TextAlign.end,
                       ),
