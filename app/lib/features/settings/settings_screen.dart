@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../../platform/device_security.dart';
+import '../../platform/storage_persistence.dart';
 import '../../ui/brand.dart';
 import '../../ui/theme.dart';
 import 'lock.dart';
@@ -152,6 +153,16 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ],
           section(l.settingsData),
+          // Só no navegador: o site pode perder os dados se o navegador precisar de espaço.
+          if (ref.watch(persistentStorageProvider).value case final granted?)
+            Card(
+              child: ListTile(
+                leading: Icon(granted ? Icons.verified_outlined : Icons.warning_amber_outlined,
+                    color: granted ? context.palette.success : context.palette.warning),
+                title: Text(granted ? l.storagePersistent : l.storageNotPersistent),
+                subtitle: Text(l.storagePersistentHint),
+              ),
+            ),
           Card(
             child: ListTile(
               leading: Icon(Icons.delete_forever, color: context.palette.error),

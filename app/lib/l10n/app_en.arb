@@ -526,5 +526,20 @@
   "logFamily": "Family and populations: {count} samples",
   "familyQuality": "Quality gate (failed call = missing)",
   "trioEventDeNovo": "De novo candidate",
-  "trioEventError": "Mendelian error"
+  "trioEventError": "Mendelian error",
+  "storagePersistent": "Persistent storage granted",
+  "storageNotPersistent": "The browser may delete this site's data",
+  "storagePersistentHint": "Your data stays only in this browser. If space runs out, some browsers delete site data; to keep a copy, use Export project (.genoz).",
+  "obSkip": "Skip",
+  "obNext": "Next",
+  "obStart": "Get started",
+  "obDemo": "Try it with fictional data",
+  "obDemoProject": "Example",
+  "ob1Title": "Compare, explore and learn",
+  "ob1Body": "Genoz reads VCF files and ancestry test files, compares samples, shows data quality, genes and what public databases say — and teaches genetics with fictional data.",
+  "ob2Title": "Everything stays on your device",
+  "ob2Body": "Files are processed right here: the Android app does not even have internet permission, and the website sends nothing. You can check it in Check privacy and protect projects with a password.",
+  "ob3Title": "Education and research — not a diagnosis",
+  "ob3Body": "Results depend on the quality of the files and do not replace medical tests or genetic counselling. Genoz does not classify variants: it shows what the sources say, always citing the source.",
+  "aboutOnboarding": "See the introduction again"
 }

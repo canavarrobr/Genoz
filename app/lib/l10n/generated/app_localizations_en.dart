@@ -61,10 +61,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String filesCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count files',
+      other: '$countString files',
       one: '1 file',
       zero: 'no files',
     );
@@ -152,10 +156,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String samplesCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count samples',
+      other: '$countString samples',
       one: '1 sample',
       zero: 'sites only',
     );
@@ -164,7 +172,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String variantsCount(int count) {
-    return '$count variants';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString variants';
   }
 
   @override
@@ -217,17 +229,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String recordsSummary(int ok, int read, int rejected) {
-    return '$ok valid of $read ($rejected discarded)';
+    final intl.NumberFormat okNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String okString = okNumberFormat.format(ok);
+    final intl.NumberFormat readNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String readString = readNumberFormat.format(read);
+    final intl.NumberFormat rejectedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String rejectedString = rejectedNumberFormat.format(rejected);
+
+    return '$okString valid of $readString ($rejectedString discarded)';
   }
 
   @override
   String multiallelicSummary(int multi, int split) {
-    return '$multi → $split biallelic records';
+    final intl.NumberFormat multiNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String multiString = multiNumberFormat.format(multi);
+    final intl.NumberFormat splitNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String splitString = splitNumberFormat.format(split);
+
+    return '$multiString → $splitString biallelic records';
   }
 
   @override
   String filterSummary(int pass, int failed, int missing) {
-    return 'PASS $pass · filtered $failed · no filter $missing';
+    final intl.NumberFormat passNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String passString = passNumberFormat.format(pass);
+    final intl.NumberFormat failedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failedString = failedNumberFormat.format(failed);
+    final intl.NumberFormat missingNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String missingString = missingNumberFormat.format(missing);
+
+    return 'PASS $passString · filtered $failedString · no filter $missingString';
   }
 
   @override
@@ -258,7 +300,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String problemsCount(int errors, int warnings) {
-    return '$errors errors · $warnings warnings';
+    final intl.NumberFormat errorsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String errorsString = errorsNumberFormat.format(errors);
+    final intl.NumberFormat warningsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String warningsString = warningsNumberFormat.format(warnings);
+
+    return '$errorsString errors · $warningsString warnings';
   }
 
   @override
@@ -270,7 +319,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String lineNumber(int n) {
-    return 'line $n';
+    final intl.NumberFormat nNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String nString = nNumberFormat.format(n);
+
+    return 'line $nString';
   }
 
   @override
@@ -509,7 +563,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String rowsCount(int count) {
-    return '$count rows';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString rows';
   }
 
   @override
@@ -628,12 +686,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String exportFiltered(int count) {
-    return 'Exports the $count rows of the current filter, with the reproducibility manifest.';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Exports the $countString rows of the current filter, with the reproducibility manifest.';
   }
 
   @override
   String exportDone(int count) {
-    return '$count rows exported.';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString rows exported.';
   }
 
   @override
@@ -673,7 +739,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String logExport(String format, int count) {
-    return '$format export: $count rows';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$format export: $countString rows';
   }
 
   @override
@@ -794,12 +864,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String checkOwnSite(int count) {
-    return '$count to this site (loading the app)';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString to this site (loading the app)';
   }
 
   @override
   String checkExternal(int count) {
-    return '$count to other addresses';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString to other addresses';
   }
 
   @override
@@ -822,7 +900,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String webTooLargeHint(int mb) {
-    return 'In the browser each file can be up to $mb MB. For larger files, use the Android app.';
+    final intl.NumberFormat mbNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String mbString = mbNumberFormat.format(mb);
+
+    return 'In the browser each file can be up to $mbString MB. For larger files, use the Android app.';
   }
 
   @override
@@ -873,7 +956,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String minutes(int count) {
-    return '$count min';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString min';
   }
 
   @override
@@ -933,7 +1020,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String lockWait(int seconds) {
-    return 'Too many attempts. Wait $seconds s.';
+    final intl.NumberFormat secondsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String secondsString = secondsNumberFormat.format(seconds);
+
+    return 'Too many attempts. Wait $secondsString s.';
   }
 
   @override
@@ -954,7 +1045,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String pinDigitsEntered(int count) {
-    return '$count digits entered';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString digits entered';
   }
 
   @override
@@ -999,7 +1094,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String mapChromSemantics(String chrom, int count) {
-    return 'Chromosome $chrom: $count variants. Tap to see the region.';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Chromosome $chrom: $countString variants. Tap to see the region.';
   }
 
   @override
@@ -1018,7 +1117,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String regionTrackSemantics(String region, int count) {
-    return 'Track of region $region with $count variants. Double-tap to zoom in; drag sideways to move.';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Track of region $region with $countString variants. Double-tap to zoom in; drag sideways to move.';
   }
 
   @override
@@ -1026,12 +1129,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String regionShowing(int shown, int total) {
-    return 'Showing $shown of $total variants — zoom in to see all.';
+    final intl.NumberFormat shownNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String shownString = shownNumberFormat.format(shown);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return 'Showing $shownString of $totalString variants — zoom in to see all.';
   }
 
   @override
   String regionCount(int count) {
-    return '$count variants in this stretch';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString variants in this stretch';
   }
 
   @override
@@ -1049,7 +1163,22 @@ class AppLocalizationsEn extends AppLocalizations {
     int diff,
     int onlyB,
   ) {
-    return 'Intersection diagram: $onlyA variants only in $a, $both in both ($diff with a different genotype), $onlyB only in $b.';
+    final intl.NumberFormat onlyANumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String onlyAString = onlyANumberFormat.format(onlyA);
+    final intl.NumberFormat bothNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String bothString = bothNumberFormat.format(both);
+    final intl.NumberFormat diffNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String diffString = diffNumberFormat.format(diff);
+    final intl.NumberFormat onlyBNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String onlyBString = onlyBNumberFormat.format(onlyB);
+
+    return 'Intersection diagram: $onlyAString variants only in $a, $bothString in both ($diffString with a different genotype), $onlyBString only in $b.';
   }
 
   @override
@@ -1062,12 +1191,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String vennBreakdown(int same, int diff) {
-    return '$same equal · $diff different genotype';
+    final intl.NumberFormat sameNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String sameString = sameNumberFormat.format(same);
+    final intl.NumberFormat diffNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String diffString = diffNumberFormat.format(diff);
+
+    return '$sameString equal · $diffString different genotype';
   }
 
   @override
   String vennOutside(int missing, int notAssessed) {
-    return 'Outside the diagram: $missing missing/uncertain and $notAssessed not assessed.';
+    final intl.NumberFormat missingNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String missingString = missingNumberFormat.format(missing);
+    final intl.NumberFormat notAssessedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String notAssessedString = notAssessedNumberFormat.format(
+      notAssessed,
+    );
+
+    return 'Outside the diagram: $missingString missing/uncertain and $notAssessedString not assessed.';
   }
 
   @override
@@ -1083,7 +1230,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String learnProgress(int correct, int total) {
-    return '$correct of $total exercises right';
+    final intl.NumberFormat correctNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String correctString = correctNumberFormat.format(correct);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return '$correctString of $totalString exercises right';
   }
 
   @override
@@ -1091,7 +1245,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String glossarySubtitle(int count) {
-    return '$count terms, in Portuguese and English';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString terms, in Portuguese and English';
   }
 
   @override
@@ -1242,12 +1400,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String sitesCount(int count) {
-    return '$count sites';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString sites';
   }
 
   @override
   String sequencesCount(int count) {
-    return '$count sequences';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString sequences';
   }
 
   @override
@@ -1376,7 +1542,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String annotInstalledOk(String name, int records) {
-    return 'Package \"$name\" installed ($records records).';
+    final intl.NumberFormat recordsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String recordsString = recordsNumberFormat.format(records);
+
+    return 'Package \"$name\" installed ($recordsString records).';
   }
 
   @override
@@ -1434,7 +1604,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String sourcesMore(int count) {
-    return '… and $count more';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '… and $countString more';
   }
 
   @override
@@ -1488,7 +1662,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String vaultPasswordShort(int min) {
-    return 'Use at least $min characters.';
+    final intl.NumberFormat minNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String minString = minNumberFormat.format(min);
+
+    return 'Use at least $minString characters.';
   }
 
   @override
@@ -1587,12 +1766,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String reproOk(int total) {
-    return 'Reproduced: same ID and $total of $total identical outputs (SHA-256).';
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return 'Reproduced: same ID and $totalString of $totalString identical outputs (SHA-256).';
   }
 
   @override
   String reproPartial(int ok, int total) {
-    return '$ok of $total outputs identical.';
+    final intl.NumberFormat okNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String okString = okNumberFormat.format(ok);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return '$okString of $totalString outputs identical.';
   }
 
   @override
@@ -1664,12 +1855,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String familySamples(int count, int max) {
-    return 'Samples ($count of at most $max)';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+
+    return 'Samples ($countString of at most $maxString)';
   }
 
   @override
   String familyTooMany(int max) {
-    return 'Choose 2 to $max samples.';
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+
+    return 'Choose 2 to $maxString samples.';
   }
 
   @override
@@ -1768,7 +1972,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String rohSummary(int runs, String mb, String froh) {
-    return '$runs runs · $mb Mb · F_ROH $froh';
+    final intl.NumberFormat runsNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String runsString = runsNumberFormat.format(runs);
+
+    return '$runsString runs · $mb Mb · F_ROH $froh';
   }
 
   @override
@@ -1823,7 +2032,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String trioTruncated(int max) {
-    return 'Showing the first $max events (the counts above are complete).';
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+
+    return 'Showing the first $maxString events (the counts above are complete).';
   }
 
   @override
@@ -1846,7 +2060,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String familyListTitle(int count) {
-    return 'Family: $count samples';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Family: $countString samples';
   }
 
   @override
@@ -1861,7 +2079,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String logFamily(int count) {
-    return 'Family and populations: $count samples';
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Family and populations: $countString samples';
   }
 
   @override
@@ -1872,4 +2094,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trioEventError => 'Mendelian error';
+
+  @override
+  String get storagePersistent => 'Persistent storage granted';
+
+  @override
+  String get storageNotPersistent => 'The browser may delete this site\'s data';
+
+  @override
+  String get storagePersistentHint =>
+      'Your data stays only in this browser. If space runs out, some browsers delete site data; to keep a copy, use Export project (.genoz).';
+
+  @override
+  String get obSkip => 'Skip';
+
+  @override
+  String get obNext => 'Next';
+
+  @override
+  String get obStart => 'Get started';
+
+  @override
+  String get obDemo => 'Try it with fictional data';
+
+  @override
+  String get obDemoProject => 'Example';
+
+  @override
+  String get ob1Title => 'Compare, explore and learn';
+
+  @override
+  String get ob1Body =>
+      'Genoz reads VCF files and ancestry test files, compares samples, shows data quality, genes and what public databases say — and teaches genetics with fictional data.';
+
+  @override
+  String get ob2Title => 'Everything stays on your device';
+
+  @override
+  String get ob2Body =>
+      'Files are processed right here: the Android app does not even have internet permission, and the website sends nothing. You can check it in Check privacy and protect projects with a password.';
+
+  @override
+  String get ob3Title => 'Education and research — not a diagnosis';
+
+  @override
+  String get ob3Body =>
+      'Results depend on the quality of the files and do not replace medical tests or genetic counselling. Genoz does not classify variants: it shows what the sources say, always citing the source.';
+
+  @override
+  String get aboutOnboarding => 'See the introduction again';
 }

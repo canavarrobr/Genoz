@@ -3266,6 +3266,96 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Erro mendeliano'**
   String get trioEventError;
+
+  /// No description provided for @storagePersistent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Armazenamento persistente concedido'**
+  String get storagePersistent;
+
+  /// No description provided for @storageNotPersistent.
+  ///
+  /// In pt, this message translates to:
+  /// **'O navegador pode apagar os dados deste site'**
+  String get storageNotPersistent;
+
+  /// No description provided for @storagePersistentHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os dados ficam só neste navegador. Se faltar espaço, alguns navegadores apagam dados de sites; para ter uma cópia, use Exportar projeto (.genoz).'**
+  String get storagePersistentHint;
+
+  /// No description provided for @obSkip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pular'**
+  String get obSkip;
+
+  /// No description provided for @obNext.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próximo'**
+  String get obNext;
+
+  /// No description provided for @obStart.
+  ///
+  /// In pt, this message translates to:
+  /// **'Começar'**
+  String get obStart;
+
+  /// No description provided for @obDemo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Experimentar com dados fictícios'**
+  String get obDemo;
+
+  /// No description provided for @obDemoProject.
+  ///
+  /// In pt, this message translates to:
+  /// **'Exemplo'**
+  String get obDemoProject;
+
+  /// No description provided for @ob1Title.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compare, explore e aprenda'**
+  String get ob1Title;
+
+  /// No description provided for @ob1Body.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Genoz lê arquivos VCF e de testes de ancestralidade, compara amostras, mostra a qualidade dos dados, os genes e o que bancos públicos dizem — e ensina genética com dados fictícios.'**
+  String get ob1Body;
+
+  /// No description provided for @ob2Title.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tudo fica no seu aparelho'**
+  String get ob2Title;
+
+  /// No description provided for @ob2Body.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os arquivos são processados aqui mesmo: o app Android nem tem permissão de internet, e o site não envia nada. Você pode conferir em Verificar privacidade e proteger projetos com senha.'**
+  String get ob2Body;
+
+  /// No description provided for @ob3Title.
+  ///
+  /// In pt, this message translates to:
+  /// **'Educação e pesquisa — não é diagnóstico'**
+  String get ob3Title;
+
+  /// No description provided for @ob3Body.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os resultados dependem da qualidade dos arquivos e não substituem exames nem aconselhamento genético. O Genoz não classifica variantes: mostra o que as fontes dizem, sempre com a fonte.'**
+  String get ob3Body;
+
+  /// No description provided for @aboutOnboarding.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver a apresentação de novo'**
+  String get aboutOnboarding;
 }
 
 class _AppLocalizationsDelegate

@@ -12,6 +12,7 @@
 
 mod analysis;
 mod anot;
+mod bench;
 mod family_cmd;
 mod repro;
 
@@ -96,6 +97,8 @@ enum Command {
     CompareChip(analysis::ChipCompareArgs),
     /// Cria o índice .fai de um FASTA (igual ao `samtools faidx`).
     Faidx { fasta: PathBuf },
+    /// Benchmark reproduzível com dados sintéticos (tempos de cada etapa)
+    Bench(bench::BenchArgs),
     /// Família e populações: parentesco, ROH, trio (VCF multiamostra com chamada conjunta)
     Family(family_cmd::FamilyArgs),
     /// Relatório HTML autocontido ou PDF de uma comparação
@@ -228,6 +231,7 @@ fn run(cli: Cli) -> Result<ExitCode, GenozError> {
         Command::Export(args) => analysis::export_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::Density(args) => analysis::density_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::CompareChip(args) => analysis::chip_compare_cmd(args).map(|()| ExitCode::SUCCESS),
+        Command::Bench(args) => bench::bench_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::Family(args) => family_cmd::family_cmd(args).map(|()| ExitCode::SUCCESS),
         Command::Report(args) => repro::report_cmd(args),
         Command::Verify { result } => repro::verify_cmd(&result),

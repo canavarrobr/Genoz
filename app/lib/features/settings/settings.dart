@@ -27,6 +27,7 @@ class AppSettings {
     this.lockAfterSeconds = 60,
     this.failedAttempts = 0,
     this.lockedUntil,
+    this.onboardingDone = true,
   });
 
   final ThemeMode themeMode;
@@ -42,6 +43,10 @@ class AppSettings {
   final int failedAttempts;
   final DateTime? lockedUntil;
 
+  /// Apresentação inicial já vista. Instalação nova (sem ajustes.json) = `false`;
+  /// ajustes antigos sem o campo = `true` (quem atualiza não revê a apresentação).
+  final bool onboardingDone;
+
   bool get lockEnabled => pin != null;
 
   AppSettings copyWith({
@@ -53,6 +58,7 @@ class AppSettings {
     int? lockAfterSeconds,
     int? failedAttempts,
     DateTime? Function()? lockedUntil,
+    bool? onboardingDone,
   }) => AppSettings(
     themeMode: themeMode ?? this.themeMode,
     locale: locale != null ? locale() : this.locale,
@@ -62,6 +68,7 @@ class AppSettings {
     lockAfterSeconds: lockAfterSeconds ?? this.lockAfterSeconds,
     failedAttempts: failedAttempts ?? this.failedAttempts,
     lockedUntil: lockedUntil != null ? lockedUntil() : this.lockedUntil,
+    onboardingDone: onboardingDone ?? this.onboardingDone,
   );
 
   Map<String, Object?> toJson() => {
@@ -74,6 +81,7 @@ class AppSettings {
     'lock_after_seconds': lockAfterSeconds,
     'failed_attempts': failedAttempts,
     'locked_until': lockedUntil?.toUtc().toIso8601String(),
+    'onboarding_done': onboardingDone,
   };
 
   /// Lê o JSON tolerando campos ausentes ou inválidos (volta ao padrão de cada um).
@@ -91,12 +99,14 @@ class AppSettings {
       lockAfterSeconds: lockDelayOptions.contains(delay) ? delay! : 60,
       failedAttempts: as<int>(j['failed_attempts']) ?? 0,
       lockedUntil: DateTime.tryParse(as<String>(j['locked_until']) ?? ''),
+      onboardingDone: as<bool>(j['onboarding_done']) ?? true,
     );
   }
 
   static Future<AppSettings> load(BlobStore blobs) async {
     try {
-      if (!await blobs.exists(settingsFile)) return const AppSettings();
+      // Primeira abertura: mostra a apresentação.
+      if (!await blobs.exists(settingsFile)) return const AppSettings(onboardingDone: false);
       final json = jsonDecode(await blobs.readString(settingsFile));
       return json is Map<String, Object?> ? AppSettings.fromJson(json) : const AppSettings();
     } catch (_) {
@@ -118,6 +128,8 @@ class SettingsController extends Notifier<AppSettings> {
     state = next;
     await _blobs.writeBytes(settingsFile, Uint8List.fromList(utf8.encode(jsonEncode(next.toJson()))));
   }
+
+  Future<void> setOnboardingDone() => _save(state.copyWith(onboardingDone: true));
 
   Future<void> setThemeMode(ThemeMode mode) => _save(state.copyWith(themeMode: mode));
 

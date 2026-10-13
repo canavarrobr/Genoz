@@ -20,7 +20,8 @@
   "@filesCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -85,7 +86,8 @@
   "@samplesCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -93,7 +95,8 @@
   "@variantsCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -117,13 +120,16 @@
   "@recordsSummary": {
     "placeholders": {
       "ok": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "read": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "rejected": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -131,10 +137,12 @@
   "@multiallelicSummary": {
     "placeholders": {
       "multi": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "split": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -142,13 +150,16 @@
   "@filterSummary": {
     "placeholders": {
       "pass": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "failed": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "missing": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -171,10 +182,12 @@
   "@problemsCount": {
     "placeholders": {
       "errors": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "warnings": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -184,7 +197,8 @@
   "@lineNumber": {
     "placeholders": {
       "n": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -297,7 +311,8 @@
   "@rowsCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -342,7 +357,8 @@
   "@exportFiltered": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -350,7 +366,8 @@
   "@exportDone": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -397,7 +414,8 @@
         "type": "String"
       },
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -464,7 +482,8 @@
   "@checkOwnSite": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -472,7 +491,8 @@
   "@checkExternal": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -485,7 +505,8 @@
   "@webTooLargeHint": {
     "placeholders": {
       "mb": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -508,7 +529,8 @@
   "@minutes": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -539,7 +561,8 @@
   "@lockWait": {
     "placeholders": {
       "seconds": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -552,7 +575,8 @@
   "@pinDigitsEntered": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -576,7 +600,8 @@
         "type": "String"
       },
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -605,7 +630,8 @@
         "type": "String"
       },
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -614,10 +640,12 @@
   "@regionShowing": {
     "placeholders": {
       "shown": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "total": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -625,7 +653,8 @@
   "@regionCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -641,16 +670,20 @@
         "type": "String"
       },
       "onlyA": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "both": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "diff": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "onlyB": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -667,10 +700,12 @@
   "@vennBreakdown": {
     "placeholders": {
       "same": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "diff": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -678,10 +713,12 @@
   "@vennOutside": {
     "placeholders": {
       "missing": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "notAssessed": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -692,10 +729,12 @@
   "@learnProgress": {
     "placeholders": {
       "correct": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       },
       "total": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -704,7 +743,8 @@
   "@glossarySubtitle": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -799,7 +839,8 @@
   "@sitesCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -807,7 +848,8 @@
   "@sequencesCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -866,7 +908,8 @@
         "type": "String"
       },
       "records": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -916,7 +959,8 @@
   "@sourcesMore": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern"
       }
     }
   },
@@ -945,7 +989,14 @@
   "vaultPassword": "Senha",
   "vaultPasswordRepeat": "Repita a senha",
   "vaultPasswordShort": "Use pelo menos {min} caracteres.",
-  "@vaultPasswordShort": {"placeholders": {"min": {"type": "int"}}},
+  "@vaultPasswordShort": {
+    "placeholders": {
+      "min": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "vaultPasswordMismatch": "As senhas não são iguais.",
   "vaultLossWarning": "Se você esquecer a senha, os dados não podem ser recuperados — por ninguém, nem pelo Genoz. Anote-a num lugar seguro.",
   "vaultLossAccept": "Entendi: senha perdida = dados perdidos",
@@ -960,10 +1011,22 @@
   "vaultExported": "Projeto exportado.",
   "vaultProtected": "Projeto protegido com senha.",
   "vaultImported": "Projeto \"{name}\" importado.",
-  "@vaultImported": {"placeholders": {"name": {"type": "String"}}},
+  "@vaultImported": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "vaultOpened": "Projeto aberto. Para cifrar de novo, use \"Proteger com senha\".",
   "vaultFailed": "Não foi possível concluir: {detail}",
-  "@vaultFailed": {"placeholders": {"detail": {"type": "String"}}},
+  "@vaultFailed": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
   "logVaultImported": "Projeto importado de um arquivo .genoz",
   "logVaultOpened": "Projeto aberto com a senha",
   "logVaultExported": "Projeto exportado (.genoz, cifrado)",
@@ -972,14 +1035,38 @@
   "reportPdf": "Relatório PDF",
   "reportSaved": "Relatório salvo.",
   "logReport": "Relatório {format} gerado",
-  "@logReport": {"placeholders": {"format": {"type": "String"}}},
+  "@logReport": {
+    "placeholders": {
+      "format": {
+        "type": "String"
+      }
+    }
+  },
   "reproVerify": "Verificar reprodutibilidade",
   "reproRunning": "Conferindo as entradas e refazendo a análise…",
   "reproTitle": "Reprodutibilidade",
   "reproOk": "Reproduzida: mesmo ID e {total} de {total} saídas idênticas (SHA-256).",
-  "@reproOk": {"placeholders": {"total": {"type": "int"}}},
+  "@reproOk": {
+    "placeholders": {
+      "total": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "reproPartial": "{ok} de {total} saídas idênticas.",
-  "@reproPartial": {"placeholders": {"ok": {"type": "int"}, "total": {"type": "int"}}},
+  "@reproPartial": {
+    "placeholders": {
+      "ok": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "total": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "reproInputs": "Entradas",
   "reproOutputs": "Saídas",
   "reproInputOk": "SHA-256 confere",
@@ -989,22 +1076,52 @@
   "reproIdDiffers": "O ID da reexecução é diferente do original.",
   "reproNotRun": "As entradas não conferem: a reexecução não provaria nada.",
   "reproFailed": "A reexecução falhou: {detail}",
-  "@reproFailed": {"placeholders": {"detail": {"type": "String"}}},
+  "@reproFailed": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
   "reproIdentical": "idêntica",
   "reproDifferent": "diferente",
   "reproMissing": "ausente",
   "reproExplain": "A análise foi refeita numa pasta temporária com os mesmos arquivos e parâmetros, e cada saída comparada pelo SHA-256 com o manifesto. A análise salva não muda.",
   "logRepro": "Reprodutibilidade verificada: {result}",
-  "@logRepro": {"placeholders": {"result": {"type": "String"}}},
+  "@logRepro": {
+    "placeholders": {
+      "result": {
+        "type": "String"
+      }
+    }
+  },
   "familyTitle": "Família e populações",
   "familyIntro": "Parentesco, trechos de homozigose e herança num trio, a partir de um VCF com várias pessoas chamadas juntas (chamada conjunta).",
   "familyNeedsJoint": "Para VCFs de uma pessoa só, use Comparar A × B: neles, ausência não é referência, e o parentesco sairia errado.",
   "familyNoMultiSample": "Nenhum VCF deste projeto tem 2 ou mais amostras.",
   "familyFile": "Arquivo",
   "familySamples": "Amostras ({count} de no máximo {max})",
-  "@familySamples": {"placeholders": {"count": {"type": "int"}, "max": {"type": "int"}}},
+  "@familySamples": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "familyTooMany": "Escolha de 2 a {max} amostras.",
-  "@familyTooMany": {"placeholders": {"max": {"type": "int"}}},
+  "@familyTooMany": {
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "familyTrioOptional": "Trio (opcional)",
   "familyChild": "Filho(a)",
   "familyFather": "Pai",
@@ -1018,7 +1135,13 @@
   "familyTabTrio": "Trio",
   "familyTabShared": "Interseções",
   "familySitesUsed": "{count} SNVs autossômicos usados",
-  "@familySitesUsed": {"placeholders": {"count": {"type": "String"}}},
+  "@familySitesUsed": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "relDuplicate": "Mesma pessoa ou gêmeos idênticos",
   "relParentOffspring": "Pai/mãe e filho(a)",
   "relFullSiblings": "Irmãos",
@@ -1036,14 +1159,45 @@
   "familyPairs": "Pares",
   "rohIntro": "Runs of homozygosity (ROH) são trechos longos em que as duas cópias do genoma são iguais. Aparecem quando os pais têm ancestrais em comum, próximos ou distantes, e ajudam a estudar a história das populações. Conteúdo educativo, não clínico.",
   "rohSummary": "{runs} trechos · {mb} Mb · F_ROH {froh}",
-  "@rohSummary": {"placeholders": {"runs": {"type": "int"}, "mb": {"type": "String"}, "froh": {"type": "String"}}},
+  "@rohSummary": {
+    "placeholders": {
+      "runs": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "mb": {
+        "type": "String"
+      },
+      "froh": {
+        "type": "String"
+      }
+    }
+  },
   "rohNone": "Nenhum trecho longo de homozigose.",
   "rohUnavailable": "O VCF não está ordenado por posição: ROH não foi calculado.",
   "rohMethod": "Trechos de ≥ 1000 kb com ≥ 100 SNPs, até 1 heterozigoto e 5 ausentes (inspirado no plink --homozyg). Com poucas pessoas no VCF há menos SNPs por trecho.",
   "trioRoles": "Filho(a): {child} · Pai: {father} · Mãe: {mother}",
-  "@trioRoles": {"placeholders": {"child": {"type": "String"}, "father": {"type": "String"}, "mother": {"type": "String"}}},
+  "@trioRoles": {
+    "placeholders": {
+      "child": {
+        "type": "String"
+      },
+      "father": {
+        "type": "String"
+      },
+      "mother": {
+        "type": "String"
+      }
+    }
+  },
   "trioSites": "{count} sítios com os três genotipados",
-  "@trioSites": {"placeholders": {"count": {"type": "String"}}},
+  "@trioSites": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "trioConsistent": "Consistentes com herança mendeliana",
   "trioDeNovo": "Candidatas a de novo",
   "trioOtherErrors": "Outros erros mendelianos",
@@ -1054,21 +1208,69 @@
   "trioDeNovoExplain": "Candidata a de novo: o(a) filho(a) tem uma variante que nenhum dos pais tem. Em dados reais, a maioria é erro de chamada ou de cobertura — confira QUAL, DP e GQ antes de qualquer conclusão. Uma taxa alta de inconsistência pode indicar troca de amostra ou pais biológicos diferentes dos indicados; só um teste oficial confirma.",
   "trioEvents": "Eventos",
   "trioTruncated": "Mostrando os primeiros {max} eventos (as contagens acima são completas).",
-  "@trioTruncated": {"placeholders": {"max": {"type": "int"}}},
+  "@trioTruncated": {
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "trioNone": "Nenhum trio foi indicado nesta análise.",
   "trioGenotypes": "filho(a) {child} · pai {father} · mãe {mother}",
-  "@trioGenotypes": {"placeholders": {"child": {"type": "String"}, "father": {"type": "String"}, "mother": {"type": "String"}}},
+  "@trioGenotypes": {
+    "placeholders": {
+      "child": {
+        "type": "String"
+      },
+      "father": {
+        "type": "String"
+      },
+      "mother": {
+        "type": "String"
+      }
+    }
+  },
   "sharedIntro": "Quais amostras carregam o alelo alternativo de cada variante: as combinações mais frequentes (estilo UpSet).",
   "sharedCarriers": "Variantes por amostra",
   "sharedCombos": "Combinações mais frequentes",
   "familyListTitle": "Família: {count} amostras",
-  "@familyListTitle": {"placeholders": {"count": {"type": "int"}}},
+  "@familyListTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "familyListTrio": "com trio",
   "familySynthetic": "Gerar família fictícia",
   "familySyntheticHint": "VCF com 7 pessoas fictícias (avô, pai, mãe, dois filhos, uma pessoa sem parentesco e uma duplicata) para experimentar Família e populações.",
   "logFamily": "Família e populações: {count} amostras",
-  "@logFamily": {"placeholders": {"count": {"type": "int"}}},
+  "@logFamily": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "familyQuality": "Portão de qualidade (chamada reprovada = ausente)",
   "trioEventDeNovo": "Candidata a de novo",
-  "trioEventError": "Erro mendeliano"
+  "trioEventError": "Erro mendeliano",
+  "storagePersistent": "Armazenamento persistente concedido",
+  "storageNotPersistent": "O navegador pode apagar os dados deste site",
+  "storagePersistentHint": "Os dados ficam só neste navegador. Se faltar espaço, alguns navegadores apagam dados de sites; para ter uma cópia, use Exportar projeto (.genoz).",
+  "obSkip": "Pular",
+  "obNext": "Próximo",
+  "obStart": "Começar",
+  "obDemo": "Experimentar com dados fictícios",
+  "obDemoProject": "Exemplo",
+  "ob1Title": "Compare, explore e aprenda",
+  "ob1Body": "O Genoz lê arquivos VCF e de testes de ancestralidade, compara amostras, mostra a qualidade dos dados, os genes e o que bancos públicos dizem — e ensina genética com dados fictícios.",
+  "ob2Title": "Tudo fica no seu aparelho",
+  "ob2Body": "Os arquivos são processados aqui mesmo: o app Android nem tem permissão de internet, e o site não envia nada. Você pode conferir em Verificar privacidade e proteger projetos com senha.",
+  "ob3Title": "Educação e pesquisa — não é diagnóstico",
+  "ob3Body": "Os resultados dependem da qualidade dos arquivos e não substituem exames nem aconselhamento genético. O Genoz não classifica variantes: mostra o que as fontes dizem, sempre com a fonte.",
+  "aboutOnboarding": "Ver a apresentação de novo"
 }

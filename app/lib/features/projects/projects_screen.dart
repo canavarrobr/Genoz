@@ -6,6 +6,8 @@ import '../../core/genoz_core.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../persistence/project_repository.dart';
 import '../../ui/brand.dart';
+import '../onboarding/onboarding_screen.dart';
+import '../settings/settings.dart';
 import '../vault/vault_ui.dart';
 import 'project_dialogs.dart';
 
@@ -15,6 +17,8 @@ class ProjectsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
+    // Primeira abertura: a apresentação antes da lista de projetos.
+    if (!ref.watch(settingsProvider.select((s) => s.onboardingDone))) return const OnboardingScreen();
     final projects = ref.watch(projectsProvider);
     return Scaffold(
       appBar: AppBar(

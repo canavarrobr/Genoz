@@ -554,3 +554,21 @@ Testes: 113 Dart, 126 Rust (núcleo e CLI) + 6 da ponte. Decisões em [ADR-017](
 
 Testes: 118 Dart, 134 Rust (núcleo e CLI) + 7 da ponte. Decisões em [ADR-018](../adr/ADR-018-familia-e-populacoes.md).
 
+
+## Contrato do Módulo 13 — Lançamento 1.0 (antes de implementar)
+
+**Ajustes de escopo decididos pelo usuário (02/10/2026):** o site **não** será publicado no GitHub Pages por enquanto (continua compilado e testado no CI, pronto para publicar quando ele quiser). Release do APK e assinatura **autorizadas**: a chave já foi gerada e testada; a tag `v1.0.0` é criada assim que os 4 secrets estiverem no GitHub (o APK sai assinado; sem eles sairia com chave de depuração, e não queremos isso no 1.0).
+
+**Entregas:**
+- **Desempenho e limites:** benchmarks reproduzíveis (`genoz-cli bench`: VCF sintético de tamanho escolhido → tempos de importação, comparação, família e cofre, memória de pico no PC) + medições no emulador Android e no navegador com os mesmos arquivos; documento `docs/LIMITES.md` com números e limites (400 MB por arquivo na Web, tamanho de VCF prático no celular, o que fica fora: BAM/CRAM).
+- **Acessibilidade:** testes automáticos com as diretrizes do Flutter (alvos de toque ≥ 48 dp, rótulos em botões, contraste de texto) nas telas principais em claro e escuro; correções do que falhar; textos com fonte grande (130%) sem estourar.
+- **Traduções finais:** pt-BR e inglês completos (nenhuma chave faltando, nenhum texto fixo em português nas telas); mensagens do núcleo continuam em português (limite documentado).
+- **Apresentação inicial (onboarding):** 3 telas na primeira abertura — o que o Genoz faz, tudo fica no aparelho, não é diagnóstico — com "Experimentar com dados fictícios"; pode ser revista em Sobre; guardada nos ajustes.
+- **Auditoria de dependências:** RustSec (`cargo audit`) no núcleo e na ponte, revisão das dependências Dart, lista de licenças de terceiros (nada GPL dentro do app), resultado em `docs/AUDITORIA.md`; verificação automática no CI.
+- **Auditoria de privacidade:** checklist com evidências (permissões do APK, CSP do site, nenhuma biblioteca de rede no app, tela "Verificar privacidade" com 0 conexões, cofre, apagar tudo, logs sem genótipos) em `docs/AUDITORIA.md`.
+- **Manual do usuário (PDF)** em português, com capturas de tela, gerado de um HTML do repositório (impressão do navegador em modo local), anexado ao release; a tela Sobre mostra privacidade e "não é diagnóstico" de forma clara.
+- **Versão 1.0.0** e notas de lançamento; tag `v1.0.0` (depois dos secrets).
+
+**Invariantes:** nada do que já funciona muda de resultado (IDs de análise e hashes dourados iguais); nada sai do aparelho.
+
+**Testes:** acessibilidade (diretrizes), onboarding (primeira vez × depois), traduções (chaves iguais nos dois idiomas), benchmarks executados e registrados, auditorias executadas no CI.

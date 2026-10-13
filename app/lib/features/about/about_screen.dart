@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../onboarding/onboarding_screen.dart';
 import '../../core/genoz_core.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../ui/brand.dart';
@@ -63,6 +64,13 @@ class AboutScreen extends ConsumerWidget {
             leading: const Icon(Icons.lock_outline),
             title: Text(l.privacyTitle),
             onTap: () => showPrivacyDialog(context),
+          ),
+          ListTile(
+            leading: const Icon(Icons.slideshow_outlined),
+            title: Text(l.aboutOnboarding),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const OnboardingScreen(again: true)),
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.description_outlined),

@@ -143,7 +143,7 @@ class _KinshipTab extends StatelessWidget {
                 backgroundColor: _kinColor(context, p.kinship),
                 child: Text(
                   p.kinship == null ? '?' : _fmt(context, math.max(0, p.kinship!), 2),
-                  style: TextStyle(fontSize: 11, color: (p.kinship ?? 0) > 0.2 ? Colors.white : null),
+                  style: TextStyle(fontSize: 11, color: _onColor(_kinColor(context, p.kinship))),
                 ),
               ),
             ),
@@ -153,6 +153,16 @@ class _KinshipTab extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Preto ou branco, o que tiver mais contraste com o fundo (WCAG).
+Color _onColor(Color bg) {
+  double contrast(Color a, Color b) {
+    final (la, lb) = (a.computeLuminance(), b.computeLuminance());
+    return (math.max(la, lb) + 0.05) / (math.min(la, lb) + 0.05);
+  }
+
+  return contrast(bg, Colors.white) >= contrast(bg, Colors.black) ? Colors.white : Colors.black;
 }
 
 /// Cor pelo φ: 0 → claro, 0,5 → azul-petróleo (negativos ficam claros).
@@ -209,8 +219,8 @@ class _KinshipMatrix extends StatelessWidget {
                           : Text(
                               r.pair(i, j)?.kinship == null ? '·' : _fmt(context, math.max(0, r.pair(i, j)!.kinship!), 2),
                               style: TextStyle(
-                                fontSize: 10,
-                                color: (r.pair(i, j)?.kinship ?? 0) > 0.2 ? Colors.white : null,
+                                fontSize: 11,
+                                color: _onColor(_kinColor(context, r.pair(i, j)?.kinship)),
                               ),
                             ),
                     ),

@@ -2,9 +2,12 @@ name: Núcleo Rust
 
 on:
   push:
-    paths: ["rust/**", "test_fixtures/**", ".github/workflows/rust.yml"]
+    paths: ["rust/**", "app/rust/Cargo.lock", "test_fixtures/**", ".github/workflows/rust.yml"]
   pull_request:
-    paths: ["rust/**", "test_fixtures/**", ".github/workflows/rust.yml"]
+    paths: ["rust/**", "app/rust/Cargo.lock", "test_fixtures/**", ".github/workflows/rust.yml"]
+  # Alertas novos do RustSec aparecem sem mudança no código: confere toda segunda-feira.
+  schedule:
+    - cron: "0 9 * * 1"
 
 jobs:
   test:
@@ -44,3 +47,18 @@ jobs:
           workspaces: rust
       - run: cargo build -p genoz_core --target wasm32-unknown-unknown --release
         working-directory: rust
+
+  auditoria:
+    name: auditoria de dependências (RustSec)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit
+      - name: Núcleo e CLI
+        run: cargo audit --deny warnings
+        working-directory: rust
+      - name: Ponte do app
+        run: cargo audit --deny warnings
+        working-directory: app/rust
